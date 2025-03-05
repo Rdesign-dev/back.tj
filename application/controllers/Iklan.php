@@ -36,10 +36,13 @@ class Iklan extends CI_Controller {
     public function index()
     {
         $data['title'] = "Iklan Promosi";
-        $data['iklans'] = $this->db->select('id, title, description, image_name')
+        $data['iklans'] = $this->db->select('id, title, description, image_name, status') // tadi kurang column status na teu kabawa
                                    ->from('promo')
                                    ->get()
                                    ->result_array();
+		// $test = json_encode($data['iklans']);
+		// var_dump($test);
+		// die();
         $this->template->load('templates/dashboard', 'iklan/index', $data);
     }
 
