@@ -24,25 +24,24 @@
                 <?= $this->session->flashdata('pesan'); ?>
                 <?php echo form_open_multipart('cabang/tambah_save', array('id' => 'memberForm')); ?>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="kodecabang">Kode Cabang</label>
+                    <label class="col-md-4 text-md-right" for="branch_code">Kode Cabang</label>
                     <div class="col-md-6">
-                        <input value="<?= set_value('kodecabang'); ?>" type="text" id="kodecabang" name="kodecabang" class="form-control" placeholder="Masukkan Kode Cabang">
-                        <?= form_error('kodecabang', '<span class="text-danger small">', '</span>'); ?>
+                        <input value="<?= set_value('branch_code'); ?>" type="text" id="branch_code" name="branch_code" class="form-control" placeholder="Masukkan Kode Cabang">
+                        <?= form_error('branch_code', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="namacabang">Nama Cabang</label>
+                    <label class="col-md-4 text-md-right" for="branch_name">Nama Cabang</label>
                     <div class="col-md-6">
-                        <input type="text" id="namacabang" name="namacabang" class="form-control" placeholder="namacabang">
-                        <?= form_error('namacabang', '<span class="text-danger small">', '</span>'); ?>
+                        <input type="text" id="branch_name" name="branch_name" class="form-control" placeholder="Nama Cabang">
+                        <?= form_error('branch_name', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="nomor">Alamat</label>
+                    <label class="col-md-4 text-md-right" for="address">Alamat</label>
                     <div class="col-md-6">
-                        <textarea name="alamat" id="alamat" cols="30" rows="10" class="form-control"></textarea>
-                        <?= form_error('alamat', '<span class="text-danger small">', '</span>'); ?>
+                        <textarea name="address" id="address" cols="30" rows="10" class="form-control"></textarea>
+                        <?= form_error('address', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
 

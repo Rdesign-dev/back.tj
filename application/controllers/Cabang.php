@@ -25,26 +25,20 @@ class Cabang extends CI_Controller {
 
     public function tambah_save(){
         //validasi server side
-        $this->form_validation->set_rules('kodecabang','Kode Cabang','required');
-        $this->form_validation->set_rules('namacabang','Nama Cabang','required');
-        $this->form_validation->set_rules('alamat','Alamat','required');
+        $this->form_validation->set_rules('branch_code','Kode Cabang','required');
+        $this->form_validation->set_rules('branch_name','Nama Cabang','required');
+        $this->form_validation->set_rules('address','Alamat','required');
         if($this->form_validation->run() == FALSE){
-            //validasi menemukan error
             $data['title'] = "Tambah cabang";
             $this->template->load('templates/dashboard', 'cabang/add', $data);
         } else {
-                $kodecabang = $this->input->post('kodecabang');
-                $namacabang = $this->input->post('namacabang');
-                $alamat = $this->input->post('alamat');
-                $jumlahtransaksi = 0;
                 $data = array(
-                    'kodecabang' => $kodecabang,
-                    'namacabang' => $namacabang,
-                    'alamat' => $alamat,
-                    'jumlahtransaksi' => $jumlahtransaksi,
+                    'branch_code' => $this->input->post('branch_code'),
+                    'branch_name' => $this->input->post('branch_name'),
+                    'address' => $this->input->post('address'),
+                    'transaction_count' => 0,
                 );
-                var_dump($data);
-                $this->db->insert('cabang',$data);
+                $this->db->insert('branch',$data);
                 $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>');
                 redirect(base_url('cabang'));
             }

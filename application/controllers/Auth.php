@@ -17,14 +17,14 @@ class Auth extends CI_Controller
     public function index()
     {
         if ($this->session->userdata('login_session')) {
-            $user_role = $this->session->userdata('login_session')['role'];
-            if ($user_role == 'cashier') {
+            $user_type = $this->session->userdata('login_session')['account_type']; // Changed from 'role' to 'account_type'
+            if ($user_type == 'cashier') {
                 redirect('dashboard/kasir');
-            } elseif ($user_role == 'super_admin') {
+            } elseif ($user_type == 'super_admin') {
                 redirect('dashboard');
-            } elseif($user_role == 'branch_admin'){
+            } elseif($user_type == 'branch_admin'){
                 redirect('dashboard/cabang');
-            } elseif($user_role == 'admin_central'){
+            } elseif($user_type == 'admin_central'){
                 redirect('dashboard');
             }
         }
@@ -54,7 +54,7 @@ class Auth extends CI_Controller
                             'username' => $user_db['username'],
                             'name' => $user_db['Name'],
                             'photo' => $user_db['photo'],
-                            'account_type' => $user_db['account_type'],
+                            'account_type' => $user_db['account_type'], // This is what we're checking
                             'branch_id' => $user_db['branch_id']
                         ];
                         

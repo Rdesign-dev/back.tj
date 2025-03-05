@@ -1,9 +1,9 @@
-    <?php
+<?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Cabang_model extends CI_Model {
 
-    public $table = "cabang";
+    public $table = "branch";  // Ensure the table name is correct
     public function __construct() {
         parent::__construct();
     }
@@ -23,8 +23,8 @@ class Cabang_model extends CI_Model {
         // Insert data ke tabel 'produk'
         return $this->db->insert($this->table, $data);
     }
-    public function updateJumlahTransaksi($nocabang, $totalTransaksi) {
-        $this->db->where('nocabang', $nocabang);
-        return $this->db->update('cabang', array('jumlahtransaksi' => $totalTransaksi));
+    public function updateJumlahTransaksi($branch_code, $totalTransaksi) {
+        $this->db->where('branch_code', $branch_code);
+        return $this->db->update('branch', array('transaction_count' => $totalTransaksi));
     }
 }

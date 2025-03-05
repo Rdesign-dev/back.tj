@@ -48,8 +48,10 @@
                                 <a onclick="return confirm('Yakin ingin menghapus data?')" href="<?= base_url('iklan/delete/') . $iklan['id'] ?>" class="btn btn-circle btn-sm btn-danger">
                                     <i class="fa fa-fw fa-trash"></i>
                                 </a>
+                                <!-- Debug: <?= isset($iklan['status']) ? $iklan['status'] : 'not set' ?> -->
                                 <a href="<?= base_url('iklan/toggle_status/') . $iklan['id'] ?>" 
-                                   class="btn btn-circle btn-sm <?= isset($iklan['status']) && $iklan['status'] == 'Active' ? 'btn-success' : 'btn-secondary' ?>">
+                                   class="btn btn-circle btn-sm <?= isset($iklan['status']) && $iklan['status'] == 'Active' ? 'btn-success' : 'btn-danger' ?>"
+                                   data-toggle="tooltip" title="Status: <?= isset($iklan['status']) ? $iklan['status'] : 'inactive' ?>">
                                     <i class="fa fa-fw <?= isset($iklan['status']) && $iklan['status'] == 'Active' ? 'fa-toggle-on' : 'fa-toggle-off' ?>"></i>
                                 </a>
                             </td>
@@ -64,3 +66,8 @@
         </table>
     </div>
 </div>
+<script>
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>

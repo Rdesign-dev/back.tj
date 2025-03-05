@@ -39,10 +39,10 @@
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
-                            <td><?= $cabang['kodecabang']; ?></td>
-                            <td><?= $cabang['namacabang']; ?></td>
-                            <td><?= $cabang['alamat']; ?></td>
-                            <td><?= $cabang['jumlahtransaksi'];?></td>
+                            <td><?= $cabang['branch_code']; ?></td>
+                            <td><?= $cabang['branch_name']; ?></td>
+                            <td><?= $cabang['address']; ?></td>
+                            <td><?= $cabang['transaction_count'];?></td>
                             <td><a href="<?= base_url("cabang/getTransaksiCabang/{$cabang['id']}")?>" class="btn btn-primary"><i class="fas fa-info-circle"></i> Detail</a>
                         </tr>
                     <?php endforeach;
