@@ -14,12 +14,11 @@ function is_admin()
     $ci = get_instance();
     $login_session = $ci->session->userdata('login_session');
     
-    if (!$login_session) {
+    if (!$login_session || !isset($login_session['account_type'])) {
         return false;
     }
     
-    return isset($login_session['account_type']) && 
-           $login_session['account_type'] == 'super_admin';
+    return $login_session['account_type'] === 'super_admin';
 }
 
 function set_pesan($pesan, $tipe = true)

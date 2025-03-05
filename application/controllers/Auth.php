@@ -50,31 +50,29 @@ class Auth extends CI_Controller
                         redirect('auth');
                     } else {
                         $userdata = [
-                            'id'  => $user_db['id'],
+                            'id' => $user_db['id'],
                             'username' => $user_db['username'],
-                            'password' => $user_db['password'],
-                            'account_type' => $user_db['account_type'], // Mengubah 'role' menjadi 'account_type'
-                            'branch_id' => $user_db['branch_id'], // Menambahkan branch_id langsung dari user_db
-                            'name' => $user_db['Name'], // Menambahkan nama user
-                            'photo' => $user_db['photo'], // Menambahkan foto user
-                            'timestamp' => time()
+                            'name' => $user_db['Name'],
+                            'photo' => $user_db['photo'],
+                            'account_type' => $user_db['account_type'],
+                            'branch_id' => $user_db['branch_id']
                         ];
+                        
+                        $this->session->set_userdata('login_session', $userdata);
+                        
                         if ($user_db['account_type'] == 'cashier') {
                             $branch_id = $this->auth->get_branch_id($user_db['id']);
                             $branch_name = $this->auth->get_name_id($user_db['id']);
                             $userdata['idcabang'] = $branch_id;
                             $userdata['namacabang'] = $branch_name;
-                            $this->session->set_userdata('login_session', $userdata);
                             redirect('dashboard/kasir'); // Sesuaikan dengan URL dashboard kasir Anda
                         } else if($user_db['account_type'] == 'branch_admin') {
                             $branch_id = $this->auth->get_branch_id($user_db['id']);
                             $branch_name = $this->auth->get_name_id($user_db['id']);
                             $userdata['idcabang'] = $branch_id;
                             $userdata['namacabang'] = $branch_name;
-                            $this->session->set_userdata('login_session', $userdata);
                             redirect('dashboard/cabang');
                         } else {
-                            $this->session->set_userdata('login_session', $userdata);
                             redirect('dashboard');
                         }
                     }

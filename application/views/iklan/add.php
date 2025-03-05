@@ -24,16 +24,23 @@
                 <?= $this->session->flashdata('pesan'); ?>
                 <?php echo form_open_multipart('iklan/tambah_save', array('id' => 'memberForm')); ?>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="link">Link Promosi</label>
+                    <label class="col-md-4 text-md-right" for="title">Nama Promo</label>
                     <div class="col-md-6">
-                        <input value="<?= set_value('link'); ?>" type="text" id="link" name="link" class="form-control" placeholder="Masukkan Link Iklan Promosi">
+                        <input value="<?= set_value('title'); ?>" type="text" id="title" name="title" class="form-control" placeholder="Masukkan Nama Promo">
                         <div id="error-message" class="text-danger small"></div>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="foto">Foto Iklan</label>
+                    <label class="col-md-4 text-md-right" for="description">Deskripsi</label>
                     <div class="col-md-6">
-                        <input type="file" id="foto" name="foto" class="form-control" placeholder="foto">
+                        <textarea id="description" name="description" class="form-control" placeholder="Masukkan Deskripsi Promo"><?= set_value('description'); ?></textarea>
+                        <div id="error-message" class="text-danger small"></div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="foto">Gambar Promo</label>
+                    <div class="col-md-6">
+                        <input type="file" id="foto" name="foto" class="form-control" accept="image/*">
                         <div id="error-message" class="text-danger small"></div>
                     </div>
                 </div>
@@ -57,34 +64,41 @@
     </div>
 </div>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var memberForm = document.getElementById('memberForm');
-        var linkInput = document.getElementById('link');
-        var fotoInput = document.getElementById('foto');
+document.addEventListener("DOMContentLoaded", function () {
+    var memberForm = document.getElementById('memberForm');
+    var titleInput = document.getElementById('title');
+    var descInput = document.getElementById('description');
+    var fotoInput = document.getElementById('foto');
 
-        memberForm.addEventListener("submit", function (event) {
-            if (!linkInput.value.trim()) {
-                event.preventDefault();
-                linkInput.classList.add("is-invalid");
-            } else {
-                linkInput.classList.remove("is-invalid");
-            }
+    memberForm.addEventListener("submit", function (event) {
+        let isValid = true;
 
-            if (!fotoInput.value.trim()) {
-                event.preventDefault();
-                fotoInput.classList.add("is-invalid");
-            } else {
-                fotoInput.classList.remove("is-invalid");
-            }
-        });
+        if (!titleInput.value.trim()) {
+            event.preventDefault();
+            titleInput.classList.add("is-invalid");
+            isValid = false;
+        }
 
-        linkInput.addEventListener("input", function () {
-            linkInput.classList.remove("is-invalid");
-        });
+        if (!descInput.value.trim()) {
+            event.preventDefault();
+            descInput.classList.add("is-invalid");
+            isValid = false;
+        }
 
-        fotoInput.addEventListener("input", function () {
-            fotoInput.classList.remove("is-invalid");
+        if (!fotoInput.value.trim()) {
+            event.preventDefault();
+            fotoInput.classList.add("is-invalid");
+            isValid = false;
+        }
+
+        return isValid;
+    });
+
+    [titleInput, descInput, fotoInput].forEach(input => {
+        input.addEventListener("input", function () {
+            this.classList.remove("is-invalid");
         });
     });
+});
 </script>
 

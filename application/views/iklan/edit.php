@@ -22,29 +22,31 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?= form_open_multipart('',[], ['id' => $iklan['id']]); ?>
-                <!-- Tambahkan input hidden untuk menyimpan ID member -->
+                <?= form_open_multipart('iklan/edit_iklan/' . $iklan['id'], [], ['id' => $iklan['id']]); ?>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="link">Link Promosi</label>
+                    <label class="col-md-4 text-md-right" for="title">Nama Promo</label>
                     <div class="col-md-6">
-                    <?php if ($iklan) : ?>
-                                <!-- Tampilkan nilai yang akan di-edit -->
-                        <input type="text" id="link" name="link" value="<?= set_value('link', $iklan['link']); ?>" class="form-control" placeholder="Masukkan Link Promosi">
-                        <?= form_error('link', '<span class="text-danger small">', '</span>'); ?>
-                        
+                        <input type="text" id="title" name="title" value="<?= set_value('title', $iklan['title']); ?>" class="form-control" placeholder="Masukkan Nama Promo">
+                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-3 text-md-right" for="foto">Foto</label>
+                    <label class="col-md-4 text-md-right" for="description">Deskripsi</label>
+                    <div class="col-md-6">
+                        <textarea id="description" name="description" class="form-control" placeholder="Masukkan Deskripsi Promo"><?= set_value('description', $iklan['description']); ?></textarea>
+                        <?= form_error('description', '<span class="text-danger small">', '</span>'); ?>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="foto">Gambar Promo</label>
                     <div class="col-md-6">
                         <div class="row">
                             <div class="col-6">
-                            <?php if ($iklan) : ?>
-                                <img src="https://terasjapan.com/fotoiklan/<?= $iklan['foto'] ?>" alt="User" class="rounded-circle shadow-sm img-thumbnail">
-                                <?php endif; ?>
+                                <img src="<?= base_url('../ImageTerasJapan/promo/' . $iklan['image_name']) ?>" alt="Promo Image" class="img-thumbnail">
                             </div>
                             <div class="col-6">
-                                <input type="file" name="foto" id="foto">
+                                <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
+                                <small class="text-muted">Biarkan kosong jika tidak ingin mengubah gambar</small>
                                 <?= form_error('foto', '<small class="text-danger">', '</small>'); ?>
                             </div>
                         </div>
@@ -57,12 +59,11 @@
                             <span class="text">Update</span>
                         </button>
                         <button type="reset" class="btn btn-secondary btn-icon-split">
-                        <span class="icon"><i class="fas fa-backspace"></i></span>
+                            <span class="icon"><i class="fas fa-backspace"></i></span>
                             <span class="text">Reset</span>
                         </button>
                     </div>
                 </div>
-                <?php endif; ?>
                 <?= form_close(); ?>
             </div>
         </div>

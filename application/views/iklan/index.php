@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col">
                 <h4 class="h5 align-middle m-0 font-weight-bold text-primary">
-                    Iklan Promosi
+                    Promo Mingguan
                 </h4>
             </div>
             <div class="col-auto">
@@ -13,7 +13,7 @@
                     <i class="fas fa-plus-circle"></i>
                     </span>
                     <span class="text">
-                        Tambah Iklan
+                        Tambah Promo
                     </span>
                 </a>
             </div>
@@ -24,8 +24,9 @@
             <thead>
                 <tr>
                     <th width="30">No.</th>
-                    <th>Link Iklan</th>
-                    <th>Foto Iklan</th>
+                    <th>Nama Promo</th>
+                    <th>Deskripsi</th>
+                    <th>Foto Promo</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -37,16 +38,26 @@
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
-                            <td><?= $iklan['link']; ?></td>
-                            <td><img src="https://terasjapan.com/fotoiklan/<?= $iklan['foto'] ?>" alt="" width="150px" height="100px"></td>
-                            <td><a href="<?= base_url('iklan/edit_iklan/') . $iklan['id'] ?>" class="btn btn-circle btn-sm btn-warning"><i class="fa fa-fw fa-edit"></i></a>
-                            <a onclick="return confirm('Yakin ingin menghapus data?')" href="<?= base_url('iklan/delete/') . $iklan['id'] ?>" class="btn btn-circle btn-sm btn-danger"><i class="fa fa-fw fa-trash"></i></a>
+                            <td><?= $iklan['title']; ?></td>
+                            <td><?= $iklan['description']; ?></td>
+                            <td><img src="<?= base_url('../ImageTerasJapan/promo/') . $iklan['image_name'] ?>" alt="" width="150px" height="100px"></td>
+                            <td>
+                                <a href="<?= base_url('iklan/edit_iklan/') . $iklan['id'] ?>" class="btn btn-circle btn-sm btn-warning">
+                                    <i class="fa fa-fw fa-edit"></i>
+                                </a>
+                                <a onclick="return confirm('Yakin ingin menghapus data?')" href="<?= base_url('iklan/delete/') . $iklan['id'] ?>" class="btn btn-circle btn-sm btn-danger">
+                                    <i class="fa fa-fw fa-trash"></i>
+                                </a>
+                                <a href="<?= base_url('iklan/toggle_status/') . $iklan['id'] ?>" 
+                                   class="btn btn-circle btn-sm <?= isset($iklan['status']) && $iklan['status'] == 'Active' ? 'btn-success' : 'btn-secondary' ?>">
+                                    <i class="fa fa-fw <?= isset($iklan['status']) && $iklan['status'] == 'Active' ? 'fa-toggle-on' : 'fa-toggle-off' ?>"></i>
+                                </a>
                             </td>
                         </tr>
                     <?php endforeach;
                     else : ?>
                     <tr>
-                        <td colspan="8" class="text-center">Silahkan tambahkan Iklan Promosi</td>
+                        <td colspan="8" class="text-center">Silahkan tambahkan Promo</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
