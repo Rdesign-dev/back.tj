@@ -101,7 +101,7 @@
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('blog'); ?>">
                 <i class="fas fa-blog"></i>
-                    <span>Blog</span>
+                    <span>Berita dan acara</span>
                 </a>
             </li>
             <li class="nav-item">
