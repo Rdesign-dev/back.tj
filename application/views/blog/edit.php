@@ -9,7 +9,7 @@
                         </h4>
                     </div>
                     <div class="col-auto">
-                        <a href="<?= base_url('voucher') ?>" class="btn btn-sm btn-secondary btn-icon-split">
+                        <a href="<?= base_url('blog') ?>" class="btn btn-sm btn-secondary btn-icon-split">
                             <span class="icon">
                                 <i class="fa fa-arrow-left"></i>
                             </span>
@@ -22,42 +22,47 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?= form_open_multipart('',[], ['id' => $blog['id']]); ?>
+                <?= form_open_multipart('blog/edit_blog/' . $blog['id'], [], ['id' => $blog['id']]); ?>
                 <div class="row form-group">
-                    <label class="col-md-3 text-md-right" for="foto">Foto</label>
+                    <label class="col-md-4 text-md-right" for="image">Gambar</label>
                     <div class="col-md-6">
                         <div class="row">
                             <div class="col-6">
-                            <?php if ($blog) : ?>
-                                <img src="https://terasjapan.com/fotoblog/<?= $blog['gambar'] ?>" alt="User" class="rounded-circle shadow-sm img-thumbnail">
-                                <?php endif; ?>
+                                <img src="<?= base_url('../ImageTerasJapan/news_event/') . $blog['image'] ?>" 
+                                     alt="News Image" class="img-thumbnail" style="max-width: 150px;">
                             </div>
                             <div class="col-6">
-                                <input type="file" name="gambar" id="gambar">
-                                <?= form_error('foto', '<small class="text-danger">', '</small>'); ?>
+                                <input type="file" name="image" id="image" class="form-control" accept="image/*">
+                                <small class="text-muted">Biarkan kosong jika tidak ingin mengubah gambar</small>
+                                <?= form_error('image', '<small class="text-danger">', '</small>'); ?>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="judul">Judul</label>
+                    <label class="col-md-4 text-md-right" for="title">Judul</label>
                     <div class="col-md-6">
-                    <?php if ($blog) : ?>
-                                <!-- Tampilkan nilai yang akan di-edit -->
-                        <input type="text" id="judul" name="judul" value="<?= set_value('judul', $blog['judul']); ?>" class="form-control" placeholder="Masukkan Judul Blog">
-                        <?= form_error('judul', '<span class="text-danger small">', '</span>'); ?>
-                        <?php endif; ?>
+                        <input type="text" id="title" name="title" 
+                               value="<?= set_value('title', $blog['title']); ?>" 
+                               class="form-control" placeholder="Masukkan Judul">
+                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-                
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="konten">Konten</label>
-                    <div class="col-md-12">
-                    <?php if ($blog) : ?>
-                                <!-- Tampilkan nilai yang akan di-edit -->
-                        <textarea name="konten" id="kontenBlog" value="<?= set_value('konten', $blog['konten']); ?>"><?= $blog['konten'] ?></textarea>
-                        <?= form_error('konten', '<span class="text-danger small">', '</span>'); ?>
-                        <?php endif; ?>
+                    <label class="col-md-4 text-md-right" for="captions">Caption</label>
+                    <div class="col-md-6">
+                        <input type="text" id="captions" name="captions" 
+                               value="<?= set_value('captions', $blog['captions']); ?>" 
+                               class="form-control" placeholder="Masukkan Caption">
+                        <?= form_error('captions', '<span class="text-danger small">', '</span>'); ?>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="description">Deskripsi</label>
+                    <div class="col-md-6">
+                        <textarea id="description" name="description" class="form-control" 
+                                  rows="4" placeholder="Masukkan Deskripsi"><?= set_value('description', $blog['description']); ?></textarea>
+                        <?= form_error('description', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group justify-content-end">
@@ -67,7 +72,7 @@
                             <span class="text">Update</span>
                         </button>
                         <button type="reset" class="btn btn-secondary btn-icon-split">
-                        <span class="icon"><i class="fas fa-backspace"></i></span>
+                            <span class="icon"><i class="fas fa-undo"></i></span>
                             <span class="text">Reset</span>
                         </button>
                     </div>

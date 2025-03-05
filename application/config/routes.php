@@ -54,14 +54,6 @@ $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 $route['logout'] = 'auth/logout';
 $route['register'] = 'auth/register';
-
-// Database nu admin na teu dibere?
-// ngahiji ball ie teh 
-// jadi dalam database ie teh aya akses jeng admin jeng member 
-// tidituna kieu jal?
-// route na ge ngan auth hungkul ieu mah wkwkwk
-// huuh kie hungkul tapi anhe na anu dina server mah bisa diakses
-// ieu code na can di update deui cigana, jadi kudu nyieun route dei wkwk
-// coba login na make role nu admin biasa ulah superadmin
-// eta aya admin pusat oh teu apalen si akang gek eta mah 
+$route['blog/tambah'] = 'blog/tambah';
+$route['blog/tambah_save'] = 'blog/tambah_save';
 

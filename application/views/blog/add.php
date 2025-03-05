@@ -22,30 +22,39 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?php echo form_open_multipart('blog/tambah_save'); ?>
+                <?php echo form_open_multipart('blog/tambah_save', array('id' => 'newsEventForm')); ?>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="gambar">Gambar</label>
+                    <label class="col-md-4 text-md-right" for="title">Judul</label>
                     <div class="col-md-6">
-                        <input type="file" id="gambar" name="gambar" class="form-control" placeholder="gambar">
-                        <?= form_error('gambar', '<span class="text-danger small">', '</span>'); ?>
+                        <input value="<?= set_value('title'); ?>" type="text" id="title" name="title" 
+                               class="form-control" placeholder="Masukkan Judul">
+                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="judul">Judul Blog</label>
+                    <label class="col-md-4 text-md-right" for="captions">Caption</label>
                     <div class="col-md-6">
-                        <input value="<?= set_value('judul'); ?>" type="text" id="judul" name="judul" class="form-control" placeholder="Masukkan Kode Voucher">
-                        <?= form_error('judul', '<span class="text-danger small">', '</span>'); ?>
+                        <input value="<?= set_value('captions'); ?>" type="text" id="captions" 
+                               name="captions" class="form-control" placeholder="Masukkan Caption">
+                        <?= form_error('captions', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-                
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="konten">Konten Blog</label>
-                    <div class="col-md-12">
-                        <textarea name="konten" id="kontenBlog" class="form-control"></textarea>
-                        <?= form_error('konten', '<span class="text-danger small">', '</span>'); ?>
+                    <label class="col-md-4 text-md-right" for="description">Deskripsi</label>
+                    <div class="col-md-6">
+                        <textarea id="description" name="description" class="form-control" 
+                                rows="4" placeholder="Masukkan Deskripsi"><?= set_value('description'); ?></textarea>
+                        <?= form_error('description', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="image">Gambar</label>
+                    <div class="col-md-6">
+                        <input type="file" id="image" name="image" class="form-control" accept="image/*">
+                        <small class="text-muted">Format: jpg, jpeg, png, gif (Max: 2MB)</small>
+                        <?= form_error('image', '<span class="text-danger small">', '</span>'); ?>
+                    </div>
+                </div>
                 <br>
                 <div class="row form-group justify-content-end">
                     <div class="col-md-8">
@@ -63,3 +72,49 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var form = document.getElementById('newsEventForm');
+    var titleInput = document.getElementById('title');
+    var captionsInput = document.getElementById('captions');
+    var descriptionInput = document.getElementById('description');
+    var imageInput = document.getElementById('image');
+
+    form.addEventListener("submit", function (event) {
+        let isValid = true;
+
+        if (!titleInput.value.trim()) {
+            event.preventDefault();
+            titleInput.classList.add("is-invalid");
+            isValid = false;
+        }
+
+        if (!captionsInput.value.trim()) {
+            event.preventDefault();
+            captionsInput.classList.add("is-invalid");
+            isValid = false;
+        }
+
+        if (!descriptionInput.value.trim()) {
+            event.preventDefault();
+            descriptionInput.classList.add("is-invalid");
+            isValid = false;
+        }
+
+        if (!imageInput.value && !imageInput.getAttribute('data-existing')) {
+            event.preventDefault();
+            imageInput.classList.add("is-invalid");
+            isValid = false;
+        }
+
+        return isValid;
+    });
+
+    [titleInput, captionsInput, descriptionInput, imageInput].forEach(input => {
+        input.addEventListener("input", function () {
+            this.classList.remove("is-invalid");
+        });
+    });
+});
+</script>

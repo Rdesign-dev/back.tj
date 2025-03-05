@@ -7,135 +7,144 @@ class Blog extends CI_Controller {
         parent::__construct();
         cek_login();
         $this->load->model('Blog_model','blog');
-        $this->load->model('admin_model','admin');
-    }
-
-    public function tambahs(){
-        $data['title'] = "Tambah Voucher";
-        $this->template->load('templates/dashboard', 'blog/add', $data);
     }
 
     public function index() {
-        // Mengambil data produk dari model
-        $data['title'] = "Blog";
+        $data['title'] = "News & Event";
         $data['blogs'] = $this->blog->find_all();
-
-        // Memuat tampilan daftar produk
         $this->template->load('templates/dashboard', 'blog/index', $data);
     }
 
-    public function tambah_save(){
-        $this->form_validation->set_rules('judul','Judul','required');
-        $this->form_validation->set_rules('konten','Konten','required');
-        if($this->form_validation->run() == FALSE){
-            $data['title'] = "Tambah Blog";
+    public function tambah() 
+    {
+        $data['title'] = "Tambah News & Event";
+        $this->template->load('templates/dashboard', 'blog/add', $data);
+    }
+
+    public function tambah_save()
+    {
+        $data['title'] = "Tambah News & Event";
+        
+        $this->form_validation->set_rules('title', 'Judul', 'required|trim');
+        $this->form_validation->set_rules('captions', 'Caption', 'required|trim');
+        $this->form_validation->set_rules('description', 'Deskripsi', 'required|trim');
+        
+        if ($this->form_validation->run() == FALSE) {
             $this->template->load('templates/dashboard', 'blog/add', $data);
         } else {
-                $config['upload_path'] = '../fotoblog/';
-                $config['allowed_types'] = 'gif|jpg|png|PNG|jpeg|JPEG|svg';
-                $config['max_size'] = 1048576;
-                $config['max_width'] = 10000;
-                $config['max_height'] = 10000;
-                $this->load->library('upload', $config);
-                if(!$this->upload->do_upload('gambar')){
-                    $data['title'] = "Tambah Blog";
-                    $this->template->load('templates/dashboard', 'blog/add', $data);
-                }else{
-                    $gambar = $this->upload->data();
-                    $gambar = $gambar['file_name'];
-                    $judul= $this->input->post('judul');
-                    $konten= $this->input->post('konten');
-                    $data = array(
-                        'gambar' => $gambar,
-                        'judul' => $judul,
-                        'konten' => $konten
-                    );
-                    var_dump($data);
-                    $this->db->insert('blog',$data);
-                    $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>');
-                    redirect(base_url('blog'));
-                }
+            $config['upload_path'] = 'C:/laragon/www/ImageTerasJapan/news_event/';
+            $config['allowed_types'] = 'gif|jpg|png|jpeg';
+            $config['max_size'] = 2048; // 2MB
+            $config['encrypt_name'] = TRUE;
             
+            if (!is_dir($config['upload_path'])) {
+                mkdir($config['upload_path'], 0777, true);
             }
-        }
-        public function edit($id){
-            $data['title'] = "Edit Iklan Promosi";
-            $id = $this->uri->segment('3');
-        
-            if (!empty($id)) {
-                $data['iklan'] = $this->iklan->cari_detail_id($id);
-        
-                // Pastikan member ditemukan sebelum memuat template
-                if ($data['iklan']) {
-                    // Load template dengan data yang telah disiapkan
-                    $this->template->load('templates/dashboard', 'iklan/edit', $data);
-                } else {
-                    $this->session->set_flashdata('pesan','<div class="alert alert-error" role="alert">Data Tidak Ditemukan</div>');
-                    redirect(base_url('iklan'));
-                }
+
+            $this->load->library('upload', $config);
+            
+            if(!$this->upload->do_upload('image')){
+                set_pesan($this->upload->display_errors(), false);
+                redirect('blog/tambah');
             } else {
-                $this->session->set_flashdata('pesan','<div class="alert alert-error" role="alert">Data Tidak Valid</div>');
-                    redirect(base_url('iklan'));
-            }
-            }
-            public function edit_blog($id){
-                $id = encode_php_tags($id);
-                $this->form_validation->set_rules('judul','Judul','required');
-                $this->form_validation->set_rules('konten','Konten','required');
-                if($this->form_validation->run() == FALSE){
-                    $data['title'] = "Edit Blog";
-                    $data['blog'] = $this->admin->get('blog', ['id' => $id]);
-                    $this->template->load('templates/dashboard', 'blog/edit', $data);
-                }else{
-                    $config['upload_path'] = '../fotoblog/';
-                    $config['allowed_types'] = 'gif|jpg|png|PNG|jpeg|JPEG|svg';
-                    $config['max_size'] = 2048000;
-                    $config['max_width'] = 10000;
-                    $config['max_height'] = 10000;
-                    $this->load->library('upload', $config);
-                    if(!$this->upload->do_upload('gambar')){
-                        $judul= $this->input->post('judul');
-                        $konten= $this->input->post('konten');
-                        $data = array(
-                            'judul' => $judul,
-                            'konten' => $konten,
-                        );
-                        var_dump($data);
-                        $this->db->where('id',$id);
-                        $this->db->update('blog',$data);
-                        $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Diupdate</div>');
-                        redirect('blog');
-                    }else{
-                        $gambar = $this->upload->data();
-                        $gambar = $gambar['file_name'];
-                        $judul= $this->input->post('judul');
-                        $konten= $this->input->post('konten');
-                        $data = array(
-                            'gambar' => $gambar,
-                            'judul' => $judul,
-                            'konten' => $konten,
-                        );
-                        var_dump($data);
-                        $this->db->where('id',$id);
-                        $this->db->update('blog',$data);
-                        $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Diupdate</div>');
-                        redirect('blog');
-                    }
-                    
+                $uploaded_data = $this->upload->data();
+                
+                $data = [
+                    'title' => $this->input->post('title', true),
+                    'captions' => $this->input->post('captions', true),
+                    'description' => $this->input->post('description', true),
+                    'image' => $uploaded_data['file_name'],
+                    'status' => 'inactive'
+                ];
+                
+                if($this->blog->insert($data)){
+                    set_pesan('Data berhasil disimpan');
+                    redirect('blog');
+                } else {
+                    set_pesan('Gagal menyimpan data', false);
+                    redirect('blog/tambah');
                 }
             }
-        public function delete($getId)
-        {
-        $id= encode_php_tags($getId);
-        if ($this->blog->delete('blog', 'id', $id)) {
-            $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Dihapus</div>');
+        }
+    }
+
+    public function edit_blog($getId) {
+        $id = encode_php_tags($getId);
+        $this->form_validation->set_rules('title', 'Judul', 'required|trim');
+        $this->form_validation->set_rules('captions', 'Caption', 'required|trim');
+        $this->form_validation->set_rules('description', 'Deskripsi', 'required|trim');
+
+        if ($this->form_validation->run() == false) {
+            $data['title'] = "Edit News & Event";
+            $data['blog'] = $this->db->get_where('news_event', ['id' => $id])->row_array();
+            $this->template->load('templates/dashboard', 'blog/edit', $data);
         } else {
-            $this->session->set_flashdata('pesan','<div class="alert alert-danger" role="alert">Data Gagal Dihapus</div>');
+            $data = [
+                'title' => $this->input->post('title', true),
+                'captions' => $this->input->post('captions', true),
+                'description' => $this->input->post('description', true)
+            ];
+
+            // Cek jika ada gambar yang akan diupload
+            if ($_FILES['image']['name']) {
+                $config['upload_path']   = 'C:/laragon/www/ImageTerasJapan/news_event/';
+                $config['allowed_types'] = 'gif|jpg|png|jpeg';
+                $config['max_size']      = 2048;
+                $config['encrypt_name']  = TRUE;
+
+                // Buat direktori jika belum ada
+                if (!is_dir($config['upload_path'])) {
+                    mkdir($config['upload_path'], 0777, true);
+                }
+
+                $this->load->library('upload', $config);
+
+                if ($this->upload->do_upload('image')) {
+                    // Hapus file lama
+                    $old_image = $this->db->get_where('news_event', ['id' => $id])->row_array()['image'];
+                    if ($old_image != 'default.png') {
+                        $old_file = $config['upload_path'] . $old_image;
+                        if (file_exists($old_file)) {
+                            unlink($old_file);
+                        }
+                    }
+                    // Set nama file baru
+                    $data['image'] = $this->upload->data('file_name');
+                } else {
+                    set_pesan($this->upload->display_errors(), false);
+                    redirect('blog/edit_blog/' . $id);
+                }
+            }
+
+            $this->db->where('id', $id);
+            $this->db->update('news_event', $data);
+            set_pesan('Data berhasil diubah');
+            redirect('blog');
         }
+    }
+
+    public function delete($getId) {
+        $id = encode_php_tags($getId);
+        
+        // Ambil info file gambar
+        $image = $this->db->get_where('news_event', ['id' => $id])->row_array()['image'];
+        
+        // Hapus file gambar
+        if ($image != 'default.png') {
+            $file_path = 'C:/laragon/www/ImageTerasJapan/news_event/' . $image;
+            if (file_exists($file_path)) {
+                unlink($file_path);
+            }
+        }
+
+        // Hapus data dari database
+        $this->db->delete('news_event', ['id' => $id]);
+        set_pesan('Data berhasil dihapus');
         redirect('blog');
-        }
-        public function toggle($getId)
-        {
+    }
+
+    public function toggle($getId)
+    {
         $id = encode_php_tags($getId);
         $status = $this->admin->get('blog', ['id' => $id])['isActive'];
         $toggle = $status ? 0 : 1; //Jika user aktif maka nonaktifkan, begitu pula sebaliknya
@@ -145,5 +154,19 @@ class Blog extends CI_Controller {
             set_pesan($pesan);
         }
         redirect('blog');
+    }
+
+    public function toggle_status($getId)
+    {
+        $id = encode_php_tags($getId);
+        $current_status = $this->blog->get_status($id);
+        $new_status = ($current_status == 'Active') ? 'inactive' : 'Active';
+
+        if ($this->blog->update_status($id, $new_status)) {
+            set_pesan('Status berhasil diubah');
+        } else {
+            set_pesan('Gagal mengubah status', false);
         }
+        redirect('blog');
+    }
 }
