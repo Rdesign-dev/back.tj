@@ -15,5 +15,14 @@ class Brand extends CI_Controller {
         $this->template->load('templates/dashboard', 'brand/index', $data);
     }
 
+    public function get_brand_details($id) {
+        $brand = $this->brand->get_by_id($id);
+        if ($brand) {
+            echo json_encode($brand);
+        } else {
+            echo json_encode(['error' => 'Brand not found']);
+        }
+    }
+
     // Tambahkan method lain seperti add, edit, delete sesuai kebutuhan
 }
