@@ -1,24 +1,24 @@
 <?= $this->session->flashdata('pesan'); ?>
-<div class="card shadow-sm mb-4 border-bottom-primary">
-    <div class="brand-selection mb-4">
+    <div class="brand-selection bg-white mb-4 shadow-sm">
         <h4 class="h5 align-middle m-0 font-weight-bold text-primary" style="padding: 20px 0 10px 20px;">Select Brand</h4>
-        <div class="row gap-3" style="padding: 20px 0 0 20px;">
+        <div class="row gap-1" style="padding: 20px 0 20px 20px;">
             <?php if ($brands) :
                 foreach ($brands as $brand) : ?>
-                    <div class="col-md-2 col-4 mb-3">
-                        <img src="<?= base_url('../ImageTerasJapan/logo/' . $brand['image']) ?>" class="img-fluid" alt="<?= $brand['name'] ?>">
+                    <div class="col-md-1 col-2 mb-1" style="cursor: pointer;">
+                        <img src="<?= base_url('../ImageTerasJapan/logo/' . $brand['image']) ?>" class="img-fluid" alt="<?= $brand['name'] ?>" style="width: 50px; height: 50px; object-fit: contain;">
                     </div>
                 <?php endforeach; ?>
-            <div class="col-md-2 col-4 mb-3 d-flex align-items-center justify-content-center">
-                <a href="<?= base_url('brand/add') ?>" class="text-decoration-none">
-                    <div class="social-icons">
+            <?php endif; ?>
+            <div class="col-md-1 col-2 mb-3 d-flex align-items-center justify-content-center">
+                <a href="<?= base_url('brand/add') ?>" class="text-decoration-none"></a>
+                    <div class="btn btn-primary border" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
                         <i class='bx bx-plus' style="font-size: 2rem;"></i>
                     </div>
                 </a>
             </div>
-            <?php endif; ?>
         </div>
     </div>
+<div class="card shadow-sm mb-4 border-bottom-primary">
     <div class="divider"></div>
     <div class="card-header bg-white py-3">
         <div class="row">
