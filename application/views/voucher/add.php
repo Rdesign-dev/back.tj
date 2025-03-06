@@ -71,21 +71,6 @@
                         <?= form_error('foto', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="syarat">Ketentuan Penukaran</label>
-                    <div class="col-md-12">
-                        <textarea name="syarat" id="syarat" class="form-control" rows="5"></textarea>
-                        <?= form_error('syarat', '<span class="text-danger small">', '</span>'); ?>
-                        
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="syarattukar">Ketentuan Pemakaian</label>
-                    <div class="col-md-12">
-                        <textarea name="syarattukar" id="syarattukar" class="form-control" rows="5"></textarea>
-                        <?= form_error('syarattukar', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
                 
 
                 <br>
