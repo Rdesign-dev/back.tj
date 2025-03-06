@@ -26,14 +26,9 @@
                         <select name="nocabang" id="nocabang" class="form-control">
                             <option value="" disabled selected>-- Pilih Cabang --</option>
                             <option value="all">Semua Cabang</option>
-                            <?php
-                            foreach ($cabang as $cg => $cbg){
-                                ?>
-                                <option value="<?= $cbg['id']?>"><?= $cbg['kodecabang']?> | <?= $cbg['namacabang']?></option>
-                                <?php
-                                
-                            }
-                            ?>
+                            <?php foreach ($cabang as $cbg) : ?>
+                                <option value="<?= $cbg['id'] ?>"><?= $cbg['branch_code'] ?> | <?= $cbg['branch_name'] ?></option>
+                            <?php endforeach; ?>
                         </select>
                         <?= form_error('nocabang', '<span class="text-danger small">', '</span>'); ?>
                     </div>

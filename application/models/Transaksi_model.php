@@ -70,20 +70,29 @@ class Transaksi_model extends CI_Model {
         // Insert data into the 'transaksi' table
         return $this->db->insert($this->table, $data);
     }
-    public function generate_pdf_data($nocabang,$range=null) {
-        $this->db->select('transaksi.*, cabang.namacabang, user.nama'); // Include the branch name in the select
-        $this->db->from('transaksi');
-        $this->db->join('cabang', 'cabang.id = transaksi.nocabang'); // Join with cabang table
-        $this->db->join('user', 'user.id_user = transaksi.iduser');
-        $this->db->where('transaksi.tanggaltransaksi >=', $range['mulai']);
-        $this->db->where('transaksi.tanggaltransaksi <=', $range['akhir']);
-    
-        if ($nocabang != 'all') {
-            $this->db->where('transaksi.nocabang', $nocabang);
+    public function generate_pdf_data($branch_id, $range)
+    {
+        $this->db->select('
+            transactions.transaction_codes as kodetransaksi,
+            transactions.created_at as tanggaltransaksi,
+            branch.branch_name as namacabang,
+            users.name as namamember,
+            accounts.Name as nama,
+            transactions.amount as total
+        ');
+        $this->db->from('transactions');
+        $this->db->join('branch', 'branch.id = transactions.branch_id', 'left');
+        $this->db->join('users', 'users.id = transactions.user_id', 'left');
+        $this->db->join('accounts', 'accounts.id = transactions.account_cashier_id', 'left');
+        $this->db->where('transactions.transaction_type', 'Teras Japan Payment');
+        $this->db->where('DATE(transactions.created_at) >=', $range['mulai']);
+        $this->db->where('DATE(transactions.created_at) <=', $range['akhir']);
+        
+        if ($branch_id !== 'all') {
+            $this->db->where('transactions.branch_id', $branch_id);
         }
-        $this->db->order_by('transaksi.tanggaltransaksi', 'DESC');
-        $query = $this->db->get();
-    
-        return $query->result_array();
+        
+        $this->db->order_by('transactions.created_at', 'DESC');
+        return $this->db->get()->result_array();
     }
 }

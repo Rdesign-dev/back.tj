@@ -41,40 +41,38 @@ class Laporan extends CI_Controller {
         $pdf = new FPDF();
         $pdf->AddPage('L');
 
-        // Tambahkan judul
+        // Header
         $pdf->SetFont('Arial', 'B', 16);
         $pdf->Cell(0, 10, 'Laporan Transaksi', 0, 1, 'C');
-
         $pdf->SetFont('Arial', 'B', 12);
         $pdf->Cell(0, 10, 'PT. Amigos Mulia Indonesia', 0, 1, 'C');    
+        $pdf->Ln(5);
 
-        // Tambahkan header tabel
-        $pdf->SetFont('Arial', 'B', 12);
+        // Tabel Header
+        $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(50, 10, 'Kode Transaksi', 1);
-        $pdf->Cell(50, 10, 'Tanggal Transaksi', 1);
-        $pdf->Cell(50, 10, 'Cabang', 1);
-        $pdf->Cell(50, 10, 'Nama Member', 1);
-        $pdf->Cell(40, 10, 'Kasir', 1);
+        $pdf->Cell(40, 10, 'Tanggal', 1);
+        $pdf->Cell(45, 10, 'Cabang', 1);
+        $pdf->Cell(45, 10, 'Nama Member', 1);
+        $pdf->Cell(45, 10, 'Kasir', 1);
         $pdf->Cell(40, 10, 'Total', 1);
-        // Tambahkan kolom lain sesuai kebutuhan
+        $pdf->Ln();
 
-        $pdf->Ln(); // Pindah ke baris berikutnya
-
-        // Tambahkan data ke tabel
+        // Data
+        $pdf->SetFont('Arial', '', 10);
         foreach ($data as $row) {
             $pdf->Cell(50, 10, $row['kodetransaksi'], 1);
-            $pdf->Cell(50, 10, $row['tanggaltransaksi'], 1);
-            $pdf->Cell(50, 10, $row['namacabang'], 1);
-            $pdf->Cell(50, 10, $row['namamember'], 1);
-            $pdf->Cell(40, 10, $row['nama'], 1);
+            $pdf->Cell(40, 10, date('d-m-Y H:i', strtotime($row['tanggaltransaksi'])), 1);
+            $pdf->Cell(45, 10, $row['namacabang'], 1);
+            $pdf->Cell(45, 10, $row['namamember'], 1);
+            $pdf->Cell(45, 10, $row['nama'], 1);
             $formatted_total = 'Rp ' . number_format($row['total'], 0, ',', '.');
             $pdf->Cell(40, 10, $formatted_total, 1);
-            // Tambahkan kolom lain sesuai kebutuhan
-            $pdf->Ln(); // Pindah ke baris berikutnya
+            $pdf->Ln();
         }
 
-        // Output PDF ke browser
-        $pdf->Output('laporan_transaksi.pdf', 'I'); // 'D' untuk tampilkan sebagai unduhan
+        // Output PDF
+        $pdf->Output('laporan_transaksi.pdf', 'I');
     }
     
 }
