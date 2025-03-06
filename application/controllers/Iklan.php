@@ -35,7 +35,7 @@ class Iklan extends CI_Controller {
 
     public function index()
     {
-        $data['title'] = "Iklan Promosi";
+        $data['title'] = "Promo Mingguan";
         $data['iklans'] = $this->db->select('id, title, description, image_name, status') // tadi kurang column status na teu kabawa
                                    ->from('promo')
                                    ->get()
