@@ -56,4 +56,6 @@ $route['logout'] = 'auth/logout';
 $route['register'] = 'auth/register';
 $route['blog/tambah'] = 'blog/tambah';
 $route['blog/tambah_save'] = 'blog/tambah_save';
+$route['brand/get_brand_details/(:num)'] = 'brand/get_brand_details/$1';
+$route['brand/get_brand_promos/(:num)'] = 'brand/get_brand_promos/$1';
 

@@ -87,18 +87,20 @@
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-striped dt-responsive nowrap" id="dataTable">
+            <table class="table table-striped dt-responsive nowrap" id="promoTable">
                 <thead>
                     <tr>
                         <th>Nama Promo</th>
                         <th>Deskripsi</th>
                         <th>Status</th>
+                        <th>Points</th>
                         <th>Batas Waktu</th>
                         <th>Gambar</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="brandTableBody">
-                    <!-- Data will be loaded here -->
+                <tbody id="promoTableBody">
+                    <!-- Promo data will be loaded here -->
                 </tbody>
             </table>
         </div>
@@ -120,6 +122,16 @@
     border-radius: 4px;
     padding: 2px;
 }
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+.status-Available { background-color: #28a745; color: white; }
+.status-Coming { background-color: #ffc107; color: black; }
+.status-Expired { background-color: #dc3545; color: white; }
 </style>
 
 <script>
@@ -128,22 +140,56 @@ const BASE_URL = '<?= base_url() ?>';
 
 document.addEventListener('DOMContentLoaded', function() {
     const brandImages = document.querySelectorAll('.brand-image');
-    const tableBody = document.getElementById('brandTableBody');
+    const brandTableBody = document.getElementById('brandTableBody');
+    const promoTableBody = document.getElementById('promoTableBody');
 
-    async function fetchBrandDetails(brandId) {
+    // Update the fetchBrandData function
+    async function fetchBrandData(brandId) {
         try {
-            const response = await fetch(`${BASE_URL}brand/get_brand_details/${brandId}`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            const [brandResponse, promoResponse] = await Promise.all([
+                fetch(`${BASE_URL}brand/get_brand_details/${brandId}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    method: 'GET'
+                }),
+                fetch(`${BASE_URL}brand/get_brand_promos/${brandId}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    method: 'GET'
+                })
+            ]);
+
+            if (!brandResponse.ok) {
+                throw new Error(`Brand fetch failed: ${brandResponse.status}`);
             }
-            const data = await response.json();
-            updateTable(data);
+            if (!promoResponse.ok) {
+                throw new Error(`Promo fetch failed: ${promoResponse.status}`);
+            }
+
+            const brandData = await brandResponse.json();
+            const promoData = await promoResponse.json();
+
+            if (brandData.error) {
+                throw new Error(brandData.error);
+            }
+
+            updateBrandTable(brandData);
+            updatePromoTable(promoData);
+
         } catch (error) {
             console.error('Error:', error);
+            brandTableBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
+            promoTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
         }
     }
 
-    function updateTable(brand) {
+    function updateBrandTable(brand) {
+        if (!brand) return;
+        
         const row = `
             <tr>
                 <td>
@@ -167,13 +213,47 @@ document.addEventListener('DOMContentLoaded', function() {
                     <a onclick="return confirm('Yakin ingin menghapus data?')" href="${BASE_URL}brand/delete/${brand.id}" class="btn btn-circle btn-sm btn-danger"><i class="fa fa-fw fa-trash"></i></a>
                 </td>
             </tr>`;
-        tableBody.innerHTML = row;
+        brandTableBody.innerHTML = row;
+    }
+
+    function updatePromoTable(promos) {
+        let rows = '';
+        promos.forEach(promo => {
+            rows += `
+                <tr>
+                    <td>${promo.promo_name}</td>
+                    <td style="white-space: normal;">${promo.promo_desc || '-'}</td>
+                    <td>
+                        <span class="status-badge status-${promo.status}">
+                            ${promo.status}
+                        </span>
+                    </td>
+                    <td>${promo.points_required}</td>
+                    <td>${promo.valid_until || '-'}</td>
+                    <td>
+                        <img src="${BASE_URL}../ImageTerasJapan/promo/${promo.promo_image}" 
+                             alt="${promo.promo_name}" 
+                             style="width: 100px; height: 50px; object-fit: cover;">
+                    </td>
+                    <td>
+                        <a href="${BASE_URL}brand/editpromo/${promo.id}" class="btn btn-circle btn-sm btn-warning">
+                            <i class="fa fa-fw fa-edit"></i>
+                        </a>
+                        <a onclick="return confirm('Yakin ingin menghapus promo ini?')" 
+                           href="${BASE_URL}brand/deletepromo/${promo.id}" 
+                           class="btn btn-circle btn-sm btn-danger">
+                            <i class="fa fa-fw fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>`;
+        });
+        promoTableBody.innerHTML = rows || '<tr><td colspan="7" class="text-center">Tidak ada promo untuk brand ini</td></tr>';
     }
 
     brandImages.forEach(img => {
         img.addEventListener('click', function() {
             const brandId = this.dataset.id;
-            fetchBrandDetails(brandId);
+            fetchBrandData(brandId);
             
             // Remove active class from all images
             brandImages.forEach(img => img.classList.remove('border-primary'));

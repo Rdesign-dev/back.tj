@@ -15,12 +15,65 @@ class Brand extends CI_Controller {
         $this->template->load('templates/dashboard', 'brand/index', $data);
     }
 
-    public function get_brand_details($id) {
-        $brand = $this->brand->get_by_id($id);
-        if ($brand) {
-            echo json_encode($brand);
-        } else {
-            echo json_encode(['error' => 'Brand not found']);
+    public function get_brand_promos($brand_id) {
+        try {
+            if (!$this->input->is_ajax_request()) {
+                show_404();
+                return;
+            }
+
+            $brand_id = intval($brand_id);
+            if ($brand_id <= 0) {
+                throw new Exception('Invalid brand ID');
+            }
+
+            $promos = $this->brand->get_brand_promos($brand_id);
+            
+            $this->output
+                ->set_status_header(200)
+                ->set_content_type('application/json')
+                ->set_output(json_encode($promos));
+                
+        } catch (Exception $e) {
+            log_message('error', 'Brand promos error: ' . $e->getMessage());
+            $this->output
+                ->set_status_header(500)
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['error' => $e->getMessage()]));
+        }
+    }
+
+    public function get_brand_details($brand_id) {
+        try {
+            if (!$this->input->is_ajax_request()) {
+                show_404();
+                return;
+            }
+
+            $brand_id = intval($brand_id);
+            if ($brand_id <= 0) {
+                throw new Exception('Invalid brand ID');
+            }
+
+            $brand = $this->brand->get_by_id($brand_id);
+            
+            if ($brand) {
+                $this->output
+                    ->set_status_header(200)
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode($brand));
+            } else {
+                $this->output
+                    ->set_status_header(404)
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode(['error' => 'Brand not found']));
+            }
+        } catch (Exception $e) {
+            log_message('error', 'Brand details error: ' . $e->getMessage());
+            $this->output
+                ->set_status_header(500)
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['error' => $e->getMessage()]));
         }
     }
 
@@ -164,5 +217,18 @@ class Brand extends CI_Controller {
             }
             redirect('brand');
         }
+    }
+
+    public function debug_brand($id) {
+        // Remove in production
+        $this->output->enable_profiler(TRUE);
+        
+        $brand = $this->brand->get_by_id($id);
+        echo "<pre>";
+        print_r($brand);
+        echo "</pre>";
+        
+        // Show last query
+        echo $this->db->last_query();
     }
 }
