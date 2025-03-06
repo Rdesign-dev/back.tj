@@ -47,7 +47,6 @@
             <table class="table table-striped dt-responsive nowrap" id="dataTable">
                 <thead>
                     <tr>
-                        <th width="30">No.</th>
                         <th>Logo</th>
                         <th>Banner</th>
                         <th>Nama Brand</th>
@@ -108,7 +107,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateTable(brand) {
         const row = `
             <tr>
-                <td>1</td>
                 <td>
                     <img src="${BASE_URL}../ImageTerasJapan/logo/${brand.image}" 
                          alt="${brand.name}" 
@@ -120,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
                          style="width: 100px; height: 50px; object-fit: cover;">
                 </td>
                 <td>${brand.name}</td>
-                <td>${brand.desc || '-'}</td>
+                <td style="white-space: normal;">${brand.desc || '-'}</td>
                 <td>${brand.instagram || '-'}</td>
                 <td>${brand.tiktok || '-'}</td>
                 <td>${brand.wa || '-'}</td>
