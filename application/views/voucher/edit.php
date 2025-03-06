@@ -22,102 +22,87 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?= form_open_multipart('',[], ['kodevoucher' => $voucher['kodevoucher']]); ?>
-                <!-- Tambahkan input hidden untuk menyimpan ID member -->
+                <?= form_open_multipart('voucher/update', [], ['id' => $voucher['id']]); ?>
+                
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="kodevoucher">Kode Voucher</label>
+                    <label class="col-md-4 text-md-right" for="title">Judul Voucher</label>
                     <div class="col-md-6">
-                    <?php if ($voucher) : ?>
-                                <!-- Tampilkan nilai yang akan di-edit -->
-                        <input type="text" id="kodevoucher" name="kodevoucher" value="<?= set_value('kodevoucher', $voucher['kodevoucher']); ?>" class="form-control" placeholder="Masukkan kodevoucher Promosi">
-                        <?= form_error('link', '<span class="text-danger small">', '</span>'); ?>
-                        <?php endif; ?>
+                        <input type="text" id="title" name="title" value="<?= set_value('title', $voucher['title']); ?>" class="form-control" placeholder="Masukkan Judul Voucher">
+                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
+
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="namavoucher">Nama Voucher</label>
+                    <label class="col-md-4 text-md-right" for="points_required">Poin</label>
                     <div class="col-md-6">
-                    <?php if ($voucher) : ?>
-                                <!-- Tampilkan nilai yang akan di-edit -->
-                        <input type="text" id="namavoucher" name="namavoucher" value="<?= set_value('namavoucher', $voucher['namavoucher']); ?>" class="form-control" placeholder="Masukkan Nama Voucher">
-                        <?= form_error('link', '<span class="text-danger small">', '</span>'); ?>
-                        <?php endif; ?>
+                        <input type="number" id="points_required" name="points_required" value="<?= set_value('points_required', $voucher['points_required']); ?>" class="form-control" placeholder="Masukkan Jumlah Poin">
+                        <?= form_error('points_required', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
+
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="poin">Kode Voucher</label>
+                    <label class="col-md-4 text-md-right" for="category">Kategori</label>
                     <div class="col-md-6">
-                    <?php if ($voucher) : ?>
-                                <!-- Tampilkan nilai yang akan di-edit -->
-                        <input type="number" id="poin" name="poin" value="<?= set_value('poin', $voucher['poin']); ?>" class="form-control" placeholder="Masukkan Poin Voucher">
-                        <?= form_error('link', '<span class="text-danger small">', '</span>'); ?>
-                        <?php endif; ?>
+                        <?php
+                        $category_options = array(
+                            ''          => '-- Pilih Kategori --',
+                            'oldmember' => 'Member Biasa',
+                            'newmember' => 'Member Baru',
+                            'code'      => 'Kode Referal'
+                        );
+                        echo form_dropdown('category', $category_options, $voucher['category'], 'class="form-control" id="category"');
+                        ?>
+                        <?= form_error('category', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="kategori">Kategori</label>
+
+                <div class="row form-group" id="quantityRow">
+                    <label class="col-md-4 text-md-right" for="qty">Quantity</label>
                     <div class="col-md-6">
-                        <?php if ($voucher) : ?>
-                            <?php
-                            $kategori_options = array(
-                                ''          => '-- Pilih Kategori --',
-                                'memberbiasa'     => 'Member Biasa',
-                                'memberbaru'     => 'Member Baru',
-                                'kodereferal'   => 'Kode Referal'
-                            );
-                            echo form_dropdown('kategori', $kategori_options, $voucher['isNew'], 'class="form-control" id="kategori"');
-                            ?>
-                            <?= form_error('kategori', '<span class="text-danger small">', '</span>'); ?>
-                        <?php endif; ?>
+                        <input type="number" id="qty" name="qty" value="<?= set_value('qty', $voucher['qty']); ?>" class="form-control" placeholder="Masukkan Quantity">
+                        <?= form_error('qty', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-                <div class="row form-group" id="quantityRow" style="display:none;">
-                    <label class="col-md-4 text-md-right" for="quantity">Quantity</label>
-                    <div class="col-md-6">
-                    <?php if ($voucher) : ?>
-                                <!-- Tampilkan nilai yang akan di-edit -->
-                        <input type="number" id="quantity" name="quantity" value="<?= set_value('quantity', $voucher['qty']); ?>" class="form-control" placeholder="Masukkan quantity Voucher">
-                        <?= form_error('quantity', '<span class="text-danger small">', '</span>'); ?>
-                        <?php endif; ?>
-                    </div>
-                </div>
+
                 <div class="row form-group">
-                    <label class="col-md-3 text-md-right" for="foto">Foto</label>
+                    <label class="col-md-4 text-md-right" for="image_name">Foto</label>
                     <div class="col-md-6">
                         <div class="row">
                             <div class="col-6">
-                            <?php if ($voucher) : ?>
-                                <img src="https://terasjapan.com/fotovoucher/<?= $voucher['foto'] ?>" alt="User" class="rounded-circle shadow-sm img-thumbnail">
-                                <?php endif; ?>
+                                <img src="https://terasjapan.com/fotovoucher/<?= $voucher['image_name'] ?>" alt="Voucher Image" class="img-thumbnail">
                             </div>
                             <div class="col-6">
-                                <input type="file" name="foto" id="foto">
-                                <?= form_error('foto', '<small class="text-danger">', '</small>'); ?>
+                                <input type="file" name="image_name" id="image_name">
+                                <?= form_error('image_name', '<small class="text-danger">', '</small>'); ?>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="syarat">Ketentuan Penukaran</label>
-                    <div class="col-md-12">
-                    <?php if ($voucher) : ?>
-                                <!-- Tampilkan nilai yang akan di-edit -->
-                        <textarea name="syarat" id="syarat"  value="<?= set_value('syarat', $voucher['syarat']); ?>"><?= $voucher['syarat'] ?></textarea>
-                        <?= form_error('link', '<span class="text-danger small">', '</span>'); ?>
-                        <?php endif; ?>
+                    <label class="col-md-4 text-md-right" for="description">Deskripsi</label>
+                    <div class="col-md-6">
+                        <textarea class="form-control" id="description" name="description" rows="4"><?= set_value('description', $voucher['description']); ?></textarea>
+                        <?= form_error('description', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
+
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="syarattukar">Ketentuan Pemakaian</label>
-                    <div class="col-md-12">
-                    <?php if ($voucher) : ?>
-                                <!-- Tampilkan nilai yang akan di-edit -->
-                        <textarea name="syarattukar" id="syarattukar" value="<?= set_value('syarattukar', $voucher['syarattukar']); ?>"><?= $voucher['syarattukar'] ?></textarea>
-                        <?= form_error('link', '<span class="text-danger small">', '</span>'); ?>
-                        <?php endif; ?>
+                    <label class="col-md-4 text-md-right" for="valid_until">Berlaku Sampai</label>
+                    <div class="col-md-6">
+                        <input type="datetime-local" id="valid_until" name="valid_until" value="<?= set_value('valid_until', date('Y-m-d\TH:i', strtotime($voucher['valid_until']))); ?>" class="form-control">
+                        <?= form_error('valid_until', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-                
+
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="total_days">Total Hari</label>
+                    <div class="col-md-6">
+                        <input type="number" id="total_days" name="total_days" value="<?= set_value('total_days', $voucher['total_days']); ?>" class="form-control" placeholder="Masukkan Total Hari">
+                        <?= form_error('total_days', '<span class="text-danger small">', '</span>'); ?>
+                    </div>
+                </div>
+
                 <div class="row form-group justify-content-end">
                     <div class="col-md-8">
                         <button type="submit" class="btn btn-primary btn-icon-split">
@@ -125,7 +110,7 @@
                             <span class="text">Update</span>
                         </button>
                         <button type="reset" class="btn btn-secondary btn-icon-split">
-                        <span class="icon"><i class="fas fa-backspace"></i></span>
+                            <span class="icon"><i class="fas fa-backspace"></i></span>
                             <span class="text">Reset</span>
                         </button>
                     </div>
@@ -139,28 +124,22 @@
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
     $(document).ready(function () {
-        // Pada saat halaman dimuat, cek nilai kategori dan tampilkan/hide input quantity
+        // Check category on page load
         toggleQuantityInput();
 
-        // Tambahkan event listener untuk perubahan nilai pada dropdown kategori
-        $("#kategori").change(function () {
-            // Simpan nilai kategori ke sessionStorage
-            sessionStorage.setItem('selectedCategory', $("#kategori").val());
+        // Add listener for category changes
+        $("#category").change(function () {
             toggleQuantityInput();
         });
 
         function toggleQuantityInput() {
-            var selectedValue = sessionStorage.getItem('selectedCategory') || $("#kategori").val();
+            var selectedValue = $("#category").val();
             
-            // Set nilai kategori berdasarkan yang tersimpan di sessionStorage atau nilai saat ini jika sessionStorage kosong
-            $("#kategori").val(selectedValue);
-
-            if (selectedValue === "0") {
-                // Jika kategori "Member Biasa" dipilih, tampilkan input quantity
-                $("#quantityRow").show();
-            } else {
-                // Jika kategori lain dipilih, sembunyikan input quantity
+            if (selectedValue === "newmember") {
+                $("#qty").val(0);
                 $("#quantityRow").hide();
+            } else {
+                $("#quantityRow").show();
             }
         }
     });

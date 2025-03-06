@@ -24,13 +24,13 @@
             <thead>
                 <tr>
                     <th width="30">No.</th>
-                    <th>Kode Voucher</th>
-                    <th>Nama Voucher</th>
-                    <th>Foto Voucher</th>
-                    <th>Ketentuan Penukaran</th>
-                    <th>Ketentuan Pemakaian</th>
+                    <th>Judul</th>
+                    <th>Gambar</th>
                     <th>Poin</th>
                     <th>Kategori</th>
+                    <th>Deskripsi</th>
+                    <th>Berlaku Sampai</th>
+                    <th>Total Hari</th>
                     <th>Qty</th>
                     <th>Aksi</th>
                 </tr>
@@ -43,34 +43,35 @@
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
-                            <td><?= $voucher['kodevoucher']; ?></td>
-                            <td><?= $voucher['namavoucher']; ?></td>
-                            <td><img src="https://terasjapan.com/fotovoucher/<?= $voucher['foto'] ?>" alt="" width="150px" height="100px"></td>
-                            <td><?= $voucher['syarat']; ?></td>
-                            <td><?= $voucher['syarattukar']; ?></td>
-                            <td><?= $voucher['poin']; ?></td>
+                            <td><?= $voucher['title']; ?></td>
+                            <td><img src="https://terasjapan.com/fotovoucher/<?= $voucher['image_name'] ?>" alt="" width="150px" height="100px"></td>
+                            <td><?= $voucher['points_required']; ?></td>
                             <td>
                                 <?php
-                                if ($voucher['isNew'] == 'memberbiasa') {
+                                if ($voucher['category'] == 'oldmember') {
                                     echo "Member Biasa";
-                                } elseif ($voucher['isNew'] == 'memberbaru') {
+                                } elseif ($voucher['category'] == 'newmember') {
                                     echo "Member Baru";
-                                } elseif($voucher['isNew'] == 'kodereferal'){
+                                } elseif($voucher['category'] == 'code'){
                                     echo "Kode Referal";
                                 } else {
                                     echo "Undefined";
                                 }
                                 ?>
                             </td>
+                            <td><?= $voucher['description']; ?></td>
+                            <td><?= date('d-m-Y', strtotime($voucher['valid_until'])); ?></td>
+                            <td><?= $voucher['total_days']; ?></td>
                             <td><?= $voucher['qty']; ?></td>
-                            <td><a href="<?= base_url('voucher/edit_voucher/') . $voucher['kodevoucher'] ?>" class="btn btn-circle btn-sm btn-warning"><i class="fa fa-fw fa-edit"></i></a>
-                            <a onclick="return confirm('Yakin ingin menghapus data?')" href="<?= base_url('voucher/delete/') . $voucher['kodevoucher'] ?>" class="btn btn-circle btn-sm btn-danger"><i class="fa fa-fw fa-trash"></i></a>
+                            <td>
+                                <a href="<?= base_url('voucher/edit_voucher/') . $voucher['id'] ?>" class="btn btn-circle btn-sm btn-warning"><i class="fa fa-fw fa-edit"></i></a>
+                                <a onclick="return confirm('Yakin ingin menghapus data?')" href="<?= base_url('voucher/delete/') . $voucher['id'] ?>" class="btn btn-circle btn-sm btn-danger"><i class="fa fa-fw fa-trash"></i></a>
                             </td>
                         </tr>
                     <?php endforeach;
                     else : ?>
                     <tr>
-                        <td colspan="8" class="text-center">Silahkan tambahkan Voucher Penukaran Poin</td>
+                        <td colspan="10" class="text-center">Silahkan tambahkan Voucher Penukaran Poin</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
