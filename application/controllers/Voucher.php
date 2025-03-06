@@ -23,70 +23,61 @@ class Voucher extends CI_Controller {
         // Memuat tampilan daftar produk
         $this->template->load('templates/dashboard', 'voucher/index', $data);
     }
-
     public function tambah_save(){
         //validasi server side
-        $this->form_validation->set_rules('kodevoucher','Kode Voucher','required');
-        $this->form_validation->set_rules('namavoucher','Nama Voucher','required');
-        $this->form_validation->set_rules('poin','Poin','required');
-        $this->form_validation->set_rules('syarat','Syarat','required');
-        $this->form_validation->set_rules('syarattukar','Syarat Tukar','required');
-        $this->form_validation->set_rules('kategori','Kategori','required');
-        if ($this->input->post('kategori') == 'memberbiasa') {
-            $this->form_validation->set_rules('quantity', 'Quantity', 'required|numeric|greater_than[0]', [
-                'required' => 'Field ini untuk Kategori Member Biasa.',
-                'numeric' => 'Field Quantity ini harus number.',
-                'greater_than' => 'Field Quantity ini harus lebih dari 0.'
-            ]);
-        } else if($this->input->post('kategori') == 'memberbaru') {
-        // If the category is "Member Baru," set a default value for Quantity
-            $this->input->post('quantity', 0);
-        }else if($this->input->post('kategori') == 'kodereferal'){
-            $this->input->post('quantity', 0);
+        $this->form_validation->set_rules('title','Nama Voucher','required');
+        $this->form_validation->set_rules('category','Kategori','required');
+        $this->form_validation->set_rules('description','Deskripsi','required');
+        
+        // Conditional validation based on category
+        if ($this->input->post('category') != 'newmember') {
+            $this->form_validation->set_rules('points_required','Poin','required|numeric');
+            $this->form_validation->set_rules('valid_until','Berlaku Sampai','required');
+            $this->form_validation->set_rules('total_days','Total Hari','required|numeric');
+            $this->form_validation->set_rules('qty','Quantity','required|numeric');
         }
+        
         if($this->form_validation->run() == FALSE){
             $data['title'] = "Tambah Voucher";
             $this->template->load('templates/dashboard', 'voucher/add', $data);
         } else {
-                $config['upload_path'] = '../fotovoucher/';
-                $config['allowed_types'] = 'gif|jpg|png|PNG|jpeg|JPEG|svg';
-                $config['max_size'] = 1073741824;
-                $config['max_width'] = 10000;
-                $config['max_height'] = 10000;
-                $this->load->library('upload', $config);
-                if(!$this->upload->do_upload('foto')){
-                    $error = $this->upload->display_errors();
-                    echo $error;
-                }else{
-                    $foto = $this->upload->data();
-                    $foto = $foto['file_name'];
-                    $kodevoucher= $this->input->post('kodevoucher');
-                    $namavoucher= $this->input->post('namavoucher');
-                    $poin= $this->input->post('poin');
-                    $syarat= $this->input->post('syarat');
-                    $syarattukar= $this->input->post('syarattukar');
-                    $kategori= $this->input->post('kategori');
-                    $quantity= $this->input->post('quantity');
-                    $data = array(
-                        'title' => $this->input->post('namavoucher'),
-                        'image_name' => $foto,
-                        'points_required' => $this->input->post('poin'),
-                        'category' => $this->input->post('kategori') == 'memberbiasa' ? 'oldmember' : 
-                                     ($this->input->post('kategori') == 'memberbaru' ? 'newmember' : 'code'),
-                        'description' => $this->input->post('syarat'),
-                        'valid_until' => date('Y-m-d H:i:s', strtotime('+30 days')), // contoh 30 hari
-                        'total_days' => 30,
-                        'qty' => $this->input->post('quantity')
-                    );
-                    var_dump($data);
-                    $this->db->insert('voucher',$data);
-                    $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>');
-                    redirect(base_url('voucher'));
-                }
+            $config['upload_path'] = '../ImageTerasJapan/reward';
+            $config['allowed_types'] = 'gif|jpg|png|PNG|jpeg|JPEG|svg';
+            $config['max_size'] = 1073741824;
+            $config['max_width'] = 10000;
+            $config['max_height'] = 10000;
+            $this->load->library('upload', $config);
             
+            if(!$this->upload->do_upload('image_name')){
+                $error = $this->upload->display_errors();
+                $this->session->set_flashdata('pesan','<div class="alert alert-danger" role="alert">'.$error.'</div>');
+                redirect(base_url('voucher/tambahs'));
+            } else {
+                $foto = $this->upload->data();
+                $foto = $foto['file_name'];
+                
+                // Set default values for newmember category
+                $points_required = ($this->input->post('category') == 'newmember') ? 0 : $this->input->post('points_required');
+                $valid_until = ($this->input->post('category') == 'newmember') ? null : date('Y-m-d H:i:s', strtotime($this->input->post('valid_until')));
+                $total_days = ($this->input->post('category') == 'newmember') ? 0 : $this->input->post('total_days');
+                $qty = ($this->input->post('category') == 'newmember') ? 0 : $this->input->post('qty');
+                
+                $data = array(
+                    'title' => $this->input->post('title'),
+                    'image_name' => $foto,
+                    'points_required' => $points_required,
+                    'category' => $this->input->post('category'),
+                    'description' => $this->input->post('description'),
+                    'valid_until' => $valid_until,
+                    'total_days' => $total_days,
+                    'qty' => $qty
+                );
+                $this->db->insert('rewards', $data);
+                $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>');
+                redirect(base_url('voucher'));
             }
         }
-
+    }
     public function edit_voucher($id) {
         $data['title'] = "Edit Voucher";
         // Mengambil data voucher berdasarkan ID dari tabel rewards
@@ -123,7 +114,7 @@ class Voucher extends CI_Controller {
     
         // Handle image upload if there's new image
         if (!empty($_FILES['image_name']['name'])) {
-            $config['upload_path'] = './fotovoucher/';
+            $config['upload_path'] = '../ImageTerasJapan/reward';
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
             $config['max_size'] = 2048;
             $config['file_name'] = 'voucher-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
