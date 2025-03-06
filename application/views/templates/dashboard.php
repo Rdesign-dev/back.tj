@@ -99,6 +99,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link pb-0" href="<?= base_url('brand'); ?>">
+                <i class="fas fa-clone"></i>
+                    <span>Brand Detail</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('blog'); ?>">
                 <i class="fas fa-blog"></i>
                     <span>Berita dan acara</span>
