@@ -9,7 +9,7 @@
                         </h4>
                     </div>
                     <div class="col-auto">
-                        <a href="<?= base_url('iklan') ?>" class="btn btn-sm btn-secondary btn-icon-split">
+                        <a href="<?= base_url('brand') ?>" class="btn btn-sm btn-secondary btn-icon-split">
                             <span class="icon">
                                 <i class="fa fa-arrow-left"></i>
                             </span>
@@ -22,124 +22,112 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?php echo form_open_multipart('iklan/tambah_save', array('id' => 'memberForm')); ?>
+                <?= form_open_multipart('brand/save', array('id' => 'brandForm')); ?>
+                
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="title">Nama Brand</label>
+                    <label class="col-md-4 text-md-right" for="name">Nama Brand</label>
                     <div class="col-md-6">
-                        <input value="<?= set_value('title'); ?>" type="text" id="title" name="title" class="form-control" placeholder="Masukkan Nama Promo">
-                        <div id="error-message" class="text-danger small"></div>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="description">Deskripsi</label>
-                    <div class="col-md-6">
-                        <textarea id="description" name="description" class="form-control" placeholder="Masukkan Deskripsi Promo"><?= set_value('description'); ?></textarea>
-                        <div id="error-message" class="text-danger small"></div>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="foto">Gambar Logo</label>
-                    <div class="col-md-6">
-                        <input type="file" id="foto" name="foto" class="form-control" accept="image/*">
-                        <div id="error-message" class="text-danger small"></div>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="foto">Gambar Banner</label>
-                    <div class="col-md-6">
-                        <div class="row">
-                            <div class="col-6">
-                                <img src="<?= base_url('../ImageTerasJapan/promo/' . $iklan['image_name']) ?>" alt="Promo Image" class="img-thumbnail">
-                            </div>
-                            <div class="col-6">
-                                <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
-                                <small class="text-muted">Biarkan kosong jika tidak ingin mengubah gambar</small>
-                                <?= form_error('foto', '<small class="text-danger">', '</small>'); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="title">Link Instagram</label>
-                    <div class="col-md-6">
-                        <input type="text" id="title" name="title" value="<?= set_value('title', $iklan['title']); ?>" class="form-control" placeholder="Masukkan Nama Promo">
-                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="title">Link Tiktok</label>
-                    <div class="col-md-6">
-                        <input type="text" id="title" name="title" value="<?= set_value('title', $iklan['title']); ?>" class="form-control" placeholder="Masukkan Nama Promo">
-                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="title">Link WA</label>
-                    <div class="col-md-6">
-                        <input type="text" id="title" name="title" value="<?= set_value('title', $iklan['title']); ?>" class="form-control" placeholder="Masukkan Nama Promo">
-                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="title">Link Web</label>
-                    <div class="col-md-6">
-                        <input type="text" id="title" name="title" value="<?= set_value('title', $iklan['title']); ?>" class="form-control" placeholder="Masukkan Nama Promo">
-                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
+                        <input value="<?= set_value('name'); ?>" type="text" id="name" name="name" class="form-control" placeholder="Masukkan Nama Brand">
+                        <?= form_error('name', '<div class="text-danger small">', '</div>'); ?>
                     </div>
                 </div>
 
-                <br>
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="desc">Deskripsi</label>
+                    <div class="col-md-6">
+                        <textarea id="desc" name="desc" class="form-control" placeholder="Masukkan Deskripsi Brand"><?= set_value('desc'); ?></textarea>
+                        <?= form_error('desc', '<div class="text-danger small">', '</div>'); ?>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="image">Logo Brand</label>
+                    <div class="col-md-6">
+                        <input type="file" id="image" name="image" class="form-control" accept="image/*">
+                        <?= form_error('image', '<div class="text-danger small">', '</div>'); ?>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="banner">Banner Brand</label>
+                    <div class="col-md-6">
+                        <input type="file" id="banner" name="banner" class="form-control" accept="image/*">
+                        <?= form_error('banner', '<div class="text-danger small">', '</div>'); ?>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="instagram">Link Instagram</label>
+                    <div class="col-md-6">
+                        <input type="text" id="instagram" name="instagram" value="<?= set_value('instagram'); ?>" class="form-control" placeholder="Masukkan Link Instagram">
+                        <?= form_error('instagram', '<div class="text-danger small">', '</div>'); ?>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="tiktok">Link Tiktok</label>
+                    <div class="col-md-6">
+                        <input type="text" id="tiktok" name="tiktok" value="<?= set_value('tiktok'); ?>" class="form-control" placeholder="Masukkan Link Tiktok">
+                        <?= form_error('tiktok', '<div class="text-danger small">', '</div>'); ?>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="wa">Link WhatsApp</label>
+                    <div class="col-md-6">
+                        <input type="text" id="wa" name="wa" value="<?= set_value('wa'); ?>" class="form-control" placeholder="Masukkan Link WhatsApp">
+                        <?= form_error('wa', '<div class="text-danger small">', '</div>'); ?>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="web">Link Website</label>
+                    <div class="col-md-6">
+                        <input type="text" id="web" name="web" value="<?= set_value('web'); ?>" class="form-control" placeholder="Masukkan Link Website">
+                        <?= form_error('web', '<div class="text-danger small">', '</div>'); ?>
+                    </div>
+                </div>
+
                 <div class="row form-group justify-content-end">
                     <div class="col-md-8">
                         <button type="submit" class="btn btn-primary btn-icon-split">
                             <span class="icon"><i class="fa fa-save"></i></span>
                             <span class="text">Simpan</span>
                         </button>
-                        <button type="reset" class="btn btn-secondary">
-                            Reset
-                        </button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
                     </div>
                 </div>
-                <?php echo form_close(); ?>
-               
+                <?= form_close(); ?>
             </div>
         </div>
     </div>
 </div>
+
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    var memberForm = document.getElementById('memberForm');
-    var titleInput = document.getElementById('title');
-    var descInput = document.getElementById('description');
-    var fotoInput = document.getElementById('foto');
-
-    memberForm.addEventListener("submit", function (event) {
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById('brandForm');
+    const requiredFields = ['name', 'desc', 'image', 'banner'];
+    
+    form.addEventListener('submit', function(e) {
         let isValid = true;
-
-        if (!titleInput.value.trim()) {
-            event.preventDefault();
-            titleInput.classList.add("is-invalid");
-            isValid = false;
+        
+        requiredFields.forEach(field => {
+            const input = document.getElementById(field);
+            if (!input.value.trim()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
         }
-
-        if (!descInput.value.trim()) {
-            event.preventDefault();
-            descInput.classList.add("is-invalid");
-            isValid = false;
-        }
-
-        if (!fotoInput.value.trim()) {
-            event.preventDefault();
-            fotoInput.classList.add("is-invalid");
-            isValid = false;
-        }
-
-        return isValid;
     });
-
-    [titleInput, descInput, fotoInput].forEach(input => {
-        input.addEventListener("input", function () {
-            this.classList.remove("is-invalid");
+    
+    requiredFields.forEach(field => {
+        const input = document.getElementById(field);
+        input.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
         });
     });
 });

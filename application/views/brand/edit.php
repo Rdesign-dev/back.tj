@@ -22,89 +22,89 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?= form_open_multipart('iklan/edit_iklan/' . $iklan['id'], [], ['id' => $iklan['id']]); ?>
+                <?= form_open_multipart('brand/update/' . $brand['id'], array('id' => 'brandForm')); ?>
+                
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="title">Nama Brand</label>
+                    <label class="col-md-4 text-md-right" for="name">Nama Brand</label>
                     <div class="col-md-6">
-                        <input type="text" id="title" name="title" value="<?= set_value('title', $iklan['title']); ?>" class="form-control" placeholder="Masukkan Nama Promo">
-                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
+                        <input type="text" id="name" name="name" value="<?= set_value('name', $brand['name']); ?>" class="form-control" placeholder="Masukkan Nama Brand">
+                        <?= form_error('name', '<div class="text-danger small">', '</div>'); ?>
                     </div>
                 </div>
+
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="description">Deskripsi</label>
+                    <label class="col-md-4 text-md-right" for="desc">Deskripsi</label>
                     <div class="col-md-6">
-                        <textarea id="description" name="description" class="form-control" placeholder="Masukkan Deskripsi Promo"><?= set_value('description', $iklan['description']); ?></textarea>
-                        <?= form_error('description', '<span class="text-danger small">', '</span>'); ?>
+                        <textarea id="desc" name="desc" class="form-control" placeholder="Masukkan Deskripsi Brand"><?= set_value('desc', $brand['desc']); ?></textarea>
+                        <?= form_error('desc', '<div class="text-danger small">', '</div>'); ?>
                     </div>
                 </div>
+
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="foto">Gambar Logo</label>
+                    <label class="col-md-4 text-md-right" for="image">Logo Brand</label>
                     <div class="col-md-6">
                         <div class="row">
-                            <div class="col-6">
-                                <img src="<?= base_url('../ImageTerasJapan/promo/' . $iklan['image_name']) ?>" alt="Promo Image" class="img-thumbnail">
+                            <div class="col-sm-3">
+                                <img src="<?= base_url('../ImageTerasJapan/logo/' . $brand['image']) ?>" class="img-thumbnail">
                             </div>
-                            <div class="col-6">
-                                <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
-                                <small class="text-muted">Biarkan kosong jika tidak ingin mengubah gambar</small>
-                                <?= form_error('foto', '<small class="text-danger">', '</small>'); ?>
+                            <div class="col">
+                                <input type="file" id="image" name="image" class="form-control" accept="image/*">
+                                <small class="text-muted">Biarkan kosong jika tidak ingin mengubah logo</small>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="foto">Gambar Banner</label>
+                    <label class="col-md-4 text-md-right" for="banner">Banner Brand</label>
                     <div class="col-md-6">
                         <div class="row">
-                            <div class="col-6">
-                                <img src="<?= base_url('../ImageTerasJapan/promo/' . $iklan['image_name']) ?>" alt="Promo Image" class="img-thumbnail">
+                            <div class="col-sm-3">
+                                <img src="<?= base_url('../ImageTerasJapan/banner/' . $brand['banner']) ?>" class="img-thumbnail">
                             </div>
-                            <div class="col-6">
-                                <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
-                                <small class="text-muted">Biarkan kosong jika tidak ingin mengubah gambar</small>
-                                <?= form_error('foto', '<small class="text-danger">', '</small>'); ?>
+                            <div class="col">
+                                <input type="file" id="banner" name="banner" class="form-control" accept="image/*">
+                                <small class="text-muted">Biarkan kosong jika tidak ingin mengubah banner</small>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="title">Link Instagram</label>
+                    <label class="col-md-4 text-md-right" for="instagram">Link Instagram</label>
                     <div class="col-md-6">
-                        <input type="text" id="title" name="title" value="<?= set_value('title', $iklan['title']); ?>" class="form-control" placeholder="Masukkan Nama Promo">
-                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
+                        <input type="text" id="instagram" name="instagram" value="<?= set_value('instagram', $brand['instagram']); ?>" class="form-control" placeholder="Masukkan Link Instagram">
                     </div>
                 </div>
+
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="title">Link Tiktok</label>
+                    <label class="col-md-4 text-md-right" for="tiktok">Link Tiktok</label>
                     <div class="col-md-6">
-                        <input type="text" id="title" name="title" value="<?= set_value('title', $iklan['title']); ?>" class="form-control" placeholder="Masukkan Nama Promo">
-                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
+                        <input type="text" id="tiktok" name="tiktok" value="<?= set_value('tiktok', $brand['tiktok']); ?>" class="form-control" placeholder="Masukkan Link Tiktok">
                     </div>
                 </div>
+
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="title">Link WA</label>
+                    <label class="col-md-4 text-md-right" for="wa">Link WhatsApp</label>
                     <div class="col-md-6">
-                        <input type="text" id="title" name="title" value="<?= set_value('title', $iklan['title']); ?>" class="form-control" placeholder="Masukkan Nama Promo">
-                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
+                        <input type="text" id="wa" name="wa" value="<?= set_value('wa', $brand['wa']); ?>" class="form-control" placeholder="Masukkan Link WhatsApp">
                     </div>
                 </div>
+
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="title">Link Web</label>
+                    <label class="col-md-4 text-md-right" for="web">Link Website</label>
                     <div class="col-md-6">
-                        <input type="text" id="title" name="title" value="<?= set_value('title', $iklan['title']); ?>" class="form-control" placeholder="Masukkan Nama Promo">
-                        <?= form_error('title', '<span class="text-danger small">', '</span>'); ?>
+                        <input type="text" id="web" name="web" value="<?= set_value('web', $brand['web']); ?>" class="form-control" placeholder="Masukkan Link Website">
                     </div>
                 </div>
+
                 <div class="row form-group justify-content-end">
                     <div class="col-md-8">
                         <button type="submit" class="btn btn-primary btn-icon-split">
                             <span class="icon"><i class="fa fa-save"></i></span>
                             <span class="text">Update</span>
                         </button>
-                        <button type="reset" class="btn btn-secondary btn-icon-split">
-                            <span class="icon"><i class="fas fa-backspace"></i></span>
-                            <span class="text">Reset</span>
-                        </button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
                     </div>
                 </div>
                 <?= form_close(); ?>
