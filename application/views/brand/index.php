@@ -1,5 +1,37 @@
 <?= $this->session->flashdata('pesan'); ?>
 <div class="card shadow-sm mb-4 border-bottom-primary">
+    <div class="brand-selection mb-4">
+        <h4 class="h5 align-middle m-0 font-weight-bold text-primary" style="padding: 20px 0 10px 20px;">Select Brand</h4>
+        <div class="row gap-3" style="padding: 20px 0 0 20px;">
+            <div class="col-md-2 col-4 mb-3">
+                <img src="../assets/image/logo/terasjapan.jpeg" class="img-fluid" alt="Brand 1">
+            </div>
+            <div class="col-md-2 col-4 mb-3">
+                <img src="../assets/image/logo/tottori.jpeg" class="img-fluid" alt="Brand 2">
+            </div>
+            <div class="col-md-2 col-4 mb-3">
+                <img src="../assets/image/logo/amigos.jpeg" class="img-fluid" alt="Brand 3">
+            </div>
+            <div class="col-md-2 col-4 mb-3">
+                <img src="../assets/image/logo/toyotomi.jpeg" class="img-fluid" alt="Brand 4">
+            </div>
+            <div class="col-md-2 col-4 mb-3">
+                <img src="../assets/image/logo/toyofuku.jpeg" class="img-fluid" alt="Brand 5">
+            </div>
+            <div class="col-md-2 col-4 mb-3">
+                <img src="../assets/image/logo/wataame.jpeg" class="img-fluid" alt="Brand 6">
+            </div>
+            <div class="col-md-2 col-4 mb-3">
+                <img src="../assets/image/logo/pokapoka.jpeg" class="img-fluid" alt="Brand 7">
+            </div>
+            <div class="col-md-2 col-4 mb-3 d-flex align-items-center justify-content-center">
+                <div class="social-icons">
+                    <i class='bx bx-plus' style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="divider"></div>
     <div class="card-header bg-white py-3">
         <div class="row">
             <div class="col">
@@ -13,7 +45,7 @@
                         <i class="fas fa-plus"></i>
                     </span>
                     <span class="text">
-                        Tambah Brand
+                        Tambah Data Brand
                     </span>
                 </a>
             </div>
