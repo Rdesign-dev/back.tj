@@ -1,6 +1,6 @@
 <?= $this->session->flashdata('pesan'); ?>
     <div class="brand-selection bg-white mb-4 shadow-sm">
-        <h4 class="h5 align-middle m-0 font-weight-bold text-primary" style="padding: 20px 0 10px 20px;">Select Brand</h4>
+        <h4 class="h5 align-middle m-0 font-weight-bold text-primary" style="padding: 20px 0 10px 20px;">Pilih Brand</h4>
         <div class="row gap-1" style="padding: 20px 0 20px 20px;">
             <?php if ($brands) :
                 foreach ($brands as $brand) : ?>
@@ -56,6 +56,45 @@
                         <th>WhatsApp</th>
                         <th>Website</th>
                         <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="brandTableBody">
+                    <!-- Data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4 border-bottom-primary">
+        <div class="divider"></div>
+        <div class="card-header bg-white py-3">
+            <div class="row">
+                <div class="col">
+                    <h4 class="h5 align-middle m-0 font-weight-bold text-primary">
+                        Promo Brand
+                    </h4>
+                </div>
+                <div class="col-auto">
+                    <a href="<?= base_url('brand/addpromo') ?>" class="btn btn-sm btn-primary btn-icon-split">
+                        <span class="icon">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">
+                            Tambah Promo Brand
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped dt-responsive nowrap" id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Nama Promo</th>
+                        <th>Deskripsi</th>
+                        <th>Status</th>
+                        <th>Batas Waktu</th>
+                        <th>Gambar</th>
                     </tr>
                 </thead>
                 <tbody id="brandTableBody">
