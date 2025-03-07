@@ -58,4 +58,10 @@ $route['blog/tambah'] = 'blog/tambah';
 $route['blog/tambah_save'] = 'blog/tambah_save';
 $route['brand/get_brand_details/(:num)'] = 'brand/get_brand_details/$1';
 $route['brand/get_brand_promos/(:num)'] = 'brand/get_brand_promos/$1';
-
+$route['banner'] = 'banner/index';
+$route['banner/add'] = 'banner/add';
+$route['banner/save'] = 'banner/save';
+$route['banner/edit/(:num)'] = 'banner/edit/$1';
+$route['banner/update/(:num)'] = 'banner/update/$1';
+$route['banner/delete/(:num)'] = 'banner/delete/$1';
+$route['banner/toggle_status/(:num)'] = 'banner/toggle_status/$1';

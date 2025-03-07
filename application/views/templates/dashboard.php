@@ -99,6 +99,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link pb-0" href="<?= base_url('banner'); ?>">
+                <i class="fas fa-clone"></i>
+                    <span>Banner</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('brand'); ?>">
                 <i class="fas fa-clone"></i>
                     <span>Brand Detail</span>
@@ -213,7 +219,7 @@
             <div id="content">
 
                 <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-dark bg-primary topbar mb-4 static-top shadow-sm" style="background-image: url('<?= base_url() ?>assets/img/merah.png'); background-size: cover; background-position: center;">
+                <nav class="navbar navbar-expand navbar-dark bg-primary topbar mb-4 static-top shadow-sm" style="background-image: url('<?= base_url() ?>assets/img/merah.png'); background-size: cover; background-position: center;">
                     <!-- Sidebar Toggle (Topbar) -->
                     <button id="sidebarToggleTop" class="btn btn-link bg-transparent d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars text-white"></i>
