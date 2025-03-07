@@ -45,8 +45,10 @@
                     </td>
                     <td class="text-nowrap text-center d-flex justify-content-center gap-2 flex-wrap">
                         <!-- Edit Button -->
-                        <a href="<?= base_url('banner/edit_iklan/') . $iklan['id'] ?>"
-                            class="btn btn-warning btn-sm rounded-circle" data-bs-toggle="tooltip" title="Edit">
+                        <a href="<?= base_url('banner/edit/'.$iklan['id']) ?>"
+                            class="btn btn-warning btn-sm rounded-circle" 
+                            data-bs-toggle="tooltip" 
+                            title="Edit">
                             <i class="fa fa-fw fa-edit"></i>
                         </a>
                         <!-- Delete Button -->
