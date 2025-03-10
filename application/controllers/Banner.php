@@ -56,7 +56,7 @@ class Banner extends CI_Controller {
         
         if ($banner) {
             // Delete image file if exists
-            $image_path = './assets/img/banner/' . $banner['image'];
+            $image_path = '../ImageTerasJapan/banner/' . $banner['image'];
             if (file_exists($image_path)) {
                 unlink($image_path);
             }

@@ -9,14 +9,14 @@ class Cabang_model extends CI_Model {
     }
     public function getAllCabang() {
         // Logika untuk mengambil semua data produk dari tabel
-        return $this->db->get('cabang')->result_array();
+        return $this->db->get('branch')->result_array();
     }
     public function find_all(){
         return $this->db->get($this->table)->result_array();
     }
     public function getCabangById($id) {
         // Logika untuk mengambil data produk berdasarkan ID dari tabel
-        return $this->db->get_where('cabang', array('id' => $id))->row();
+        return $this->db->get_where('branch', array('id' => $id))->row();
     }
 
     public function insert($data) {

@@ -43,12 +43,21 @@ class Cabang extends CI_Controller {
                 redirect(base_url('cabang'));
             }
         }
-        public function getTransaksiCabang()
+        
+        public function getTransaksiCabang($branch_id)
         {
-            $data['title'] = "Riwayat Transaksi Member";
-            $idcabang = $this->uri->segment('3');
-            $data['trans'] = $this->transaksi->getTransaksiByIdMemberWithDetails($idcabang);
+            $data['title'] = "Riwayat Transaksi Cabang";
+            
+            $this->db->select('t.transaction_codes, t.created_at, b.branch_name, t.amount')
+                     ->from('transactions t')
+                     ->join('branch b', 'b.id = t.branch_id')
+                     ->where('t.branch_id', $branch_id)
+                     ->where('t.transaction_type', 'Teras Japan Payment')
+                     ->order_by('t.created_at', 'DESC');
+                     
+            $data['trans'] = $this->db->get()->result_array();
+            $data['branch'] = $this->db->get_where('branch', ['id' => $branch_id])->row_array();
+            
             $this->template->load('templates/dashboard', 'cabang/history', $data);
-
         }
 }
