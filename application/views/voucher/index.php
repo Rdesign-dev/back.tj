@@ -44,7 +44,17 @@
                         <tr>
                             <td><?= $no++; ?></td>
                             <td><?= $voucher['title']; ?></td>
-                            <td><img src="https://terasjapan.com/fotovoucher/<?= $voucher['image_name'] ?>" alt="" width="150px" height="100px"></td>
+                            <td>
+                                <?php if(!empty($voucher['image_name'])): ?>
+                                    <img src="<?= base_url('../ImageTerasJapan/reward/' . $voucher['image_name']) ?>" 
+                                         alt="Voucher Image" 
+                                         width="150px" 
+                                         height="100px"
+                                         class="img-thumbnail">
+                                <?php else: ?>
+                                    <span class="text-muted">No image</span>
+                                <?php endif; ?>
+                            </td>
                             <td><?= $voucher['points_required']; ?></td>
                             <td>
                                 <?php

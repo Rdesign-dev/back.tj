@@ -1,4 +1,3 @@
-
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow-sm mb-4 border-bottom-primary">
@@ -37,9 +36,8 @@
                     <div class="col-md-6">
                         <select name="metode" id="metode" class="form-control">
                             <option value="">- Pilih Metode Pembayaran -</option>
-                            <option value="transfer">Transfer Bank</option>
-                            <option value="qrisbca">Qris BCA</option>
-                            <option value="qris">Qris Non BCA</option>
+                            <option value="cash">Cash</option>
+                            <option value="transferBank">Transfer Bank</option>
                         </select>
                         <?= form_error('metode', '<span class="text-danger small">', '</span>'); ?>
                     </div>
@@ -54,30 +52,17 @@
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nomor">Nomor Member</label>
                     <div class="col-md-6">
-                        <?php if(isset($member)){
-                            foreach($member as $mb => $data){
-                                ?>
-                                <input type="text" name="nomor" id="nomor" class="form-control" value="<?=$data['nomor']?>" readonly>
-                                <?php
-                            }
-                        }
-                        ?>
-                        
+                        <input type="text" name="nomor" id="nomor" class="form-control" 
+                               value="<?= isset($member['phone_number']) ? $member['phone_number'] : '' ?>" readonly>
                         <?= form_error('nomor', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
+
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nama">Nama Member</label>
                     <div class="col-md-6">
-                        <?php if(isset($member)){
-                            foreach($member as $mb => $data){
-                                ?>
-                                <input type="text" name="nama" class="form-control" id="nama" value="<?=$data['namamember']?>" readonly>
-                                <?php
-                            }
-                        }
-                        ?>
-                        
+                        <input type="text" name="nama" class="form-control" id="nama" 
+                               value="<?= isset($member['name']) ? $member['name'] : '' ?>" readonly>
                         <?= form_error('nama', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>

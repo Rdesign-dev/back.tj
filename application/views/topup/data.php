@@ -39,17 +39,23 @@
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
-                            <td><?= $top->nominal; ?></td>
+                            <td>Rp <?= number_format($top->nominal, 0, ',', '.'); ?></td>
                             <td><?= $top->metode; ?></td>
-                            <td><img src="https://terasjapan.com/fotobukti/<?= $top->bukti ?>" alt="" width="100px" height="100px"></td>
+                            <td>
+                                <?php if($top->bukti && $top->bukti != 'struk.png'): ?>
+                                    <img src="<?= base_url('../ImageTerasJapan/transaction_evidence/' . $top->bukti) ?>" 
+                                         alt="Bukti Transfer" width="100px" height="100px">
+                                <?php else: ?>
+                                    <span class="text-muted">Cash Payment</span>
+                                <?php endif; ?>
+                            </td>
                             <td><?= $top->namamember; ?></td>
                             <td><?= $top->nama; ?></td>
-                            
                         </tr>
                     <?php endforeach;
                     else : ?>
                     <tr>
-                        <td colspan="8" class="text-center">Silahkan tambahkan data topup baru</td>
+                        <td colspan="6" class="text-center">Silahkan tambahkan data topup baru</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

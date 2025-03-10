@@ -1,4 +1,6 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
 class Member_model extends CI_Model{
 
     public $table = "member";
@@ -8,43 +10,51 @@ class Member_model extends CI_Model{
     }
 
     public function insert($data){
-        //akan digenerate DML insert into oleh ci
-        return $this->db->insert($this->table,$data);
+        return $this->db->insert('users', $data);
     }
+
     public function find_all(){
-        return $this->db->query("SELECT * from member ORDER by tanggaldaftar DESC")->result_array();
+        return $this->db->select('id, name, phone_number, email, balance, poin, registration_time')
+                    ->from('users')
+                    ->order_by('registration_time', 'DESC')
+                    ->get()
+                    ->result_array();
     }
 
     public function update($id,$data){
-        //ci akan men-generate statement where 
         $this->db->where('id',$id);
-        //ci mengupdate sesuai where diatas
-        return $this->db->update($this->table,$data);
+        return $this->db->update('users', $data);
     }
+
     public function delete($id){
         $this->db->where('id',$id);
         $this->db->delete($this->table);
     }
+
     public function tambahPoin($idmember, $poin) {
         $this->db->where('id', $idmember);
         $this->db->set('poin', 'poin+' . $poin, FALSE);
         $this->db->update('member');
     }
+
     public function get_by_nomor($nomor)
     {
         return $this->db->get_where('member',array('nomor' => $nomor))->row();
     }
+
     public function get_by_email($email)
     {
         return $this->db->get_where('member',array('email' => $email))->row();
     }
+
     public function find_by_nohp($nohp){
         $result = $this->db->query("SELECT * from member where nomor = $nohp")->result_array();
         return $result;
     }
+
     public function cari_detail_id($nomor){
         $this->db->where('nomor', $nomor);
-        $query = $this->db->get('member'); // replace 'your_member_table_name' with your actual table name
+        $query = $this->db->get('member');
 
         return $query->row();
     }
@@ -57,6 +67,7 @@ class Member_model extends CI_Model{
             return false;
         }
     }
+
     public function cari_member($keyword) {
         $this->db->like('namamember', $keyword);
         $this->db->or_like('nomor', $keyword);
@@ -64,24 +75,30 @@ class Member_model extends CI_Model{
     
         return $this->db->get('member')->result_array();
     }
+
     public function updateMemberSaldo($nomor, $nominal) {
         $saldo_sekarang = $this->db->get_where('member', array('nomor' => $nomor))->row()->saldo;
         
-        // Hitung saldo baru dengan menambahkan nominal top-up
         $saldo_baru = $saldo_sekarang + $nominal;
 
-        // Lakukan update saldo member
         $this->db->where('nomor', $nomor);
         $this->db->update('member', array('saldo' => $saldo_baru));
 
         return $saldo_baru;
     }
-    public function get_login_history()
-    {
-    $this->db->order_by('tanggallogin', 'desc');
-    $query = $this->db->get('logging');
 
-    return $query->result();
+    public function get_by_id($id) {
+        return $this->db->get_where('users', ['id' => $id])->row_array();
+    }
+
+
+    public function get_login_history() 
+    {
+        $this->db->select('l.login_id, u.phone_number as nomor, u.name as namamember, l.datetime as tanggallogin')
+                 ->from('login_users l')
+                 ->join('users u', 'u.id = l.id')
+                 ->order_by('l.datetime', 'DESC');
+        return $this->db->get()->result();
     }
 }
 

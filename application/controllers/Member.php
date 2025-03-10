@@ -69,40 +69,29 @@ class Member extends CI_Controller {
         $data['title'] = "Tambah Member";
         $this->template->load('templates/cabang', 'member/addCabang', $data);
     }
-    public function tambah_save()
-    {
-        
-        $this->form_validation->set_rules("namamember","Nama Member","required|trim");
-        $this->form_validation->set_rules("nomor","Nomor","required|trim|callback_check_unique_number|min_length[11]");
-        if($this->form_validation->run() == FALSE){
-            $this->_has_login();
+    public function tambah_save() {
+        $this->form_validation->set_rules('namamember', 'Nama Member', 'required|trim');
+        $this->form_validation->set_rules('nomor', 'Nomor Handphone', 'required|trim|is_unique[users.phone_number]');
+    
+        if ($this->form_validation->run() == false) {
             $data['title'] = "Tambah Member";
             $this->template->load('templates/dashboard', 'member/add', $data);
-        }else{
-            $nomor = $this->input->post("nomor");
-            $namamember = $this->input->post("namamember");
-            $poin = 0;
-            $data = array(
-                'nomor' => $nomor,
-                'namamember' => $namamember,
-                'poin' => $poin,
-                'foto' => 'hero.png',
-                'tanggaldaftar' => date('Y-m-d H:i:s')
-            );
-            $this->db->insert('member',$data);
-            $voucher_details = $this->voucher->find_all();
-            foreach ($voucher_details as $voucher) {
-            if ($voucher['isNew'] == 'memberbaru') {
-                $kodevoucher = $voucher['kodevoucher'];
-                $poin = $voucher['poin'];
-                $dateRedeem = date('Y-m-d H:i:s');
-                $expired_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
-                $vouchergenerate = date('YmdHis') . $kodevoucher;
-                $this->vouchermember->insertVoucherNewMember($kodevoucher, $nomor, $poin, $dateRedeem, $expired_date, $vouchergenerate);
+        } else {
+            $data = [
+                'name' => $this->input->post('namamember', true),
+                'phone_number' => $this->input->post('nomor', true),
+                'balance' => 0,
+                'poin' => 0,
+                'registration_time' => date('Y-m-d H:i:s')
+            ];
+    
+            if ($this->member->insert($data)) {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Data Member berhasil ditambahkan!</div>');
+                redirect('member');
+            } else {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Data Member gagal ditambahkan!</div>');
+                redirect('member/add');
             }
-        }
-            $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>');
-            redirect(base_url('member'));
         }
     }
     public function tambah_save_kasir()
@@ -219,7 +208,7 @@ class Member extends CI_Controller {
 		$this->template->load('templates/cabang', 'member/detailCabang', $data);
     }
     public function getLoggingMember(){
-        $data['title'] = "Logging Member";
+        $data['title'] = "Tracking Login Member";
         $data['loggin'] = $this->member->get_login_history();
         $this->template->load('templates/dashboard','member/logging', $data);
     }

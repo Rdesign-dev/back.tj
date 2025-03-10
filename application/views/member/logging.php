@@ -29,13 +29,13 @@
                             <td><?= $no++; ?></td>
                             <td><?= $log->nomor; ?></td>
                             <td><?= $log->namamember; ?></td>
-                            <td><?= $log->tanggallogin; ?></td>
+                            <td><?= date('d/m/Y H:i', strtotime($log->tanggallogin)); ?></td>
                             
                         </tr>
                     <?php endforeach;
                     else : ?>
                     <tr>
-                        <td colspan="8" class="text-center">Data Login Member tidak tersedia</td>
+                        <td colspan="4" class="text-center">Data Login Member tidak tersedia</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

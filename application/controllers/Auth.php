@@ -13,7 +13,6 @@ class Auth extends CI_Controller
         $this->load->model('Member_model','member');
     }
 
-    // kela ker ditanya bal
     public function index()
     {
         if ($this->session->userdata('login_session')) {

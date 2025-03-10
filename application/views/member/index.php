@@ -23,11 +23,12 @@
         <table class="table table-striped dt-responsive nowrap" id="dataTable">
             <thead>
                 <tr>
-                    <th width="30">No.</th>
-                    <th>Nama Member</th>
-                    <th>Nomor Handphone</th>
-                    <th>Poin</th>
+                    <th>No.</th>
+                    <th>Nama</th>
+                    <th>No. Telepon</th>
+                    <th>Email</th>
                     <th>Saldo</th>
+                    <th>Point</th>
                     <th>Tanggal Daftar</th>
                     <th>Aksi</th>
                 </tr>
@@ -40,19 +41,20 @@
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
-                            <td><?= $member['namamember']; ?></td>
-                            <td><?= $member['nomor']; ?></td>
-                            <td><?= $member['poin']; ?></td>
-                            <td>Rp. <?= number_format($member['saldo'], 0, ',', '.') ?></td>
-                            <td><?= $member['tanggaldaftar']; ?></td>
-                            <td><a href="<?= base_url("member/detail/{$member['nomor']}")?>" class="btn btn-primary"><i class="fas fa-info-circle"></i> Detail</a>
-                            <a href="<?= base_url('member/edit_member/') . $member['nomor'] ?>" class="btn btn-success"><i class="fas fa-user-cog"></i> Edit</a></a></td>
-                            
+                            <td><?= $member['name']; ?></td>
+                            <td><?= $member['phone_number']; ?></td>
+                            <td><?= $member['email'] ?? '-'; ?></td>
+                            <td>Rp <?= number_format($member['balance'],0,',','.'); ?></td>
+                            <td><?= number_format($member['poin'],0,',','.'); ?></td>
+                            <td><?= date('d/m/Y H:i', strtotime($member['registration_time'])); ?></td>
+                            <td>
+                                <a href="<?= base_url('member/edit/') . $member['id'] ?>" class="btn btn-circle btn-sm btn-warning"><i class="fa fa-fw fa-edit"></i></a>
+                            </td>
                         </tr>
                     <?php endforeach;
-                    else : ?>
+                else : ?>
                     <tr>
-                        <td colspan="8" class="text-center">Silahkan tambahkan member baru</td>
+                        <td colspan="8" class="text-center">Data Kosong</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

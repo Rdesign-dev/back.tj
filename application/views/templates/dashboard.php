@@ -107,7 +107,7 @@
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('brand'); ?>">
                 <i class="fas fa-clone"></i>
-                    <span>Brand Detail</span>
+                    <span>Brand Detail Dan Promo</span>
                 </a>
             </li>
             <li class="nav-item">

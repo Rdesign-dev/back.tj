@@ -26,6 +26,7 @@
                     <th class="text-center" style="width: 5%;">No.</th>
                     <th style="width: 15%;">Nama Banner</th>
                     <th style="width: 20%; word-wrap: break-word;">Link Banner</th>
+                    <th style="width: 20%;">Gambar</th>
                     <th class="text-center text-nowrap" style="width: 20%;">Aksi</th>
                 </tr>
             </thead>
@@ -42,6 +43,16 @@
                     <td><?= $iklan['title']; ?></td>
                     <td style="max-width: 400px; word-wrap: break-word; white-space: normal;">
                         <?= isset($iklan['description']) ? $iklan['description'] : 'No description available'; ?>
+                    </td>
+                    <td>
+                        <?php if(isset($iklan['image']) && !empty($iklan['image'])): ?>
+                            <img src="<?= base_url('../ImageTerasJapan/banner/' . $iklan['image']) ?>" 
+                                 alt="Banner Image" 
+                                 class="img-thumbnail"
+                                 style="max-height: 100px;">
+                        <?php else: ?>
+                            <span class="text-muted">No image</span>
+                        <?php endif; ?>
                     </td>
                     <td class="text-nowrap text-center d-flex justify-content-center gap-2 flex-wrap">
                         <!-- Edit Button -->

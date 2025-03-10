@@ -4,18 +4,8 @@
         <div class="row">
             <div class="col">
                 <h4 class="h5 align-middle m-0 font-weight-bold text-primary">
-                    Data TopUp Saldo Member
+                    History Top Up Saldo
                 </h4>
-            </div>
-            <div class="col-auto">
-                <a href="<?= base_url('transaksi/saldo') ?>" class="btn btn-sm btn-primary btn-icon-split">
-                    <span class="icon">
-                        <i class="fa fa-user-plus"></i>
-                    </span>
-                    <span class="text">
-                        Tambah Topup Saldo
-                    </span>
-                </a>
             </div>
         </div>
     </div>
@@ -23,33 +13,42 @@
         <table class="table table-striped dt-responsive nowrap" id="dataTable">
             <thead>
                 <tr>
-                    <th width="30">No.</th>
-                    <th>Nominal</th>
+                    <th>No</th>
+                    <th>Kode Transaksi</th>
+                    <th>Tanggal</th>
+                    <th>Cabang</th>
+                    <th>Nama Member</th>
+                    <th>Kasir</th>
+                    <th>Jumlah Top Up</th>
                     <th>Metode Pembayaran</th>
-                    <th>Foto Bukti</th>
-                    <th>Nama member</th>
-                    <th>Nama User</th>
+                    <th>Bukti Transfer</th>
                 </tr>
             </thead>
             <tbody>
-                <?php
-                $no = 1;
-                if ($tops) :
-                    foreach ($tops as $top) :
-                        ?>
-                        <tr>
-                            <td><?= $no++; ?></td>
-                            <td><?= $top->nominal; ?></td>
-                            <td><?= $top->metode; ?></td>
-                            <td><img src="<img src="https://terasjapan.com/fotobukti/<?= $top->bukti ?>" alt="" width="100px" height="100px"></td>
-                            <td><?= $top->namamember; ?></td>
-                            <td><?= $top->nama; ?></td>
-                            
-                        </tr>
-                    <?php endforeach;
-                    else : ?>
+                <?php if (!empty($trans)) : ?>
+                    <?php $no = 1; foreach ($trans as $tran) : ?>
                     <tr>
-                        <td colspan="8" class="text-center">Silahkan tambahkan data topup baru</td>
+                        <td><?= $no++; ?></td>
+                        <td><?= $tran->transaction_codes ?></td>
+                        <td><?= date('d/m/Y H:i', strtotime($tran->created_at)) ?></td>
+                        <td><?= $tran->branch_name ?></td>
+                        <td><?= $tran->member_name ?></td>
+                        <td><?= $tran->cashier_name ?></td>
+                        <td>Rp <?= number_format($tran->amount, 0, ',', '.') ?></td>
+                        <td><?= $tran->payment_method ?></td>
+                        <td>
+                            <?php if($tran->transaction_evidence && $tran->transaction_evidence != 'struk.png'): ?>
+                                <img src="<?= base_url('../ImageTerasJapan/transaction_evidence/' . $tran->transaction_evidence) ?>" 
+                                     alt="Transfer Evidence" width="150px" height="100px">
+                            <?php else: ?>
+                                <span class="text-muted">Cash Payment</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="9" class="text-center">Tidak ada data topup</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

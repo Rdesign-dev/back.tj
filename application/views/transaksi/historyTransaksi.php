@@ -37,21 +37,26 @@
             <tbody>
                 <?php
                 $no = 1;
-                    foreach ($trans as $tr => $tran) {
-                        ?>
-                        <tr>
-                            <td><?= $no++; ?></td>
-                            <td><?= $tran->kodetransaksi ?></td>
-                            <td><?= $tran->tanggaltransaksi ?></td>
-                            <td><?= $tran->namacabang ?></td>
-                            <td><?= $tran->namamember ?></td>
-                            <td><?= $tran->nama?></td>
-                            <td>Rp. <?= number_format($tran->total, 0, ',', '.') ?></td>
-                            <td><?= $tran->kodevoucher ?></td>
-                            <td><img src="https://terasjapan.com/fotobill/<?= $tran->fotobill ?>" alt="" width="150px" height="100px"></td>
-                        </tr>
-                        <?php
-                    }?>
+                foreach ($trans as $tr => $tran) : ?>
+                    <tr>
+                        <td><?= $no++; ?></td>
+                        <td><?= $tran->transaction_codes ?></td>
+                        <td><?= date('d/m/Y H:i', strtotime($tran->created_at)) ?></td>
+                        <td><?= $tran->branch_name ?></td>
+                        <td><?= $tran->member_name ?></td>
+                        <td><?= $tran->cashier_name ?></td>
+                        <td>Rp <?= number_format($tran->amount, 0, ',', '.') ?></td>
+                        <td>-</td>
+                        <td>
+                            <?php if($tran->transaction_evidence): ?>
+                                <img src="<?= base_url('../ImageTerasJapan/transaction_evidence/' . $tran->transaction_evidence) ?>" 
+                                     alt="Bill" width="150px" height="100px">
+                            <?php else: ?>
+                                <span class="text-muted">No Image</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
