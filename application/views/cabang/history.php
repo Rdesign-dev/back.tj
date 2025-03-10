@@ -28,6 +28,7 @@
                             <th>Kode Transaksi</th>
                             <th>Tanggal</th>
                             <th>Total</th>
+                            <th>Kasir</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,11 +41,12 @@
                                 <td><?= $t['transaction_codes'] ?></td>
                                 <td><?= date('d/m/Y H:i', strtotime($t['created_at'])) ?></td>
                                 <td>Rp <?= number_format($t['amount'], 0, ',', '.') ?></td>
+                                <td><?= $t['cashier_name'] ?></td>
                             </tr>
                             <?php endforeach;
                         else : ?>
                             <tr>
-                                <td colspan="4" class="text-center">Tidak ada transaksi</td>
+                                <td colspan="5" class="text-center">Tidak ada transaksi</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

@@ -48,9 +48,10 @@ class Cabang extends CI_Controller {
         {
             $data['title'] = "Riwayat Transaksi Cabang";
             
-            $this->db->select('t.transaction_codes, t.created_at, b.branch_name, t.amount')
+            $this->db->select('t.transaction_codes, t.created_at, b.branch_name, t.amount, a.Name as cashier_name')
                      ->from('transactions t')
                      ->join('branch b', 'b.id = t.branch_id')
+                     ->join('accounts a', 'a.id = t.account_cashier_id')
                      ->where('t.branch_id', $branch_id)
                      ->where('t.transaction_type', 'Teras Japan Payment')
                      ->order_by('t.created_at', 'DESC');
