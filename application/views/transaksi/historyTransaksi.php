@@ -49,7 +49,7 @@
                         <td>-</td>
                         <td>
                             <?php if($tran->transaction_evidence): ?>
-                                <img src="<?= base_url('../ImageTerasJapan/transaction_evidence/' . $tran->transaction_evidence) ?>" 
+                                <img src="<?= base_url('../ImageTerasJapan/transaction_proof/' . $tran->transaction_evidence) ?>" 
                                      alt="Bill" width="150px" height="100px">
                             <?php else: ?>
                                 <span class="text-muted">No Image</span>

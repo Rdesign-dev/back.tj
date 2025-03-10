@@ -617,7 +617,7 @@ function updateCabangJumlahTransaksi($nocabang){
             } else {
                 $config['upload_path'] = '../fotobukti/';
                 $config['allowed_types'] = 'gif|jpg|png|PNG|jpeg|JPEG';
-                $config['max_size'] = 2048000;
+                $config['max_size'] = 10240; // 10MB in kilobytes
                 $config['max_width'] = 10000;
                 $config['max_height'] = 10000;
                 $this->load->library('upload', $config);

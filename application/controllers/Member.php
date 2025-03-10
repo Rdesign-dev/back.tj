@@ -38,9 +38,19 @@ class Member extends CI_Controller {
 	public function index()
 	{
 	    $this->_has_login();
-        $data['title'] = "Management Member";
-        $data['members'] = $this->member->find_all();
-		$this->template->load('templates/dashboard', 'member/index', $data);
+        $data['title'] = "Data Member";
+        // Make sure we're selecting profile_pic field
+        $data['members'] = $this->db->select('id, name, phone_number, email, balance, poin, 
+                                        profile_pic, registration_time')
+                               ->from('users')
+                               ->order_by('name', 'ASC')
+                               ->get()
+                               ->result_array();
+    
+        // Debug to check if profile_pic is present in the data
+        // echo '<pre>'; print_r($data['members']); die;
+    
+        $this->template->load('templates/dashboard', 'member/index', $data);
 	}
     public function indexKasir()
 	{
@@ -217,27 +227,72 @@ class Member extends CI_Controller {
         $data['loggin'] = $this->member->get_login_history();
         $this->template->load('templates/cabang','member/loggingCabang', $data);
     }
-    public function edit($nomor){
-    $this->_has_login();
-    $data['title'] = "Edit Member";
-    $nomor = $this->uri->segment('3');
+    public function edit($getId) 
+{
+    $member = $this->member->get_member($getId);
+    
+    if (!$member) {
+        $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Member tidak ditemukan</div>');
+        redirect('member');
+    }
 
-    if (!empty($nomor)) {
-        $data['member'] = $this->member->cari_detail_id($nomor);
+    $this->form_validation->set_rules('nama', 'Nama Member', 'required|trim');
+    $this->form_validation->set_rules('phone', 'Nomor Handphone', 'required|trim');
+    $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email');
+    $this->form_validation->set_rules('alamat', 'Alamat', 'required|trim');
+    $this->form_validation->set_rules('gender', 'Jenis Kelamin', 'required');
+    $this->form_validation->set_rules('birthdate', 'Tanggal Lahir', 'required');
+    $this->form_validation->set_rules('city', 'Kota', 'required|trim');
 
-        // Pastikan member ditemukan sebelum memuat template
-        if ($data['member']) {
-            // Load template dengan data yang telah disiapkan
-            $this->template->load('templates/dashboard', 'member/edit', $data);
-        } else {
-            // Handle jika member tidak ditemukan
-            echo "Member tidak ditemukan.";
-        }
+    if ($this->form_validation->run() == false) {
+        $data['title'] = "Edit Member";
+        $data['member'] = $member;
+        $this->template->load('templates/dashboard', 'member/edit', $data);
     } else {
-        // Handle jika $id tidak valid
-        echo "Nomor member tidak valid.";
+        $data = [
+            'name' => $this->input->post('nama', true),
+            'phone_number' => $this->input->post('phone', true),
+            'email' => $this->input->post('email', true),
+            'address' => $this->input->post('alamat', true),
+            'gender' => $this->input->post('gender', true),
+            'birthdate' => $this->input->post('birthdate', true),
+            'city' => $this->input->post('city', true)
+        ];
+
+        // Handle file upload
+        if (!empty($_FILES['foto']['name'])) {
+            $config['upload_path'] = '../ImageTerasJapan/ProfPic/';
+            $config['allowed_types'] = 'gif|jpg|png|jpeg';
+            $config['max_size'] = 2048;
+            $config['file_name'] = uniqid('prof_');
+
+            $this->load->library('upload', $config);
+
+            if ($this->upload->do_upload('foto')) {
+                // Delete old image
+                $old_image = $this->input->post('old_image');
+                if ($old_image != 'default.png' && file_exists($config['upload_path'] . $old_image)) {
+                    unlink($config['upload_path'] . $old_image);
+                }
+                
+                $data['profile_pic'] = $this->upload->data('file_name');
+            } else {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">' . $this->upload->display_errors() . '</div>');
+                redirect('member/edit/' . $getId);
+            }
+        }
+
+        // Update data
+        $update = $this->db->update('users', $data, ['id' => $getId]);
+
+        if ($update) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-success">Data Member berhasil diupdate</div>');
+        } else {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Data Member gagal diupdate</div>');
+        }
+        redirect('member');
     }
-    }
+}
     public function editKasir(){
         $this->_has_login();
         $data['title'] = "Edit Member";

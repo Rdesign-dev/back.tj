@@ -38,8 +38,10 @@
                         <td><?= $tran->payment_method ?></td>
                         <td>
                             <?php if($tran->transaction_evidence && $tran->transaction_evidence != 'struk.png'): ?>
-                                <img src="<?= base_url('../ImageTerasJapan/transaction_evidence/' . $tran->transaction_evidence) ?>" 
-                                     alt="Transfer Evidence" width="150px" height="100px">
+                                <img src='http://localhost/ImageTerasJapan/transaction_proof/<?php echo $tran->transaction_evidence; ?>' 
+                                     alt="Transfer Evidence" 
+                                     width="150" 
+                                     height="100">
                             <?php else: ?>
                                 <span class="text-muted">Cash Payment</span>
                             <?php endif; ?>
