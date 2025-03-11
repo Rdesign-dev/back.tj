@@ -73,7 +73,7 @@ class Transaksi extends CI_Controller {
                      ->update('redeem_voucher', $data);
         }
     public function convert_and_update() 
-{
+	{
     // Get login session data
     $login_session = $this->session->userdata('login_session');
     
@@ -133,6 +133,9 @@ class Transaksi extends CI_Controller {
             'created_at' => $this->input->post('tanggaltransaksi')
         ];
 
+		var_dump($data);
+		die();
+
         if ($this->input->post('tukarVoucher')) {
             $data['voucher_id'] = $this->input->post('kodevouchertukar');
             // Update voucher status
@@ -147,7 +150,7 @@ class Transaksi extends CI_Controller {
             redirect('transaksi/add');
         }
     }
-}
+	}
     public function cari_member_kasir(){
         $this->form_validation->set_rules('nomor','NomorHp','required|numeric');
         if($this->form_validation->run() == false){

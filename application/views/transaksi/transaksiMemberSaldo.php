@@ -23,7 +23,7 @@
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
                 <?php echo form_open_multipart('transaksi/convert_and_updateSaldoMember'); ?>
-                
+
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nominal">Nominal TopUp</label>
                     <div class="col-md-6">
@@ -52,8 +52,8 @@
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nomor">Nomor Member</label>
                     <div class="col-md-6">
-                        <input type="text" name="nomor" id="nomor" class="form-control" 
-                               value="<?= isset($member['phone_number']) ? $member['phone_number'] : '' ?>" readonly>
+                        <input type="text" name="nomor" id="nomor" class="form-control"
+                            value="<?= isset($member['phone_number']) ? $member['phone_number'] : '' ?>" readonly>
                         <?= form_error('nomor', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
@@ -61,78 +61,75 @@
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nama">Nama Member</label>
                     <div class="col-md-6">
-                        <input type="text" name="nama" class="form-control" id="nama" 
-                               value="<?= isset($member['name']) ? $member['name'] : '' ?>" readonly>
+                        <input type="text" name="nama" class="form-control" id="nama"
+                            value="<?= isset($member['name']) ? $member['name'] : '' ?>" readonly>
                         <?= form_error('nama', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" name="use_voucher" id="use_voucher" value="true">
-                        Gunakan Voucher
-                    </label>
-                </div>
-
-                <div id="voucher_fields" style="display:none;">
-                    <div class="form-group">
-                        <label>Pilih Voucher</label>
-                        <select name="voucher_code" class="form-control">
-                            <?php foreach($unused_vouchers as $voucher): ?>
-                                <option value="<?= $voucher['kode_voucher'] ?>">
-                                    <?= $voucher['kode_voucher'] ?> - Points: <?= $voucher['points_used'] ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                <br>
+                <div class="row form-group justify-content-end">
+                    <div class="col-md-8">
+                        <button type="submit" class="btn btn-primary btn-icon-split">
+                            <span class="icon"><i class="fa fa-save"></i></span>
+                            <span class="text">Simpan</span>
+                        </button>
+                        <button type="reset" class="btn btn-secondary btn-icon-split">
+                            <span class="icon"><i class="fas fa-backspace"></i></span>
+                            <span class="text">Reset</span>
+                        </button>
                     </div>
                 </div>
+                <?= form_close(); ?>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var form = document.querySelector('form');
 
-                <div id="topup_fields">
-        form.addEventListener("submit", function (event) {
-            var nominalInput = document.getElementById('nominal');
-            var metodeInput = document.getElementById('metode');
-            var buktiInput = document.getElementById('bukti');
-            var nomorInput = document.getElementById('nomor');
-            var namaInput = document.getElementById('nama');
+    form.addEventListener("submit", function(event) {
+        var nominalInput = document.getElementById('nominal');
+        var metodeInput = document.getElementById('metode');
+        var buktiInput = document.getElementById('bukti');
+        var nomorInput = document.getElementById('nomor');
+        var namaInput = document.getElementById('nama');
 
-            if (!nominalInput.value.trim()) {
-                event.preventDefault();
-                nominalInput.classList.add("is-invalid");
-            } else {
-                nominalInput.classList.remove("is-invalid");
-            }
+        if (!nominalInput.value.trim()) {
+            event.preventDefault();
+            nominalInput.classList.add("is-invalid");
+        } else {
+            nominalInput.classList.remove("is-invalid");
+        }
 
-            if (!metodeInput.value.trim()) {
-                event.preventDefault();
-                metodeInput.classList.add("is-invalid");
-            } else {
-                metodeInput.classList.remove("is-invalid");
-            }
+        if (!metodeInput.value.trim()) {
+            event.preventDefault();
+            metodeInput.classList.add("is-invalid");
+        } else {
+            metodeInput.classList.remove("is-invalid");
+        }
 
-            if (!buktiInput.value.trim()) {
-                event.preventDefault();
-                buktiInput.classList.add("is-invalid");
-            } else {
-                buktiInput.classList.remove("is-invalid");
-            }
+        if (!buktiInput.value.trim()) {
+            event.preventDefault();
+            buktiInput.classList.add("is-invalid");
+        } else {
+            buktiInput.classList.remove("is-invalid");
+        }
 
-            if (!nomorInput.value.trim()) {
-                event.preventDefault();
-                nomorInput.classList.add("is-invalid");
-            } else {
-                nomorInput.classList.remove("is-invalid");
-            }
+        if (!nomorInput.value.trim()) {
+            event.preventDefault();
+            nomorInput.classList.add("is-invalid");
+        } else {
+            nomorInput.classList.remove("is-invalid");
+        }
 
-            if (!namaInput.value.trim()) {
-                event.preventDefault();
-                namaInput.classList.add("is-invalid");
-            } else {
-                namaInput.classList.remove("is-invalid");
-            }
-        });
+        if (!namaInput.value.trim()) {
+            event.preventDefault();
+            namaInput.classList.add("is-invalid");
+        } else {
+            namaInput.classList.remove("is-invalid");
+        }
     });
+});
 </script>
-
-
-
-
