@@ -66,28 +66,28 @@
                         <?= form_error('nama', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-                <br>
-                <div class="row form-group justify-content-end">
-                    <div class="col-md-8">
-                        <button type="submit" class="btn btn-primary btn-icon-split">
-                            <span class="icon"><i class="fa fa-save"></i></span>
-                            <span class="text">Simpan</span>
-                        </button>
-                        <button type="reset" class="btn btn-secondary btn-icon-split">
-                        <span class="icon"><i class="fas fa-backspace"></i></span>
-                            <span class="text">Reset</span>
-                        </button>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="use_voucher" id="use_voucher" value="true">
+                        Gunakan Voucher
+                    </label>
+                </div>
+
+                <div id="voucher_fields" style="display:none;">
+                    <div class="form-group">
+                        <label>Pilih Voucher</label>
+                        <select name="voucher_code" class="form-control">
+                            <?php foreach($unused_vouchers as $voucher): ?>
+                                <option value="<?= $voucher['kode_voucher'] ?>">
+                                    <?= $voucher['kode_voucher'] ?> - Points: <?= $voucher['points_used'] ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                 </div>
-                <?= form_close(); ?>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var form = document.querySelector('form');
 
+                <div id="topup_fields">
         form.addEventListener("submit", function (event) {
             var nominalInput = document.getElementById('nominal');
             var metodeInput = document.getElementById('metode');
