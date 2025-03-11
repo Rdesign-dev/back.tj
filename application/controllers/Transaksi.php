@@ -74,94 +74,102 @@ class Transaksi extends CI_Controller {
                      ->update('redeem_voucher', $data);
         }
     public function convert_and_update() 
-    	{
-    // Get login session data
-    $login_session = $this->session->userdata('login_session');
-    
-    // Check if user is logged in
-    if (!$login_session) {
-        $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Silahkan login terlebih dahulu</div>');
-        redirect('auth');
-    return;
-    }
-
-    
-    // Id Admin
-    $account_id = $login_session['id'];
-
-    // Get user_id by phone number
-    $phone_number = $this->input->post('nomor');
-    $user_id = $this->user->get_user_by_phone($phone_number);
-
-    $user_id = intval($user_id);
-    // var_dump($user_id);
-    // die();
-    
-    // Form validation rules
-    $this->form_validation->set_rules('tanggaltransaksi', 'Tanggal Transaksi', 'required');
-    $this->form_validation->set_rules('nocabang', 'Nama Cabang', 'required');
-    $this->form_validation->set_rules('nomor', 'Nomor Member', 'required');
-    $this->form_validation->set_rules('nama', 'Nama Member', 'required');
-
-    if ($this->input->post('tukarVoucher')) {
-        $this->form_validation->set_rules('kodevouchertukar', 'Kode Voucher', 'required');
-    } else {
-        $this->form_validation->set_rules('total', 'Total', 'required|numeric');
-        $this->form_validation->set_rules('payment_method', 'Metode Pembayaran', 'required');
-    }
-
-    if ($this->form_validation->run() == FALSE) {
-        $data['title'] = "Transaksi Member";
-        $data['cabang'] = $this->db->get('branches')->result_array();
-        $data['member'] = $this->session->userdata('member_data');
-        $this->template->load('templates/dashboard', 'transaksi/transaksiMember', $data);
-    } else {
-        // Process transaction
-        $config['upload_path'] = '../ImageTerasJapan/transaction_proof/';
-        $config['allowed_types'] = 'gif|jpg|png|jpeg';
-        $config['max_size'] = 2048;
-        $config['file_name'] = $this->generate_evidence_filename($this->input->post('nomor'));
-
-        $this->load->library('upload', $config);
-
-        if (!$this->upload->do_upload('fotobill')) {
-            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">'.$this->upload->display_errors().'</div>');
-            redirect('transaksi/add');
-            return;
-        }
-
-        $upload_data = $this->upload->data();
+    {
+        // Get login session data
+        $login_session = $this->session->userdata('login_session');
         
-        $data = [
-            'transaction_codes' => $this->generate_transaction_code($account_id),
-            'user_id' => $user_id,
-            'transaction_type' => $this->input->post('tukarVoucher') ? 'Reedem Voucher' : 'Teras Japan Payment',
-            'amount' => $this->input->post('total'),
-            'branch_id' => $this->input->post('nocabang'),
-            'account_cashier_id' => $account_id,
-            'payment_method' => $this->input->post('payment_method'),
-            'transaction_evidence' => $upload_data['file_name'],
-            'created_at' => $this->input->post('tanggaltransaksi')
-        ];
-
-		// var_dump($data);
-		// die();
-
-        if ($this->input->post('tukarVoucher')) {
-            $data['voucher_id'] = $this->input->post('kodevouchertukar');
-            // Update voucher status
-            $this->updateVoucherStatus($this->input->post('kodevouchertukar'));
+        // Check if user is logged in
+        if (!$login_session) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Silahkan login terlebih dahulu</div>');
+            redirect('auth');
+        return;
         }
-
-        if ($this->db->insert('transactions', $data)) {
-            $this->session->set_flashdata('pesan', '<div class="alert alert-success">Transaksi berhasil disimpan</div>');
-            redirect('transaksi/historyTransaksi');
+    
+        
+        // Id Admin
+        $account_id = $login_session['id'];
+    
+        // Get user_id by phone number
+        $phone_number = $this->input->post('nomor');
+        $user_id = $this->user->get_user_by_phone($phone_number);
+    
+        $user_id = intval($user_id);
+        
+        // Form validation rules
+        $this->form_validation->set_rules('tanggaltransaksi', 'Tanggal Transaksi', 'required');
+        $this->form_validation->set_rules('nocabang', 'Nama Cabang', 'required');
+        $this->form_validation->set_rules('nomor', 'Nomor Member', 'required');
+        $this->form_validation->set_rules('nama', 'Nama Member', 'required');
+    
+        if ($this->input->post('tukarVoucher')) {
+            $this->form_validation->set_rules('kodevouchertukar', 'Kode Voucher', 'required');
         } else {
-            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Transaksi gagal disimpan</div>');
-            redirect('transaksi/add');
+            $this->form_validation->set_rules('total', 'Total', 'required|numeric');
+            $this->form_validation->set_rules('payment_method', 'Metode Pembayaran', 'required');
+        }
+    
+        if ($this->form_validation->run() == FALSE) {
+            $data['title'] = "Transaksi Member";
+            $data['cabang'] = $this->db->get('branches')->result_array();
+            $data['member'] = $this->session->userdata('member_data');
+            $this->template->load('templates/dashboard', 'transaksi/transaksiMember', $data);
+        } else {
+            // Process transaction
+            $config['upload_path'] = '../ImageTerasJapan/transaction_proof/';
+            $config['allowed_types'] = 'gif|jpg|png|jpeg';
+            $config['max_size'] = 2048;
+            $config['file_name'] = $this->generate_evidence_filename($this->input->post('nomor'));
+    
+            $this->load->library('upload', $config);
+    
+            if (!$this->upload->do_upload('fotobill')) {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">'.$this->upload->display_errors().'</div>');
+                redirect('transaksi/add');
+                return;
+            }
+    
+            $upload_data = $this->upload->data();
+            
+            $data = [
+                'transaction_codes' => $this->generate_transaction_code($account_id),
+                'user_id' => $user_id,
+                'transaction_type' => $this->input->post('tukarVoucher') ? 'Reedem Voucher' : 'Teras Japan Payment',
+                'amount' => $this->input->post('total'),
+                'branch_id' => $this->input->post('nocabang'),
+                'account_cashier_id' => $account_id,
+                'payment_method' => $this->input->post('tukarVoucher') ? null : $this->input->post('payment_method'),
+                'transaction_evidence' => $upload_data['file_name'],
+                'created_at' => $this->input->post('tanggaltransaksi')
+            ];
+    
+            if ($this->input->post('tukarVoucher')) {
+                // Ambil redeem_id berdasarkan kode_voucher
+                $kode_voucher = $this->input->post('kodevouchertukar');
+                $voucher = $this->db->get_where('redeem_voucher', ['kode_voucher' => $kode_voucher])->row();
+                
+                if (!$voucher) {
+                    $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Voucher tidak ditemukan</div>');
+                    redirect('transaksi/add');
+                    return;
+                }
+                
+                // Set voucher_id dengan redeem_id (bukan kode_voucher)
+                $data['voucher_id'] = $voucher->redeem_id;
+                
+                // Update voucher status
+                $this->updateVoucherStatus($kode_voucher);
+            }
+    
+            if ($this->db->insert('transactions', $data)) {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Transaksi berhasil disimpan</div>');
+                redirect('transaksi/historyTransaksi');
+            } else {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Transaksi gagal disimpan: ' . $this->db->error()['message'] . '</div>');
+                redirect('transaksi/add');
+            }
         }
     }
-	}
+    
     public function cari_member_kasir(){
         $this->form_validation->set_rules('nomor','NomorHp','required|numeric');
         if($this->form_validation->run() == false){
