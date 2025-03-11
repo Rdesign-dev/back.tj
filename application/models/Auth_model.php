@@ -82,6 +82,14 @@ class Auth_model extends CI_Model
         return $query->row(); // Assuming you expect only one row
     }
 
+    public function get_user_by_phone($phone)
+    {
+        $this->db->where('phone_number', $phone);
+        $query = $this->db->get('users');
+
+        return $query->row('id');
+    }
+
     public function getUserDetail($idUser) {
         $this->db->select('accounts.*, branch.branch_name');
         $this->db->from('accounts');

@@ -5,6 +5,7 @@ class Transaksi extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
+        $this->load->model('auth_model', 'user'); 
         $this->load->model('transaksi_model', 'transaksi');
         $this->load->model('topup_model', 'topup');
         $this->load->model('member_model','member');
@@ -73,18 +74,28 @@ class Transaksi extends CI_Controller {
                      ->update('redeem_voucher', $data);
         }
     public function convert_and_update() 
-	{
+    	{
     // Get login session data
     $login_session = $this->session->userdata('login_session');
     
     // Check if user is logged in
-    if (!$login_session || !isset($login_session['user'])) {
+    if (!$login_session) {
         $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Silahkan login terlebih dahulu</div>');
         redirect('auth');
-        return;
+    return;
     }
 
-    $account_id = $login_session['user'];
+    
+    // Id Admin
+    $account_id = $login_session['id'];
+
+    // Get user_id by phone number
+    $phone_number = $this->input->post('nomor');
+    $user_id = $this->user->get_user_by_phone($phone_number);
+
+    $user_id = intval($user_id);
+    // var_dump($user_id);
+    // die();
     
     // Form validation rules
     $this->form_validation->set_rules('tanggaltransaksi', 'Tanggal Transaksi', 'required');
@@ -123,7 +134,7 @@ class Transaksi extends CI_Controller {
         
         $data = [
             'transaction_codes' => $this->generate_transaction_code($account_id),
-            'user_id' => $this->input->post('nomor'),
+            'user_id' => $user_id,
             'transaction_type' => $this->input->post('tukarVoucher') ? 'Reedem Voucher' : 'Teras Japan Payment',
             'amount' => $this->input->post('total'),
             'branch_id' => $this->input->post('nocabang'),
@@ -133,8 +144,8 @@ class Transaksi extends CI_Controller {
             'created_at' => $this->input->post('tanggaltransaksi')
         ];
 
-		var_dump($data);
-		die();
+		// var_dump($data);
+		// die();
 
         if ($this->input->post('tukarVoucher')) {
             $data['voucher_id'] = $this->input->post('kodevouchertukar');
