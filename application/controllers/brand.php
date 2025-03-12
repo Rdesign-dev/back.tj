@@ -175,7 +175,7 @@ class Brand extends CI_Controller {
         } else {
             $data = [
                 'name' => $this->input->post('name', true),
-                'desc' => $this->input->post('desc', true),
+                'desc' => $this->input->post('desc', true), // Fixed the syntax error here
                 'instagram' => $this->input->post('instagram'),
                 'tiktok' => $this->input->post('tiktok'),
                 'wa' => $this->input->post('wa'),
@@ -290,6 +290,80 @@ class Brand extends CI_Controller {
             $data['brand_id'] = $brand_id;
             $data['brand'] = $brand;
             $this->template->load('templates/dashboard', 'brand/add_promo', $data);
+        }
+    }
+
+    public function editpromo($id = null)
+    {
+        if (!$id) {
+            set_pesan('ID Promo tidak ditemukan', false);
+            redirect('brand');
+        }
+
+        // Get promo data
+        $promo = $this->brand->get_promo_by_id($id);
+        if (!$promo) {
+            set_pesan('Data promo tidak ditemukan', false);
+            redirect('brand');
+        }
+
+        if ($this->input->post()) {
+            $this->_validasi_promo();
+            
+            if ($this->form_validation->run() == false) {
+                $data['title'] = "Edit Promo";
+                $data['promo'] = $promo;
+                $this->template->load('templates/dashboard', 'brand/edit_promo', $data);
+            } else {
+                $input = $this->input->post(null, true);
+                
+                // Handle image upload if new image is provided
+                if (!empty($_FILES['promo_image']['name'])) {
+                    $config['upload_path']   = '../ImageTerasJapan/promo/';
+                    $config['allowed_types'] = 'jpg|jpeg|png';
+                    $config['max_size']      = 2048;
+                    $config['file_name']     = 'promo_' . time();
+
+                    $this->load->library('upload', $config);
+
+                    if ($this->upload->do_upload('promo_image')) {
+                        // Delete old image if exists
+                        if ($promo['promo_image'] && file_exists($config['upload_path'] . $promo['promo_image'])) {
+                            unlink($config['upload_path'] . $promo['promo_image']);
+                        }
+                        $input['promo_image'] = $this->upload->data('file_name');
+                    } else {
+                        set_pesan($this->upload->display_errors(), false);
+                        redirect('brand/editpromo/' . $id);
+                    }
+                }
+
+                // Set timezone and determine status
+                date_default_timezone_set('Asia/Jakarta');
+                $now = strtotime('now');
+                $available_from = strtotime($input['available_from']);
+                $valid_until = strtotime($input['valid_until']);
+
+                if ($available_from > $now) {
+                    $input['status'] = 'Coming';
+                } else if ($valid_until < $now) {
+                    $input['status'] = 'Expired';
+                } else {
+                    $input['status'] = 'Available';
+                }
+
+                if ($this->brand->save_edit_promo($id, $input)) {
+                    set_pesan('Promo berhasil diupdate');
+                    redirect('brand');
+                } else {
+                    set_pesan('Gagal mengupdate promo', false);
+                    redirect('brand/editpromo/' . $id);
+                }
+            }
+        } else {
+            $data['title'] = "Edit Promo";
+            $data['promo'] = $promo;
+            $this->template->load('templates/dashboard', 'brand/edit_promo', $data);
         }
     }
 

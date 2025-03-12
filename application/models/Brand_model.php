@@ -110,4 +110,37 @@ class Brand_model extends CI_Model {
         
         return true;
     }
+
+    public function get_promo_by_id($id)
+    {
+        return $this->db->get_where('brand_promo', ['id' => $id])->row_array();
+    }
+
+    public function update_promo($id, $data)
+    {
+        $this->db->trans_start();
+        $this->db->where('id', $id);
+        $result = $this->db->update('brand_promo', $data);
+        $this->db->trans_complete();
+        
+        return $this->db->trans_status() && $result;
+    }
+
+    public function save_edit_promo($id, $data)
+    {
+        $this->db->trans_start();
+        $this->db->where('id', $id);
+        $result = $this->db->update('brand_promo', $data);
+        $this->db->trans_complete();
+        
+        // Log the update attempt
+        log_message('info', sprintf(
+            'Updating promo ID: %d with data: %s. Result: %s', 
+            $id,
+            json_encode($data),
+            $result ? 'success' : 'failed'
+        ));
+        
+        return $this->db->trans_status() && $result;
+    }
 }
