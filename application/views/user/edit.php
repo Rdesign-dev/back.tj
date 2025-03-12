@@ -1,5 +1,3 @@
-
-
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow-sm mb-4 border-bottom-primary">
@@ -24,7 +22,7 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?= form_open('', [], ['id_user' => $user['id_user']]); ?>
+                <?= form_open('', [], ['id' => $user['id']]); ?>
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="username">Username</label>
                     <div class="col-md-6">
@@ -32,54 +30,61 @@
                         <?= form_error('username', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-                <hr>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="nama">Nama</label>
+                    <label class="col-md-4 text-md-right" for="Name">Nama</label>
                     <div class="col-md-6">
-                        <input value="<?= set_value('nama', $user['nama']); ?>" type="text" id="nama" name="nama" class="form-control" placeholder="Nama">
-                        <?= form_error('nama', '<span class="text-danger small">', '</span>'); ?>
+                        <input value="<?= set_value('Name', $user['Name']); ?>" type="text" id="Name" name="Name" class="form-control" placeholder="Nama">
+                        <?= form_error('Name', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="no_telp">Nomor Telepon</label>
+                    <label class="col-md-4 text-md-right" for="phone_number">Nomor Telepon</label>
                     <div class="col-md-6">
-                        <input value="<?= set_value('no_telp', $user['no_telp']); ?>" type="text" id="no_telp" name="no_telp" class="form-control" placeholder="Nomor Telepon">
-                        <?= form_error('no_telp', '<span class="text-danger small">', '</span>'); ?>
+                        <input value="<?= set_value('phone_number', $user['phone_number']); ?>" type="text" id="phone_number" name="phone_number" class="form-control" placeholder="Nomor Telepon">
+                        <?= form_error('phone_number', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="role">Role</label>
+                    <label class="col-md-4 text-md-right" for="account_type">Role</label>
                     <div class="col-md-6">
                         <div class="custom-control custom-radio">
-                            <input <?= $user['role'] == 'superadmin' ? 'checked' : ''; ?> <?= set_radio('role', 'superadmin'); ?> value="superadmin" type="radio" id="superadmin" name="role" class="custom-control-input">
-                            <label class="custom-control-label" for="superadmin">Super Admin</label>
+                            <input <?= $user['account_type'] == 'super_admin' ? 'checked' : ''; ?> <?= set_radio('account_type', 'super_admin'); ?> value="super_admin" type="radio" id="super_admin" name="account_type" class="custom-control-input">
+                            <label class="custom-control-label" for="super_admin">Super Admin</label>
                         </div>
                         <div class="custom-control custom-radio">
-                            <input <?= $user['role'] == 'kasir' ? 'checked' : ''; ?> <?= set_radio('role', 'kasir'); ?> value="kasir" type="radio" id="kasir" name="role" class="custom-control-input">
-                            <label class="custom-control-label" for="kasir">Kasir</label>
+                            <input <?= $user['account_type'] == 'admin_central' ? 'checked' : ''; ?> <?= set_radio('account_type', 'admin_central'); ?> value="admin_central" type="radio" id="admin_central" name="account_type" class="custom-control-input">
+                            <label class="custom-control-label" for="admin_central">Admin Pusat</label>
                         </div>
                         <div class="custom-control custom-radio">
-                            <input <?= $user['role'] == 'adminpusat' ? 'checked' : ''; ?> <?= set_radio('role', 'adminpusat'); ?> value="adminpusat" type="radio" id="adminpusat" name="role" class="custom-control-input">
-                            <label class="custom-control-label" for="adminpusat">Admin Pusat</label>
+                            <input <?= $user['account_type'] == 'branch_admin' ? 'checked' : ''; ?> <?= set_radio('account_type', 'branch_admin'); ?> value="branch_admin" type="radio" id="branch_admin" name="account_type" class="custom-control-input">
+                            <label class="custom-control-label" for="branch_admin">Admin Cabang</label>
                         </div>
                         <div class="custom-control custom-radio">
-                            <input <?= $user['role'] == 'admincabang' ? 'checked' : ''; ?> <?= set_radio('role', 'admincabang'); ?> value="admincabang" type="radio" id="admincabang" name="role" class="custom-control-input">
-                            <label class="custom-control-label" for="admincabang">Admin Cabang</label>
+                            <input <?= $user['account_type'] == 'cashier' ? 'checked' : ''; ?> <?= set_radio('account_type', 'cashier'); ?> value="cashier" type="radio" id="cashier" name="account_type" class="custom-control-input">
+                            <label class="custom-control-label" for="cashier">Kasir</label>
                         </div>
-                        <?= form_error('role', '<span class="text-danger small">', '</span>'); ?>
+                        <?= form_error('account_type', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group" id="divCabang" style="display: none;">
-                    <label class="col-md-4 text-md-right" for="idcabang">Cabang</label>
+                    <label class="col-md-4 text-md-right" for="branch_id">Cabang</label>
                     <div class="col-md-6">
-                        <select name="idcabang" id="idcabang" class="form-control">
-                            <option value="" selected disabled>Pilih Cabang</option>
-                            <?php foreach ($cabang as $cg => $cbg): ?>
-                                <option value="<?= $cbg['id']?>"><?= $cbg['namacabang']?></option>
+                        <select name="branch_id" id="branch_id" class="form-control">
+                            <option value="">Pilih Cabang</option>
+                            <?php foreach ($cabang as $cbg): ?>
+                                <option value="<?= $cbg['id']?>" <?= $user['branch_id'] == $cbg['id'] ? 'selected' : '' ?>><?= $cbg['branch_name']?></option>
                             <?php endforeach; ?>
                         </select>
-                        <?= form_error('idcabang', '<span class="text-danger small">', '</span>'); ?>
-                        <input type="hidden" name="namacabang" id="namacabang">
+                        <?= form_error('branch_id', '<span class="text-danger small">', '</span>'); ?>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="status">Status</label>
+                    <div class="col-md-6">
+                        <select name="status" id="status" class="form-control">
+                            <option value="Inactive" <?= $user['status'] == 'Inactive' ? 'selected' : '' ?>>Tidak Aktif</option>
+                            <option value="Active" <?= $user['status'] == 'Active' ? 'selected' : '' ?>>Aktif</option>
+                        </select>
                     </div>
                 </div>
                 <br>
@@ -101,32 +106,32 @@
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
 $(document).ready(function(){
-    // Tangkap perubahan pada radio button dengan name='role'
-    $('input[name="role"]').change(function(){
-        // Periksa apakah yang dipilih adalah 'kasir'
-        if ($(this).val() === 'kasir') {
-            // Jika 'kasir', tampilkan field cabang
+    // Tangkap perubahan pada radio button dengan name='account_type'
+    $('input[name="account_type"]').change(function(){
+        // Periksa apakah yang dipilih adalah 'cashier'
+        if ($(this).val() === 'cashier') {
+            // Jika 'cashier', tampilkan field cabang
             $('#divCabang').show();
-        } else if($(this).val() === 'admincabang') {
+        } else if($(this).val() === 'branch_admin') {
             $('#divCabang').show();
         } else {
             // Jika 'admin' atau yang lainnya, sembunyikan field cabang
             $('#divCabang').hide();
         }
     });
-        var initialRole = '<?= $user['role'] ?>';
-        if (initialRole === 'kasir') {
+        var initialRole = '<?= $user['account_type'] ?>';
+        if (initialRole === 'cashier') {
             $('#divCabang').show();
             // Set the initial selected value for the dropdown
-            $('#idcabang').val('<?= $user['idcabang'] ?>').change();
-        } else if(initialRole === 'admincabang') {
+            $('#branch_id').val('<?= $user['branch_id'] ?>').change();
+        } else if(initialRole === 'branch_admin') {
             $('#divCabang').show();
             // Set the initial selected value for the dropdown
-            $('#idcabang').val('<?= $user['idcabang'] ?>').change();
+            $('#branch_id').val('<?= $user['branch_id'] ?>').change();
         }else {
             $('#divCabang').hide();
         }
-    $('#idcabang').change(function(){
+    $('#branch_id').change(function(){
         // Ambil nilai ID cabang yang dipilih
         var selectedBranchId = $(this).val();
 
@@ -136,7 +141,7 @@ $(document).ready(function(){
         });
 
         // Update value of the hidden input field with the branch name
-        $('#namacabang').val(selectedBranch.namacabang); // Ganti 'nama_cabang' dengan kunci yang sesuai dalam objek cabang
+        $('#namacabang').val(selectedBranch.branch_name); // Ganti 'nama_cabang' dengan kunci yang sesuai dalam objek cabang
     });
 
     // Validasi form
@@ -154,18 +159,18 @@ $(document).ready(function(){
         });
 
         // Validasi radio button
-        if ($('input[name="role"]:checked').length === 0) {
+        if ($('input[name="account_type"]:checked').length === 0) {
             $('.custom-control').addClass('is-invalid');
             isValid = false;
         } else {
             $('.custom-control').removeClass('is-invalid');
         }
 
-        // Validasi cabang untuk role 'kasir'
-        if ($('input[name="role"]:checked').val() === 'kasir' && $('#idcabang').val() === '') {
+        // Validasi cabang untuk role 'cashier'
+        if ($('input[name="account_type"]:checked').val() === 'cashier' && $('#branch_id').val() === '') {
             $('#divCabang').addClass('is-invalid');
             isValid = false;
-        } else if($('input[name="role"]:checked').val() === 'admincabang' && $('#idcabang').val() === '') {
+        } else if($('input[name="account_type"]:checked').val() === 'branch_admin' && $('#branch_id').val() === '') {
             $('#divCabang').addClass('is-invalid');
             isValid = false;
         }else {

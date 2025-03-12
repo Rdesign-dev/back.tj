@@ -3,9 +3,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Admin_model extends CI_Model
 {
-    public function get($table, $where)
+    public function get($table, $where = null)
     {
-        return $this->db->get_where($table, $where)->row_array();
+        if ($where != null) {
+            $this->db->where($where);
+        }
+        $query = $this->db->get($table);
+        return $query->row_array();
     }
 
     public function update($table, $pk, $id, $data)
@@ -16,13 +20,17 @@ class Admin_model extends CI_Model
 
     public function insert($table, $data, $batch = false)
     {
-        return $batch ? $this->db->insert_batch($table, $data) : $this->db->insert($table, $data);
+        // Debug database queries
+        $this->db->db_debug = TRUE;
+        
+        if ($batch) {
+            return $this->db->insert_batch($table, $data);
+        } else {
+            return $this->db->insert($table, $data);
+        }
     }
 
-    // public function delete($table, $pk, $id)
-    // {
-    //     return $this->db->delete($table, [$pk => $id]);
-    // }
+
     public function getUsersCabang($id, $branch_id)
     {
         $this->db->where('id !=', $id);
@@ -192,6 +200,23 @@ class Admin_model extends CI_Model
         
         // Delete photo if exists and not default
         if ($user && $user['photo'] != 'default.jpg') {
+            $photo_path = FCPATH . '../ImageTerasJapan/ProfPic/' . $user['photo'];
+            if (file_exists($photo_path)) {
+                unlink($photo_path);
+            }
+        }
+        
+        // Delete the user record
+        return $this->db->delete('accounts', ['id' => $id]);
+    }
+
+    public function deleteAccount($id)
+    {
+        // Get user data first to check for photo
+        $user = $this->get('accounts', ['id' => $id]);
+        
+        // Delete photo if exists and not default
+        if ($user && $user['photo'] != 'profile_default.png') {
             $photo_path = FCPATH . '../ImageTerasJapan/ProfPic/' . $user['photo'];
             if (file_exists($photo_path)) {
                 unlink($photo_path);

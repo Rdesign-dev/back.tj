@@ -160,12 +160,31 @@ class Transaksi extends CI_Controller {
                 $this->updateVoucherStatus($kode_voucher);
             }
     
+            // Start database transaction
+            $this->db->trans_start();
+
+            // Insert transaction data
             if ($this->db->insert('transactions', $data)) {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Transaksi berhasil disimpan</div>');
-                redirect('transaksi/historyTransaksi');
-            } else {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Transaksi gagal disimpan: ' . $this->db->error()['message'] . '</div>');
-                redirect('transaksi/add');
+                // If transaction uses voucher, update voucher status
+                if ($this->input->post('tukarVoucher')) {
+                    $kode_voucher = $this->input->post('kodevouchertukar');
+                    $this->updateVoucherStatus($kode_voucher);
+                }
+
+                // Increment transaction count for the selected branch
+                $branch_id = $this->input->post('nocabang');
+                $this->incrementBranchTransactionCount($branch_id);
+
+                // Complete the transaction
+                $this->db->trans_complete();
+
+                if ($this->db->trans_status() === FALSE) {
+                    $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Transaksi gagal: Error database</div>');
+                    redirect('transaksi/add');
+                } else {
+                    $this->session->set_flashdata('pesan', '<div class="alert alert-success">Transaksi berhasil disimpan</div>');
+                    redirect('transaksi/historyTransaksi');
+                }
             }
         }
     }
@@ -733,5 +752,12 @@ public function add()
                                ->result_array();
     $data['member'] = $this->session->userdata('member_data');
     $this->template->load('templates/dashboard', 'transaksi/transaksiMember', $data);
+}
+
+// Add this new method to increment transaction count
+private function incrementBranchTransactionCount($branch_id) {
+    $this->db->set('transaction_count', 'transaction_count + 1', FALSE);
+    $this->db->where('id', $branch_id);
+    return $this->db->update('branch');
 }
 }

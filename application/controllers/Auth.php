@@ -48,6 +48,10 @@ class Auth extends CI_Controller
                         set_pesan('akun anda belum aktif/dinonaktifkan. Silahkan hubungi admin.', false);
                         redirect('auth');
                     } else {
+                        // Update promo status sebelum set session
+                        $this->load->model('Brand_model', 'brand');
+                        $this->brand->update_promo_status();
+                        
                         $userdata = [
                             'id' => $user_db['id'],
                             'username' => $user_db['username'],

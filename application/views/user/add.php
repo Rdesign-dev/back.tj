@@ -46,58 +46,67 @@
                 </div>
                 <hr>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="nama">Nama</label>
+                    <label class="col-md-4 text-md-right" for="Name">Nama</label>
                     <div class="col-md-6">
-                        <input value="<?= set_value('nama'); ?>" type="text" id="nama" name="nama" class="form-control" placeholder="Nama">
-                        <?= form_error('nama', '<span class="text-danger small">', '</span>'); ?>
+                        <input value="<?= set_value('Name'); ?>" type="text" id="Name" name="Name" class="form-control" placeholder="Nama Lengkap">
+                        <?= form_error('Name', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="no_telp">Nomor Telepon</label>
+                    <label class="col-md-4 text-md-right" for="phone_number">Nomor Telepon</label>
                     <div class="col-md-6">
-                        <input value="<?= set_value('no_telp'); ?>" type="text" id="no_telp" name="no_telp" class="form-control" placeholder="Nomor Telepon">
-                        <?= form_error('no_telp', '<span class="text-danger small">', '</span>'); ?>
+                        <input value="<?= set_value('phone_number'); ?>" type="text" id="phone_number" name="phone_number" class="form-control" placeholder="Nomor Telepon">
+                        <?= form_error('phone_number', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="role">Role</label>
+                    <label class="col-md-4 text-md-right" for="account_type">Role</label>
                     <div class="col-md-6">
                         <div class="custom-control custom-radio">
-                            <input <?= set_radio('role', 'superadmin'); ?> value="superadmin" type="radio" id="superadmin" name="role" class="custom-control-input">
-                            <label class="custom-control-label" for="superadmin">SuperAdmin</label>
+                            <input <?= set_radio('account_type', 'super_admin'); ?> value="super_admin" type="radio" id="super_admin" name="account_type" class="custom-control-input">
+                            <label class="custom-control-label" for="super_admin">Super Admin</label>
                         </div>
                         <div class="custom-control custom-radio">
-                            <input <?= set_radio('role', 'kasir'); ?> value="kasir" type="radio" id="kasir" name="role" class="custom-control-input">
-                            <label class="custom-control-label" for="kasir">Kasir</label>
+                            <input <?= set_radio('account_type', 'admin_central'); ?> value="admin_central" type="radio" id="admin_central" name="account_type" class="custom-control-input">
+                            <label class="custom-control-label" for="admin_central">Admin Pusat</label>
                         </div>
                         <div class="custom-control custom-radio">
-                            <input <?= set_radio('role', 'adminpusat'); ?> value="adminpusat" type="radio" id="adminpusat" name="role" class="custom-control-input">
-                            <label class="custom-control-label" for="adminpusat">Admin Pusat</label>
+                            <input <?= set_radio('account_type', 'branch_admin'); ?> value="branch_admin" type="radio" id="branch_admin" name="account_type" class="custom-control-input">
+                            <label class="custom-control-label" for="branch_admin">Admin Cabang</label>
                         </div>
                         <div class="custom-control custom-radio">
-                            <input <?= set_radio('role', 'admincabang'); ?> value="admincabang" type="radio" id="admincabang" name="role" class="custom-control-input">
-                            <label class="custom-control-label" for="admincabang">Admin Cabang</label>
+                            <input <?= set_radio('account_type', 'cashier'); ?> value="cashier" type="radio" id="cashier" name="account_type" class="custom-control-input">
+                            <label class="custom-control-label" for="cashier">Kasir</label>
                         </div>
-                        <?= form_error('role', '<span class="text-danger small">', '</span>'); ?>
+                        <?= form_error('account_type', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group" id="divCabang" style="display: none;">
-                    <label class="col-md-4 text-md-right" for="idcabang">Cabang</label>
+                    <label class="col-md-4 text-md-right" for="branch_id">Cabang</label>
                     <div class="col-md-6">
-                        <!-- Tambahkan input field untuk cabang di sini -->
-                        <select name="idcabang" id="idcabang" class="form-control">
-                        <option value="">- Pilih Cabang -</option>
-                            <?php
-                            foreach ($cabang as $cg => $cbg){
-                                ?>
-                                <option value="<?= $cbg['id']?>"><?= $cbg['namacabang']?></option>
-                                <?php
-                                
-                            }
-                            ?>
+                        <select name="branch_id" id="branch_id" class="form-control">
+                            <option value="">- Pilih Cabang -</option>
+                            <?php foreach ($cabang as $cbg) : ?>
+                                <option value="<?= $cbg['id'] ?>"><?= $cbg['branch_name'] ?></option>
+                            <?php endforeach; ?>
                         </select>
-                        <?= form_error('cabang', '<span class="text-danger small">', '</span>'); ?>
-                        <input type="hidden" name="namacabang" id="namacabang">
+                        <?= form_error('branch_id', '<span class="text-danger small">', '</span>'); ?>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="status">Status</label>
+                    <div class="col-md-6">
+                        <select name="status" id="status" class="form-control">
+                            <option value="Inactive">Tidak Aktif</option>
+                            <option value="Active">Aktif</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="photo">Foto</label>
+                    <div class="col-md-6">
+                        <input type="file" id="photo" name="photo" class="form-control">
+                        <small class="text-muted">Kosongkan jika tidak ingin upload foto. Sistem akan menggunakan foto default.</small>
                     </div>
                 </div>
                 <br>
@@ -120,29 +129,13 @@
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
 $(document).ready(function(){
-    // Tangkap perubahan pada radio button dengan name='role'
-    $('input[name="role"]').change(function(){
-        // Periksa apakah yang dipilih adalah 'kasir'
-        if ($(this).val() === 'kasir') {
-            // Jika 'kasir', tampilkan field cabang
+    $('input[name="account_type"]').change(function(){
+        if ($(this).val() === 'cashier' || $(this).val() === 'branch_admin') {
             $('#divCabang').show();
-        } else if($(this).val() === 'admincabang') {
-            $('#divCabang').show();
-        }else {
+        } else {
             $('#divCabang').hide();
+            $('#branch_id').val('');
         }
-    });
-    $('#idcabang').change(function(){
-        // Ambil nilai ID cabang yang dipilih
-        var selectedBranchId = $(this).val();
-
-        // Temukan objek cabang berdasarkan ID
-        var selectedBranch = <?php echo json_encode($cabang); ?>.find(function(cabang) {
-            return cabang.id == selectedBranchId;
-        });
-
-        // Update value of the hidden input field with the branch name
-        $('#namacabang').val(selectedBranch.namacabang); // Ganti 'nama_cabang' dengan kunci yang sesuai dalam objek cabang
     });
 });
 </script>
