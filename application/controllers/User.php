@@ -22,7 +22,7 @@ class User extends CI_Controller
     {
         $this->_has_login();
         $data['title'] = "User Management";
-        $data['users'] = $this->admin->getUsers(userdata('id_user'));
+        $data['users'] = $this->admin->getUsers();
         $this->template->load('templates/dashboard', 'user/data', $data);
     }
 
@@ -140,24 +140,22 @@ class User extends CI_Controller
 
     public function delete($getId)
     {
-        $id = encode_php_tags($getId);
-        if ($this->admin->delete('user', 'id_user', $id)) {
-            set_pesan('data berhasil dihapus.');
+        $delete = $this->admin->delete($getId);
+        if ($delete) {
+            set_pesan('User berhasil dihapus.');
         } else {
-            set_pesan('data gagal dihapus.', false);
+            set_pesan('User gagal dihapus.', false);
         }
         redirect('user');
     }
 
     public function toggle($getId)
     {
-        $id = encode_php_tags($getId);
-        $status = $this->admin->get('user', ['id_user' => $id])['is_active'];
-        $toggle = $status ? 0 : 1; //Jika user aktif maka nonaktifkan, begitu pula sebaliknya
-        $pesan = $toggle ? 'user diaktifkan.' : 'user dinonaktifkan.';
-
-        if ($this->admin->update('user', 'id_user', $id, ['is_active' => $toggle])) {
-            set_pesan($pesan);
+        $update = $this->admin->toggle($getId);
+        if ($update) {
+            set_pesan('User berhasil diaktifkan/nonaktifkan.');
+        } else {
+            set_pesan('Gagal mengubah status user.', false);
         }
         redirect('user');
     }

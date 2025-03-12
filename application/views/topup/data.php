@@ -28,7 +28,7 @@
                     <th>Metode Pembayaran</th>
                     <th>Foto Bukti</th>
                     <th>Nama member</th>
-                    <th>Nama User</th>
+                    <th>Nama Kasir</th>
                 </tr>
             </thead>
             <tbody>

@@ -19,20 +19,23 @@ class Admin_model extends CI_Model
         return $batch ? $this->db->insert_batch($table, $data) : $this->db->insert($table, $data);
     }
 
-    public function delete($table, $pk, $id)
-    {
-        return $this->db->delete($table, [$pk => $id]);
-    }
+    // public function delete($table, $pk, $id)
+    // {
+    //     return $this->db->delete($table, [$pk => $id]);
+    // }
     public function getUsersCabang($id, $branch_id)
     {
         $this->db->where('id !=', $id);
         $this->db->where('branch_id', $branch_id);
         return $this->db->get('accounts')->result_array();
     }
-    public function getUsers($id)
+    public function getUsers()
     {
-        $this->db->where('id !=', $id);
-        return $this->db->get('accounts')->result_array();
+        $this->db->select('accounts.*, branch.branch_name as branch_name')
+                 ->from('accounts')
+                 ->join('branch', 'branch.id = accounts.branch_id', 'left')
+                 ->order_by('accounts.Name', 'ASC');
+        return $this->db->get()->result_array();
     }
 
     public function getBarang()
@@ -174,5 +177,28 @@ class Admin_model extends CI_Model
     public function get_user_by_id($id)
     {
         return $this->db->get_where('accounts', ['id' => $id])->row_array();
+    }
+    public function toggle($id)
+    {
+        $user = $this->get('accounts', ['id' => $id]);
+        $new_status = $user['status'] == 'Active' ? 'Inactive' : 'Active';
+        return $this->update('accounts', 'id', $id, ['status' => $new_status]);
+    }
+
+    public function delete($id)
+    {
+        // Get user data first to check for photo
+        $user = $this->get('accounts', ['id' => $id]);
+        
+        // Delete photo if exists and not default
+        if ($user && $user['photo'] != 'default.jpg') {
+            $photo_path = FCPATH . '../ImageTerasJapan/ProfPic/' . $user['photo'];
+            if (file_exists($photo_path)) {
+                unlink($photo_path);
+            }
+        }
+        
+        // Delete the user record
+        return $this->db->delete('accounts', ['id' => $id]);
     }
 }

@@ -28,7 +28,9 @@
                     <th>Nama</th>
                     <th>Username</th>
                     <th>Role</th>
+                    <th>Nomor Telepon</th>
                     <th>Cabang</th>
+                    <th>Status</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -41,22 +43,37 @@
                         <tr>
                             <td><?= $no++; ?></td>
                             <td>
-                                <img width="30" src="<?= base_url() ?>assets/img/avatar/<?= $user['foto'] ?>" alt="<?= $user['nama']; ?>" class="img-thumbnail rounded-circle">
+                                <img width="30" src="<?= base_url() ?>../ImageTerasJapan/ProfPic/<?= $user['photo'] ?>" 
+                                     alt="<?= $user['Name']; ?>" class="img-thumbnail rounded-circle">
                             </td>
-                            <td><?= $user['nama']; ?></td>
+                            <td><?= $user['Name']; ?></td>
                             <td><?= $user['username']; ?></td>
-                            <td><?= $user['role']; ?></td>
-                            <td><?= $user['namacabang'] ? $user['namacabang'] : 'Teras Japan Pusat'; ?></td>
+                            <td><?= ucwords(str_replace('_', ' ', $user['account_type'])); ?></td>
+                            <td><?= $user['phone_number']; ?></td>
+                            <td><?= $user['branch_name'] ?? 'Teras Japan Pusat'; ?></td>
                             <td>
-                                <a href="<?= base_url('user/toggle/') . $user['id_user'] ?>" class="btn btn-circle btn-sm <?= $user['is_active'] ? 'btn-success' : 'btn-secondary' ?>" title="<?= $user['is_active'] ? 'Nonaktifkan User' : 'Aktifkan User' ?>"><i class="fa fa-fw fa-power-off"></i></a>
-                                <a href="<?= base_url('user/edit/') . $user['id_user'] ?>" class="btn btn-circle btn-sm btn-warning"><i class="fa fa-fw fa-edit"></i></a>
-                                <a onclick="return confirm('Yakin ingin menghapus data?')" href="<?= base_url('user/delete/') . $user['id_user'] ?>" class="btn btn-circle btn-sm btn-danger"><i class="fa fa-fw fa-trash"></i></a>
+                                <a href="<?= base_url('user/toggle/') . $user['id'] ?>" 
+                                   class="btn btn-circle btn-sm <?= $user['status'] == 'Active' ? 'btn-success' : 'btn-secondary' ?>" 
+                                   title="<?= $user['status'] == 'Active' ? 'Nonaktifkan User' : 'Aktifkan User' ?>">
+                                    <i class="fa fa-fw fa-power-off"></i>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="<?= base_url('user/edit/') . $user['id'] ?>" 
+                                   class="btn btn-circle btn-sm btn-warning">
+                                    <i class="fa fa-fw fa-edit"></i>
+                                </a>
+                                <a onclick="return confirm('Yakin ingin menghapus data?')" 
+                                   href="<?= base_url('user/delete/') . $user['id'] ?>" 
+                                   class="btn btn-circle btn-sm btn-danger">
+                                    <i class="fa fa-fw fa-trash"></i>
+                                </a>
                             </td>
                         </tr>
                     <?php endforeach;
                     else : ?>
                     <tr>
-                        <td colspan="8" class="text-center">Silahkan tambahkan user baru</td>
+                        <td colspan="9" class="text-center">Silahkan tambahkan user baru</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
