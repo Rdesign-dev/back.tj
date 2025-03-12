@@ -9,7 +9,12 @@ class Brand extends CI_Controller {
         $this->load->model('Brand_model', 'brand');
     }
 
-    public function index() {
+    public function index() 
+    {
+        // Update promo status first
+        date_default_timezone_set('Asia/Jakarta');
+        $this->brand->update_promo_status();
+        
         $data['title'] = "Brand Detail";
         $data['brands'] = $this->brand->find_all();
         $this->template->load('templates/dashboard', 'brand/index', $data);
