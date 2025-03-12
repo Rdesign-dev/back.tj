@@ -642,13 +642,14 @@ function updateCabangJumlahTransaksi($nocabang){
         public function historyTransaksi() {
     $data['title'] = "History Transaksi";
     
-    $this->db->select('t.transaction_codes, t.created_at, b.branch_name, u.name as member_name, 
-                       a.Name as cashier_name, t.amount, t.transaction_evidence')
+    $this->db->select('t.*, b.branch_name, u.name as member_name, 
+                       a.Name as cashier_name, rv.kode_voucher')
              ->from('transactions t')
-             ->join('branch b', 'b.id = t.branch_id')
-             ->join('users u', 'u.id = t.user_id')
-             ->join('accounts a', 'a.id = t.account_cashier_id')
-             ->where('t.transaction_type', 'Teras Japan Payment')
+             ->join('branch b', 'b.id = t.branch_id', 'left')
+             ->join('users u', 'u.id = t.user_id', 'left')
+             ->join('accounts a', 'a.id = t.account_cashier_id', 'left')
+             ->join('redeem_voucher rv', 'rv.redeem_id = t.voucher_id', 'left')
+             ->where_in('t.transaction_type', ['Teras Japan Payment', 'Reedem Voucher'])
              ->order_by('t.created_at', 'DESC');
              
     $data['trans'] = $this->db->get()->result();
