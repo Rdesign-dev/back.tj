@@ -235,7 +235,7 @@
                                     <?= userdata('name'); // Menggunakan 'name' bukan 'nama' ?>
                                 </span>
                                 <img class="img-profile rounded-circle" 
-                                     src="<?= base_url() ?>assets/img/avatar/<?= userdata('photo'); // Menggunakan 'photo' bukan 'foto' ?>">
+                                src="../ImageTerasJapan/ProfPic/<?php echo userdata('photo'); ?>" alt="Foto Profil">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">

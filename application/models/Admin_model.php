@@ -3,22 +3,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Admin_model extends CI_Model
 {
-    public function get($table, $data = null, $where = null)
+    public function get($table, $where)
     {
-        if ($table == 'user') {
-            $table = 'accounts'; // Mengubah tabel user menjadi accounts
-        }
-        
-        if ($data != null) {
-            // Menyesuaikan field id_user menjadi id
-            if (isset($data['id_user'])) {
-                $data['id'] = $data['id_user'];
-                unset($data['id_user']);
-            }
-            return $this->db->get_where($table, $data)->row_array();
-        } else {
-            return $this->db->get_where($table, $where)->result_array();
-        }
+        return $this->db->get_where($table, $where)->row_array();
     }
 
     public function update($table, $pk, $id, $data)
