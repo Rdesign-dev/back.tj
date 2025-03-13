@@ -67,3 +67,6 @@ $route['banner/delete/(:num)'] = 'banner/delete/$1';
 $route['banner/toggle_status/(:num)'] = 'banner/toggle_status/$1';
 $route['transaksikasir/tambahTransaksiKasir'] = 'transaksikasir/tambahTransaksiKasir';
 $route['transaksikasir/cari_member_kasir'] = 'transaksikasir/cari_member_kasir';
+$route['transaksikasir/convert_and_updateKasir'] = 'transaksikasir/convert_and_updateKasir';
+$route['transaksikasir/historyTransaksiKasir'] = 'transaksikasir/historyTransaksiKasir';
+$route['transaksikasir/getHistorysaldoKasir'] = 'transaksikasir/getHistorysaldoKasir';

@@ -18,7 +18,11 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?= form_open_multipart('transaksikasir/convert_and_updateKasir', ['id' => 'memberForm']); ?>
+                <?= form_open_multipart('transaksikasir/convert_and_updateKasir', [
+                    'id' => 'memberForm',
+                    'class' => 'needs-validation',
+                    'novalidate' => true
+                ]); ?>
                 
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="tanggaltransaksi">Tanggal Transaksi</label>
@@ -132,6 +136,10 @@
         var fotobillInput = document.getElementById('fotobill');
 
         memberForm.addEventListener("submit", function (event) {
+            // Add debug
+            console.log('Form submitted');
+            console.log('Form data:', new FormData(memberForm));
+            
             if (!tanggaltransaksiInput.value.trim()) {
                 event.preventDefault();
                 tanggaltransaksiInput.classList.add("is-invalid");

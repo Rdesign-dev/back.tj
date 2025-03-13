@@ -6,7 +6,7 @@
                 <div class="row">
                     <div class="col">
                         <h4 class="h5 align-middle m-0 font-weight-bold text-primary">
-                            Riwayat Top Up Saldo <?= userdata('namacabang') ?>
+                            Riwayat Top Up Saldo
                         </h4>
                     </div>
                 </div>
@@ -20,33 +20,31 @@
                             <th>Tanggal</th>
                             <th>Nama Member</th>
                             <th>Nominal</th>
-                            <th>Metode</th>
-                            <th>Bukti</th>
                             <th>Kasir</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php 
                         $no = 1;
-                        foreach($trans as $t): ?>
+                        if($trans): foreach($trans as $t): ?>
                         <tr>
                             <td><?= $no++; ?></td>
                             <td><?= $t->transaction_codes; ?></td>
                             <td><?= date('d-m-Y H:i', strtotime($t->created_at)); ?></td>
-                            <td><?= $t->namamember; ?></td>
+                            <td><?= $t->member_name; ?></td>
                             <td>Rp <?= number_format($t->nominal, 0, ',', '.'); ?></td>
-                            <td><?= $t->metode; ?></td>
-                            <td>
-                                <?php if($t->bukti): ?>
-                                    <img src="<?= base_url('../ImageTerasJapan/transaction_proof/' . $t->bukti); ?>" width="50">
-                                <?php endif; ?>
-                            </td>
-                            <td><?= $t->nama_kasir; ?></td>
+                            <td><?= $t->cashier_name; ?></td>
                         </tr>
-                        <?php endforeach; ?>
+                        <?php endforeach; endif; ?>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    $('#dataTable').DataTable();
+});
+</script>

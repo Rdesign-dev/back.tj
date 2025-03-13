@@ -30,16 +30,6 @@ class Topup_model extends CI_Model {
         return $query->result_array();
     }
 
-    public function getTopupDetails() {
-        $this->db->select('topup.*, member.namamember, user.nama');
-        $this->db->from('topup');
-        $this->db->join('member', 'member.nomor = topup.nomor');
-        $this->db->join('user', 'user.id_user = topup.id_user');
-        $query = $this->db->get();
-        $result = $query->result();
-        return $result;
-    }
-
     public function insert($data) {
         $this->db->trans_start();
         
@@ -55,6 +45,25 @@ class Topup_model extends CI_Model {
         return $this->db->trans_status();
     }
 
+    public function getTopupByIdCabang($branch_id)
+    {
+        $this->db->select('
+            t.transaction_codes,
+            t.created_at,
+            t.amount as nominal,
+            u.name as member_name,
+            a.Name as cashier_name
+        ')
+        ->from('transactions t')
+        ->join('users u', 'u.id = t.user_id', 'left')
+        ->join('accounts a', 'a.id = t.account_cashier_id', 'left') // Changed from account_cashier to accounts
+        ->where('t.branch_id', $branch_id)
+        ->where('t.transaction_type', 'Balance Top-up')
+        ->order_by('t.created_at', 'DESC');
+
+        return $this->db->get()->result();
+    }
+
     private function generate_transaction_code($account_id) {
         $date = date('my');
         $random = mt_rand(1000, 9999);
@@ -67,3 +76,5 @@ class Topup_model extends CI_Model {
         return "{$user_id}-SU-{$timestamp}-{$random}";
     }
 }
+
+
