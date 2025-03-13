@@ -14,11 +14,17 @@ class Member_model extends CI_Model{
     }
 
     public function find_all(){
-        return $this->db->select('id, name, phone_number, email, balance, poin, registration_time')
-                    ->from('users')
-                    ->order_by('registration_time', 'DESC')
-                    ->get()
-                    ->result_array();
+        return $this->db->select('
+            name as namamember, 
+            phone_number as nomor, 
+            poin,
+            balance as saldo, 
+            registration_time as tanggaldaftar
+        ')
+        ->from('users')
+        ->order_by('registration_time', 'DESC')
+        ->get()
+        ->result_array();
     }
 
     public function update($data, $id) 

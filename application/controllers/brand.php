@@ -122,7 +122,7 @@ class Brand extends CI_Controller {
             if (!empty($_FILES['image']['name'])) {
                 $config['upload_path'] = '../ImageTerasJapan/logo/';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
-                $config['max_size'] = 2048;
+                $config['max_size'] = 10000;
                 $config['file_name'] = 'logo-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
 
                 $this->load->library('upload', $config);
@@ -141,7 +141,7 @@ class Brand extends CI_Controller {
             if (!empty($_FILES['banner']['name'])) {
                 $config['upload_path'] = '../ImageTerasJapan/banner/';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
-                $config['max_size'] = 2048;
+                $config['max_size'] = 10000;
                 $config['file_name'] = 'banner-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
 
                 $this->upload->initialize($config);
@@ -191,7 +191,7 @@ class Brand extends CI_Controller {
             if (!empty($_FILES['image']['name'])) {
                 $config['upload_path'] = '../ImageTerasJapan/logo/';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
-                $config['max_size'] = 2048;
+                $config['max_size'] = 10000;
                 $config['file_name'] = 'logo-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
 
                 $this->load->library('upload', $config);
@@ -208,7 +208,7 @@ class Brand extends CI_Controller {
             if (!empty($_FILES['banner']['name'])) {
                 $config['upload_path'] = '../ImageTerasJapan/banner/';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
-                $config['max_size'] = 2048;
+                $config['max_size'] = 10000;
                 $config['file_name'] = 'banner-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
 
                 $this->upload->initialize($config);

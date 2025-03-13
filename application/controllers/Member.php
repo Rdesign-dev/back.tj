@@ -53,12 +53,12 @@ class Member extends CI_Controller {
         $this->template->load('templates/dashboard', 'member/index', $data);
 	}
     public function indexKasir()
-	{
-	    $this->_has_login();
-        $data['title'] = "Member Management";
-        $data['members'] = $this->member->find_all();
-		$this->template->load('templates/kasir', 'member/indexKasir', $data);
-	}
+{
+    $this->_has_login();
+    $data['title'] = "Member Management";
+    $data['members'] = $this->member->find_all();
+    $this->template->load('templates/kasir', 'member/indexKasir', $data);
+}
 	public function indexCabang()
 	{
         $data['title'] = "Member Management";

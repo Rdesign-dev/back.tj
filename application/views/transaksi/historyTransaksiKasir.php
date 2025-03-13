@@ -12,39 +12,35 @@
                 </div>
             </div>
             <div class="table-responsive">
-        <table class="table table-striped dt-responsive nowrap" id="dataTable">
-            <thead>
-                <tr>
-                    <th width="30">No.</th>
-                    <th>Kode Transaksi</th>
-                    <th>Tanggal Transaksi</th>
-                    <th>Nama Member</th>
-                    <th>Total Pembelian</th>
-                    <th>Nama Kasir</th>
-                    <th>Voucher</th>
-                    <th>Foto Bill</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $no = 1;
-                    foreach ($trans as $tr => $tran) {
-                        ?>
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Kode Transaksi</th>
+                            <th>Tipe Transaksi</th>
+                            <th>Nama Member</th>
+                            <th>Total</th>
+                            <th>Metode Pembayaran</th>
+                            <th>Kode Voucher</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $no = 1;
+                        foreach($trans as $t): ?>
                         <tr>
                             <td><?= $no++; ?></td>
-                            <td><?= $tran->kodetransaksi ?></td>
-                            <td><?= $tran->tanggaltransaksi ?></td>
-                            <td><?= $tran->namamember ?></td>
-                            <td><?= $tran->total ?></td>
-                            <td><span class="text-capitalize"><?= $tran->nama ?></span></td>
-                            <td><?= $tran->kodevoucher ?></td>
-                            <td><img src="https://terasjapan.com/fotobill/<?= $tran->fotobill ?>" alt="" width="150px" height="100px"></td>
+                            <td><?= $t->transaction_codes; ?></td>
+                            <td><?= $t->transaction_type; ?></td>
+                            <td><?= $t->member_name; ?></td>
+                            <td>Rp <?= number_format($t->amount, 0, ',', '.'); ?></td>
+                            <td><?= $t->payment_method; ?></td>
+                            <td><?= $t->kode_voucher ?? '-'; ?></td>
                         </tr>
-                        <?php
-                    }?>
-            </tbody>
-        </table>
-    </div>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

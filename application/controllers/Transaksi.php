@@ -189,115 +189,8 @@ class Transaksi extends CI_Controller {
         }
     }
     
-    public function cari_member_kasir(){
-        $this->form_validation->set_rules('nomor','NomorHp','required|numeric');
-        if($this->form_validation->run() == false){
-            $data['member'] = $this->member->find_all();
-            $data['cabang'] = $this->cabang->find_all();
-            $data['title'] = "Transaksi Member";
-            $this->template->load('templates/kasir', 'transaksi/addKasir', $data);
-        }else{
-            $nomor = $this->input->post('nomor');
-            $member_data = $this->member->find_by_nohp($nomor);
-            if(empty($member_data)){
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger" role="alert">Data dengan nomor handphone tersebut tidak ditemukan</div>');
-                redirect('transaksi/tambahTransaksiKasir'); // Redirect kembali ke halaman pencarian
-            }
-            $this->session->set_userdata('member_data', $member_data);
     
-            $data['member'] = $member_data;
-            $data['cabang'] = $this->cabang->find_all();
-            $data['title'] = "Transaksi Member";
-    
-            // Load unused voucher codes for the specific member
-            $data['unused_vouchers'] = $this->getUnusedVouchers($nomor);
-            $this->template->load('templates/kasir', 'transaksi/transaksiMemberKasir', $data);
-        }
-        }
-    public function convert_and_updateKasir() {
-        $login_session_data = $this->session->userdata('login_session');
-        // Dapatkan ID cabang dan ID user dari data sesi
-        $idcabang = $login_session_data['idcabang'];
-        $iduser = $login_session_data['user'];
-        // Set aturan validasi
-        $this->form_validation->set_rules('kodetransaksi','Kode transaksi','required');
-        $this->form_validation->set_rules('tanggaltransaksi','Tanggal Transaksi','required');
-        $this->form_validation->set_rules('nomor','Nomor','required');
-        $this->form_validation->set_rules('namamember','Nama Member','required');
-        $this->form_validation->set_rules('total','Total','required');
-        if($this->form_validation->run() == FALSE){
-        // Validasi menemukan error
-        $data['cabang'] = $this->cabang->find_all();
-        $data['title'] = "Transaksi Member";
-        $data['member'] = $this->session->userdata('member_data');
-        $this->template->load('templates/kasir', 'transaksi/transaksiMemberKasir', $data);
-        } else {
-            $config['upload_path'] = '../fotobill/';
-            $config['allowed_types'] = 'gif|jpg|png|PNG|jpeg|JPEG|svg';
-            $config['max_size'] = 1073741824;
-            $config['max_width'] = 10000;
-            $config['max_height'] = 10000;
-            $this->load->library('upload', $config);
-            if(!$this->upload->do_upload('fotobill')){
-                $data['cabang'] = $this->cabang->find_all();
-                $data['title'] = "Transaksi Member";
-                $data['member'] = $this->session->userdata('member_data');
-                $this->template->load('templates/kasir', 'transaksi/transaksiMemberKasir', $data);
-            }else{
-            $fotobill = $this->upload->data();
-            $fotobill = $fotobill['file_name'];
-            $kodetransaksi = $this->input->post('kodetransaksi');
-            $tanggaltransaksi = $this->input->post('tanggaltransaksi');
-            $nocabang = $idcabang;
-            $nomor = $this->input->post('nomor');
-            $namamember = $this->input->post('namamember');
-            $total = $this->input->post('total');
-            $id_user = $iduser;
-            $voucher_code = $this->input->post('kodevouchertukar');
-            $data = array(
-                'kodetransaksi' => $kodetransaksi,
-                'tanggaltransaksi' => $tanggaltransaksi,
-                'nocabang' => $nocabang,
-                'nomor' => $nomor,
-                'namamember' => $namamember,
-                'total' => $total,
-                'fotobill' => $fotobill,
-                'iduser' => $id_user,
-                'kodevoucher' => $voucher_code
-            );
-            var_dump($data);
-            if ($this->db->insert('transaksi', $data)) {
-                    // Get the inserted transaction ID
-                    $transaksi_id = $this->db->insert_id();
-        
-                    // Retrieve the inserted transaction data
-                    $transaksi = $this->db->get_where('transaksi', array('id' => $transaksi_id))->row();
-                    
-                    if(!empty($voucher_code)){
-                        $this->updateVoucherStatus($voucher_code);
-                    }
-        
-                    // Convert transaction total to points
-                    $poin_baru = $this->convertToPoints($transaksi->total);
-        
-                    // Update member's points
-                    $this->updateMemberPoin($transaksi->nomor, $poin_baru);
-        
-                    // // Delete the transaction (if needed, based on your logic)
-                    // $this->deleteTransaksiMember($transaksi_id);
 
-                    $this->updateCabangJumlahTransaksi($transaksi->nocabang);
-                    $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Transaksi Berhasil Ditambahkan</div>');
-                    // Redirect to the desired page
-                    redirect(base_url('transaksi/historyTransaksiKasir'));
-                } else {
-                    $this->session->set_flashdata('pesan','<div class="alert alert-danger" role="alert">Transaksi Gagal Ada data yang kosong</div>');
-                    // Redirect to the desired page
-                    redirect(base_url('transaksi/tambahTransaksiKasir'));
-            }
-            }
-    }
-}
     public function cari_member_cabang(){
         $this->form_validation->set_rules('nomor','NomorHp','required|numeric');
         if($this->form_validation->run() == false){
@@ -676,14 +569,28 @@ function updateCabangJumlahTransaksi($nocabang){
     $this->template->load('templates/dashboard', 'transaksi/historyTransaksi', $data);
 }
         public function historyTransaksiKasir()
-        {
-            $login_session_data = $this->session->userdata('login_session');
-            $idcabang = $login_session_data['idcabang'];
-            $iduser = $login_session_data['user'];
-            $data['title'] = "History Transaksi";
-            $data['trans'] = $this->transaksi->getTransaksiByIdMemberWithDetails($idcabang);
-            $this->template->load('templates/kasir', 'transaksi/historyTransaksiKasir', $data);
-        }
+{
+    $login_session = $this->session->userdata('login_session');
+    $branch_id = $login_session['branch_id'];
+    
+    $data['title'] = "History Transaksi";
+    
+    // Menggunakan model yang sudah ada dengan tambahan where clause
+    $data['trans'] = $this->db->select('t.*, b.branch_name, u.name as member_name, 
+                       a.Name as cashier_name, rv.kode_voucher')
+             ->from('transactions t')
+             ->join('branch b', 'b.id = t.branch_id', 'left')
+             ->join('users u', 'u.id = t.user_id', 'left')
+             ->join('accounts a', 'a.id = t.account_cashier_id', 'left')
+             ->join('redeem_voucher rv', 'rv.redeem_id = t.voucher_id', 'left')
+             ->where('t.branch_id', $branch_id)
+             ->where_in('t.transaction_type', ['Teras Japan Payment', 'Reedem Voucher'])
+             ->order_by('t.created_at', 'DESC')
+             ->get()
+             ->result();
+    
+    $this->template->load('templates/kasir', 'transaksi/historyTransaksiKasir', $data);
+}
         public function historyTransaksiCabang()
         {
             $login_session_data = $this->session->userdata('login_session');
@@ -759,5 +666,49 @@ private function incrementBranchTransactionCount($branch_id) {
     $this->db->set('transaction_count', 'transaction_count + 1', FALSE);
     $this->db->where('id', $branch_id);
     return $this->db->update('branch');
+}
+
+public function dashboardKasir()
+{
+    $login_session = $this->session->userdata('login_session');
+    $branch_id = $login_session['idcabang'];
+    
+    // Get transaction count for the branch
+    $this->db->select('transaction_count');
+    $this->db->from('branch');
+    $this->db->where('id', $branch_id);
+    $query = $this->db->get();
+    $result = $query->row();
+    
+    $data['transaksi'] = $result->transaction_count;
+    $this->template->load('templates/kasir', 'dashboardKasir', $data);
+}
+
+public function getHistorytopupKasir()
+{
+    $login_session = $this->session->userdata('login_session');
+    $branch_id = $login_session['branch_id'];
+    
+    $data['title'] = "History Top Up Saldo";
+    
+    $data['trans'] = $this->db->select('
+            t.transaction_codes,
+            t.created_at,
+            t.amount as nominal,
+            t.payment_method as metode,
+            t.transaction_evidence as bukti,
+            u.name as namamember,
+            a.Name as nama_kasir
+        ')
+        ->from('transactions t')
+        ->join('users u', 'u.id = t.user_id', 'left')
+        ->join('accounts a', 'a.id = t.account_cashier_id', 'left')
+        ->where('t.branch_id', $branch_id)
+        ->where('t.transaction_type', 'Balance Top-up')
+        ->order_by('t.created_at', 'DESC')
+        ->get()
+        ->result();
+    
+    $this->template->load('templates/kasir', 'topup/dataKasir', $data);
 }
 }

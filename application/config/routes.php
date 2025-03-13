@@ -65,3 +65,5 @@ $route['banner/edit/(:num)'] = 'banner/edit/$1';
 $route['banner/update/(:num)'] = 'banner/update/$1';
 $route['banner/delete/(:num)'] = 'banner/delete/$1';
 $route['banner/toggle_status/(:num)'] = 'banner/toggle_status/$1';
+$route['transaksikasir/tambahTransaksiKasir'] = 'transaksikasir/tambahTransaksiKasir';
+$route['transaksikasir/cari_member_kasir'] = 'transaksikasir/cari_member_kasir';
