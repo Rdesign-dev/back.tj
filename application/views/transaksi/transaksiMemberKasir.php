@@ -129,17 +129,48 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var memberForm = document.getElementById('memberForm');
-        var tanggaltransaksiInput = document.getElementById('tanggaltransaksi');
-        var totalInput = document.getElementById('total');
-        var fotobillInput = document.getElementById('fotobill');
+document.addEventListener('DOMContentLoaded', function() {
+    const memberForm = document.getElementById('memberForm');
+    const tukarVoucherCheckbox = document.getElementById('tukarVoucher');
+    const kodevouchertukar = document.getElementById('kodevouchertukar');
+    const paymentFields = document.querySelectorAll('.payment-field');
+    const payment_method = document.getElementById('payment_method');
+    const total = document.getElementById('total');
+    const tanggaltransaksiInput = document.getElementById('tanggaltransaksi');
+    const fotobillInput = document.getElementById('fotobill');
 
-        memberForm.addEventListener("submit", function (event) {
-            // Add debug
-            console.log('Form submitted');
-            console.log('Form data:', new FormData(memberForm));
-            
+    tukarVoucherCheckbox.addEventListener('change', function() {
+        const isChecked = this.checked;
+
+        paymentFields.forEach(field => {
+            field.style.display = isChecked ? 'none' : 'block';
+        });
+        kodevouchertukar.disabled = !isChecked;
+
+        payment_method.required = !isChecked;
+        total.required = !isChecked;
+        kodevouchertukar.required = isChecked;
+
+        if (!isChecked) {
+            kodevouchertukar.value = '';
+        } else {
+            payment_method.value = '';
+            if (total) total.value = '';
+        }
+    });
+
+    memberForm.addEventListener("submit", function (event) {
+        console.log('Form submitted');
+        console.log('Form data:', new FormData(memberForm));
+
+        if (tukarVoucherCheckbox.checked) {
+            if (!kodevouchertukar.value.trim()) {
+                event.preventDefault();
+                kodevouchertukar.classList.add("is-invalid");
+            } else {
+                kodevouchertukar.classList.remove("is-invalid");
+            }
+        } else {
             if (!tanggaltransaksiInput.value.trim()) {
                 event.preventDefault();
                 tanggaltransaksiInput.classList.add("is-invalid");
@@ -147,11 +178,18 @@
                 tanggaltransaksiInput.classList.remove("is-invalid");
             }
 
-            if (!totalInput.value.trim()) {
+            if (!total.value.trim()) {
                 event.preventDefault();
-                totalInput.classList.add("is-invalid");
+                total.classList.add("is-invalid");
             } else {
-                totalInput.classList.remove("is-invalid");
+                total.classList.remove("is-invalid");
+            }
+
+            if (!payment_method.value.trim()) {
+                event.preventDefault();
+                payment_method.classList.add("is-invalid");
+            } else {
+                payment_method.classList.remove("is-invalid");
             }
 
             if (!fotobillInput.value.trim()) {
@@ -160,46 +198,6 @@
             } else {
                 fotobillInput.classList.remove("is-invalid");
             }
-        });
-
-        tanggaltransaksiInput.addEventListener("input", function () {
-            tanggaltransaksiInput.classList.remove("is-invalid");
-        });
-
-        totalInput.addEventListener("input", function () {
-            totalInput.classList.remove("is-invalid");
-        });
-
-        fotobillInput.addEventListener("input", function () {
-            fotobillInput.classList.remove("is-invalid");
-        });
-    });
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    var tukarVoucherCheckbox = document.getElementById('tukarVoucher');
-    var kodevouchertukar = document.getElementById('kodevouchertukar');
-    var paymentFields = document.querySelectorAll('.payment-field');
-    var payment_method = document.getElementById('payment_method');
-    var total = document.getElementById('total');
-
-    tukarVoucherCheckbox.addEventListener('change', function() {
-        if (this.checked) {
-            kodevouchertukar.disabled = false;
-            paymentFields.forEach(field => {
-                field.classList.add('d-none');
-            });
-            payment_method.required = false;
-            total.required = false;
-        } else {
-            kodevouchertukar.disabled = true;
-            kodevouchertukar.value = '';
-            paymentFields.forEach(field => {
-                field.classList.remove('d-none');
-            });
-            payment_method.required = true;
-            total.required = true;
         }
     });
 });

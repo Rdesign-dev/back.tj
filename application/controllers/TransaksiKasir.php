@@ -60,6 +60,14 @@ class TransaksiKasir extends CI_Controller {
 
     public function convert_and_updateKasir() 
     {
+        // echo "<pre>";
+        // echo "POST Data:\n";
+        // var_dump($_POST);
+        // echo "\nFILES Data:\n";
+        // var_dump($_FILES);
+        // echo "</pre>";
+        // die();
+
         $login_session = $this->session->userdata('login_session');
         $member_data = $this->session->userdata('member_data');
 
@@ -124,7 +132,7 @@ class TransaksiKasir extends CI_Controller {
             $data = [
                 'transaction_codes' => $transaction_code,
                 'user_id' => $member_data->id,
-                'transaction_type' => $is_voucher ? 'Redeem Voucher' : 'Teras Japan Payment', // Fixed: use full names
+                'transaction_type' => $is_voucher ? 'Redeem Voucher' : 'Teras Japan Payment', // Corrected typo
                 'amount' => $is_voucher ? null : $amount,
                 'branch_id' => $login_session['branch_id'],
                 'account_cashier_id' => $login_session['id'],
