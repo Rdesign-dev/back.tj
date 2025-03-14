@@ -24,13 +24,34 @@
                 <?= $this->session->flashdata('pesan'); ?>
                 <?php echo form_open_multipart('transaksi/convert_and_updateSaldoMember'); ?>
 
+                <!-- Member Info Display -->
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="nomor">Nomor Member</label>
+                    <div class="col-md-6">
+                        <input type="text" name="nomor" id="nomor" class="form-control" 
+                            value="<?= isset($member->phone_number) ? $member->phone_number : '' ?>" readonly>
+                        <?= form_error('nomor', '<span class="text-danger small">', '</span>'); ?>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="nama">Nama Member</label>
+                    <div class="col-md-6">
+                        <input type="text" name="nama" id="nama" class="form-control" 
+                            value="<?= isset($member->name) ? $member->name : '' ?>" readonly>
+                        <?= form_error('nama', '<span class="text-danger small">', '</span>'); ?>
+                    </div>
+                </div>
+
+                <!-- Top Up Form -->
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nominal">Nominal TopUp</label>
                     <div class="col-md-6">
-                        <input type="text" id="nominal" name="nominal" class="form-control">
+                        <input type="text" id="nominal" name="nominal" class="form-control" placeholder="Minimal Rp 10.000">
                         <?= form_error('nominal', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
+
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="metode">Metode Pembayaran</label>
                     <div class="col-md-6">
@@ -47,23 +68,6 @@
                     <div class="col-md-6">
                         <input type="file" id="bukti" name="bukti" class="form-control">
                         <?= form_error('bukti', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="nomor">Nomor Member</label>
-                    <div class="col-md-6">
-                        <input type="text" name="nomor" id="nomor" class="form-control"
-                            value="<?= isset($member['phone_number']) ? $member['phone_number'] : '' ?>" readonly>
-                        <?= form_error('nomor', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="nama">Nama Member</label>
-                    <div class="col-md-6">
-                        <input type="text" name="nama" class="form-control" id="nama"
-                            value="<?= isset($member['name']) ? $member['name'] : '' ?>" readonly>
-                        <?= form_error('nama', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
 

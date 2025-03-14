@@ -190,133 +190,6 @@ class Transaksi extends CI_Controller {
             }
         }
     }
-    
-    
-// Batas Functions halaman admin
-//         public function convert_and_updateSaldoMember() {
-//     $login_session = $this->session->userdata('login_session');
-//     $account_id = $login_session['id'];
-    
-//     // Check if voucher redemption
-//     $is_voucher_redemption = $this->input->post('use_voucher') === 'true';
-    
-//     if ($is_voucher_redemption) {
-//         // Handle voucher redemption
-//         $voucher_code = $this->input->post('voucher_code');
-//         $user = $this->db->get_where('users', ['phone_number' => $this->input->post('nomor')])->row();
-        
-//         if (!$user) {
-//             $this->session->set_flashdata('pesan', '<div class="alert alert-danger">User tidak ditemukan</div>');
-//             redirect('transaksi/saldo');
-//             return;
-//         }
-
-//         // Get voucher details
-        // $voucher = $this->db->get_where('redeem_voucher', [
-        //     'kode_voucher' => $voucher_code,
-        //     'user_id' => $user->id,
-        //     'status' => 'Available'
-        // ])->row();
-
-//         if (!$voucher) {
-//             $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Voucher tidak valid</div>');
-//             redirect('transaksi/saldo');
-//             return;
-//         }
-
-//         // Prepare transaction data for voucher redemption
-//         $data = [
-//             'transaction_codes' => $this->generate_transaction_code($account_id),
-//             'user_id' => $user->id,
-//             'transaction_type' => 'Redeem Voucher',
-//             'amount' => $voucher->points_used,
-//             'branch_id' => null,
-//             'account_cashier_id' => $account_id,
-//             'payment_method' => 'Balance',
-//             'voucher_id' => $voucher->redeem_id
-//         ];
-
-//         // Begin transaction
-//         $this->db->trans_start();
-
-//         // Insert transaction
-//         $this->db->insert('transactions', $data);
-
-//         // Update voucher status
-//         $this->updateVoucherStatus($voucher_code);
-
-//         $this->db->trans_complete();
-
-//     } else {
-//         // Original top-up logic
-//         // ... existing top-up code ...
-//     }
-// }
-//         // public function convert_and_updateSaldoMemberCabang() {
-//         //     $login_session_data = $this->session->userdata('login_session');
-        //     $iduser = $login_session_data['user'];
-        //     // Set aturan validasi
-        //     $this->form_validation->set_rules('nominal','Nominal','required');
-        //     $this->form_validation->set_rules('metode','Metode','required');
-        //     $this->form_validation->set_rules('bukti','Bukti','callback_file_check');
-        //     $this->form_validation->set_rules('nomor','Nomor','required');
-        //     if($this->form_validation->run() == FALSE){
-        //         // Validasi menemukan error
-        //         $data['title'] = "Topup Saldo Member";
-        //         $data['member'] = $this->session->userdata('member_data');
-        //         $this->template->load('templates/cabang', 'transaksi/transaksiMemberSaldoCabang', $data);
-        //     } else {
-        //         $config['upload_path'] = '../fotobukti/';
-        //         $config['allowed_types'] = 'gif|jpg|png|PNG|jpeg|JPEG';
-        //         $config['max_size'] = 10240; // 10MB in kilobytes
-        //         $config['max_width'] = 10000;
-        //         $config['max_height'] = 10000;
-        //         $this->load->library('upload', $config);
-        //         if(!$this->upload->do_upload('bukti')){
-        //             $data['title'] = "Topup Saldo Member";
-        //             $data['member'] = $this->session->userdata('member_data');
-        //             $this->template->load('templates/cabang', 'transaksi/transaksiMemberSaldoCabang', $data);
-        //             $data['upload_error'] = $this->upload->display_errors('<span class="text-danger small">', '</span>');
-        //         }else {
-        //             // Ambil data dari form
-        //         $bukti = $this->upload->data();
-        //         $bukti = $bukti['file_name'];
-        //         $nominal = $this->input->post('nominal');
-        //         $metode = $this->input->post('metode');
-        //         $nomor = $this->input->post('nomor');
-        //         $id_user = $iduser;
-        //         // Set nilai 'nocabang' otomatis dari ID cabang kasir yang sedang login
-        //         // Buat array data untuk dimasukkan ke tabel 'transaksi'
-        //         $data = array(
-        //             'nominal' => $nominal,
-        //             'metode' => $metode,
-        //             'bukti' => $bukti,
-        //             'nomor' => $nomor,
-        //             'id_user' => $id_user
-        //         );
-        
-        //         // // Tampilkan data untuk debug
-        //         // var_dump($data);
-        
-        //         // Lakukan inser ke tabel 'transaksi'
-        //         if ($this->db->insert('topup', $data)) {
-        //             $topup_id = $this->db->insert_id();
-        //             $transaksi = $this->db->get_where('topup', array('id' => $topup_id))->row();
-        
-        //             // Update poin member
-        //             $this->member->updateMemberSaldo($transaksi->nomor, $transaksi->nominal);
-        //             $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Topup Saldo Member berhasil</div>');
-        
-        //             // Redirect ke halaman yang diinginkan
-        //             redirect(base_url('transaksi/getHistorySaldoCabang'));
-        //         } else {
-        //             // Terjadi error saat memasukkan data ke tabel 'transaksi'
-        //             echo "Error: " . $this->db->error();
-        //         }
-        //         }
-                
-        //     }
-        // }
         public function file_check($str)
         {
             // Check if a file is uploaded
@@ -335,24 +208,6 @@ class Transaksi extends CI_Controller {
         $data['tops'] = $this->topup->getTopupDetails();
 		$this->template->load('templates/dashboard', 'topup/index', $data);
 	    }
-        // public function getHistorySaldo()
-	    // {
-        // $data['title'] = "History Top Up Saldo";
-        // $data['tops'] = $this->topup->getTopupDetails();
-		// $this->template->load('templates/dashboard', 'topup/data', $data);
-	    // }
-	    // public function getHistorySaldoCabang()
-	    // {
-        // $data['title'] = "History Top Up Saldo";
-        // $data['tops'] = $this->topup->getTopupDetails();
-		// $this->template->load('templates/cabang', 'topup/dataCabang', $data);
-	    // }
-        // public function getHistorySaldoKasir()
-	    // {
-        // $data['title'] = "History Top Up Saldo";
-        // $data['tops'] = $this->topup->getTopupDetails();
-		// $this->template->load('templates/kasir', 'topup/dataKasir', $data);
-	    // }
         public function historyTransaksi() {
     $data['title'] = "History Transaksi";
     
@@ -402,6 +257,142 @@ class Transaksi extends CI_Controller {
     
     $this->template->load('templates/kasir', 'transaksi/historyTransaksiKasir', $data);
 }
+
+
+public function saldo()
+{
+    $data['title'] = "Top Up Saldo";
+    $data['member'] = $this->member->find_all();
+    $this->template->load('templates/dashboard', 'transaksi/addSaldo', $data);
+}
+
+public function cari_memberSaldo(){
+    $this->form_validation->set_rules('nohp','NomorHp','required');
+    if($this->form_validation->run() == false){
+        $data['title'] = "Top Up Saldo";
+        $this->template->load('templates/dashboard', 'transaksi/addSaldo', $data);
+    } else {
+        $nohp = $this->input->post('nohp');
+        // Get member data from database
+        $member = $this->db->get_where('users', ['phone_number' => $nohp])->row();
+        
+        if($member){
+            $this->session->set_userdata('member_data', $member);
+            $data['member'] = $member;
+            $data['title'] = "Topup Saldo Member";
+            $this->template->load('templates/dashboard', 'transaksi/transaksiMemberSaldo', $data);
+        } else {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Member tidak ditemukan</div>');
+            redirect('transaksi/saldo');
+        }
+    }
+}
+public function convert_and_updateSaldoMember() {
+    $login_session = $this->session->userdata('login_session');
+    $account_id = $login_session['id'];
+    $branch_id = $login_session['branch_id'];
+
+    // Set validation rules
+    $this->form_validation->set_rules('nominal', 'Nominal', 'required|numeric|greater_than_equal_to[10000]');
+    $this->form_validation->set_rules('metode', 'Metode Pembayaran', 'required|in_list[cash,transferBank]');
+    if($this->input->post('metode') == 'transferBank') {
+        $this->form_validation->set_rules('bukti', 'Bukti Transfer', 'callback_file_check');
+    }
+
+    if($this->form_validation->run() == FALSE) {
+        $data['title'] = "Top Up Saldo";
+        $data['member'] = $this->session->userdata('member_data');
+        $this->template->load('templates/dashboard', 'transaksi/transaksiMemberSaldo', $data);
+        return;
+    }
+
+    // Start transaction
+    $this->db->trans_start();
+
+    try {
+        $nominal = str_replace(',', '', $this->input->post('nominal')); // Remove thousand separators
+        $nominal = floatval($nominal); // Convert to float for decimal handling
+        $phone_number = $this->input->post('nomor');
+        
+        // Get current user data with precise balance
+        $user = $this->db->select('id, balance')
+                        ->where('phone_number', $phone_number)
+                        ->get('users')
+                        ->row();
+
+        if(!$user) {
+            throw new Exception('Member tidak ditemukan');
+        }
+
+        // Handle file upload if transfer
+        $evidence_filename = 'struk.png';
+        if($this->input->post('metode') == 'transferBank') {
+            $config['upload_path'] = '../ImageTerasJapan/transaction_proof/';
+            $config['allowed_types'] = 'gif|jpg|png|jpeg';
+            $config['max_size'] = 10240; // 10MB
+            $config['file_name'] = 'TRXBT' . $phone_number . mt_rand(1000, 9999);
+
+            $this->load->library('upload', $config);
+
+            if(!$this->upload->do_upload('bukti')) {
+                throw new Exception('Gagal upload bukti: ' . $this->upload->display_errors('',''));
+            }
+
+            $upload_data = $this->upload->data();
+            $evidence_filename = $upload_data['file_name'];
+        }
+
+        // Prepare transaction data with proper decimal handling
+        $transaction_data = [
+            'transaction_codes' => $this->generate_transaction_code($account_id, 'Balance Top-up'),
+            'user_id' => $user->id,
+            'transaction_type' => 'Balance Top-up',
+            'amount' => number_format($nominal, 2, '.', ''), // Ensure 2 decimal places
+            'branch_id' => $branch_id,
+            'account_cashier_id' => $account_id,
+            'payment_method' => $this->input->post('metode'),
+            'transaction_evidence' => $evidence_filename,
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+
+                // Add debug output
+        // echo "<pre>";
+        // echo "Data to be inserted:\n";
+        // var_dump($transaction_data);
+        // echo "\nUser data:\n";
+        // var_dump($user);
+        // echo "\nSession data:\n";
+        // var_dump($login_session);
+        // die();
+
+        // Insert transaction
+        $this->db->insert('transactions', $transaction_data);
+
+        // Calculate new balance with proper decimal handling
+        $current_balance = floatval($user->balance);
+        $new_balance = $current_balance + $nominal;
+
+        // Update user balance using precise decimal
+        $this->db->where('id', $user->id)
+                 ->update('users', [
+                     'balance' => number_format($new_balance, 2, '.', '')
+                 ]);
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            throw new Exception('Gagal melakukan transaksi');
+        }
+
+        $this->session->set_flashdata('pesan', '<div class="alert alert-success">Top up saldo berhasil</div>');
+        redirect('transaksi/getHistorysaldo');
+
+    } catch (Exception $e) {
+        $this->db->trans_rollback();
+        $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>');
+        redirect('transaksi/saldo');
+    }
+}
     public function getHistoryTopupBalance() {
     $data['title'] = "History Top Up Saldo";
     
@@ -436,13 +427,27 @@ public function getHistorysaldo() {
     $this->template->load('templates/dashboard', 'topup/data', $data);
 }
 
-private function generate_transaction_code($account_id) {
-    $date = date('dmy'); // Format: tanggal-bulan-tahun (250310)
+private function generate_transaction_code($account_id, $transaction_type) {
+    $date = date('dmy');
     $payment_method = $this->input->post('metode');
     $payment_code = ($payment_method == 'cash') ? 'CSH' : 'TF';
-    $random = mt_rand(1000, 9999);
     
-    return "TX{$account_id}SU{$date}TU{$payment_code}{$random}";
+    // Add transaction type code
+    $type_code = '';
+    switch($transaction_type) {
+        case 'Balance Top-up':
+            $type_code = 'BT';
+            break;
+        case 'Teras Japan Payment':
+            $type_code = 'TJP';
+            break;
+        case 'Redeem Voucher':
+            $type_code = 'RV';
+            break;
+    }
+    
+    $random = mt_rand(1000, 9999);
+    return "TRXSU{$type_code}{$account_id}{$random}";
 }
 
 private function generate_evidence_filename($user_id) {
@@ -513,4 +518,5 @@ public function getHistorytopupKasir()
     
     $this->template->load('templates/kasir', 'topup/dataKasir', $data);
     }
+
 }

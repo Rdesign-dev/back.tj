@@ -9,6 +9,16 @@
                             Riwayat Top Up Saldo
                         </h4>
                     </div>
+                    <div class="col-auto">
+                        <a href="<?= base_url('transaksicabang/saldoCabang') ?>" class="btn btn-sm btn-primary btn-icon-split">
+                            <span class="icon">
+                                <i class="fa fa-plus"></i>
+                            </span>
+                            <span class="text">
+                                Tambah Top Up
+                            </span>
+                        </a>
+                    </div>
                 </div>
             </div>
             <div class="table-responsive">

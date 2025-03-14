@@ -209,4 +209,10 @@ class TransaksiCabang extends CI_Controller {
         
         $this->template->load('templates/cabang', 'topup/dataCabang', $data);
     }
+
+    public function saldoCabang() 
+    {
+        $data['title'] = "Top Up Saldo";
+        $this->template->load('templates/cabang', 'transaksi/transaksiMemberSaldoCabang', $data);
+    }
 }
