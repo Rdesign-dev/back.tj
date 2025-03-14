@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col">
                 <h4 class="h5 align-middle m-0 font-weight-bold text-primary">
-                    News & Event
+                    Berita & Acara
                 </h4>
             </div>
             <div class="col-auto">
@@ -13,7 +13,7 @@
                         <i class="fas fa-plus-circle"></i>
                     </span>
                     <span class="text">
-                        Tambah News & Event
+                        Tambah Berita & Acara
                     </span>
                 </a>
             </div>
@@ -73,7 +73,7 @@
                 <?php endforeach;
                 else : ?>
                     <tr>
-                        <td colspan="7" class="text-center">Belum ada data News & Event</td>
+                        <td colspan="7" class="text-center">Belum ada data Berita & Acara</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
