@@ -70,3 +70,11 @@ $route['transaksikasir/cari_member_kasir'] = 'transaksikasir/cari_member_kasir';
 $route['transaksikasir/convert_and_updateKasir'] = 'transaksikasir/convert_and_updateKasir';
 $route['transaksikasir/historyTransaksiKasir'] = 'transaksikasir/historyTransaksiKasir';
 $route['transaksikasir/getHistorysaldoKasir'] = 'transaksikasir/getHistorysaldoKasir';
+
+// Transaksi Cabang Routes
+$route['transaksicabang/tambahTransaksiCabang'] = 'transaksicabang/tambahTransaksiCabang';
+$route['transaksicabang/cari_member_cabang'] = 'transaksicabang/cari_member_cabang';
+$route['transaksicabang/convert_and_updateCabang'] = 'transaksicabang/convert_and_updateCabang';
+$route['transaksicabang/historyTransaksiCabang'] = 'transaksicabang/historyTransaksiCabang';
+$route['transaksicabang/saldoCabang'] = 'transaksicabang/saldoCabang';
+$route['transaksicabang/getHistorysaldoCabang'] = 'transaksicabang/getHistorysaldoCabang';

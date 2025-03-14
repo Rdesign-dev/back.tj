@@ -5,7 +5,7 @@
                 <div class="row">
                     <div class="col">
                         <h4 class="h5 align-middle m-0 font-weight-bold text-primary">
-                            Form <?= $title; ?>
+                            Tambah User
                         </h4>
                     </div>
                     <div class="col-auto">
@@ -22,80 +22,108 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?= form_open(); ?>
+                <?= form_open_multipart('', array('class' => 'form-horizontal')); ?>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="username">Username</label>
-                    <div class="col-md-6">
-                        <input value="<?= set_value('username'); ?>" type="text" id="username" name="username" class="form-control" placeholder="Username">
-                        <?= form_error('username', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="password">Password</label>
-                    <div class="col-md-6">
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Password">
-                        <?= form_error('password', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="password2">Konfirmasi Password</label>
-                    <div class="col-md-6">
-                        <input type="password" id="password2" name="password2" class="form-control" placeholder="Konfirmasi Password">
-                        <?= form_error('password2', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <hr>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="nama">Nama</label>
-                    <div class="col-md-6">
-                        <input value="<?= set_value('nama'); ?>" type="text" id="nama" name="nama" class="form-control" placeholder="Nama">
-                        <?= form_error('nama', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="no_telp">Nomor Telepon</label>
-                    <div class="col-md-6">
-                        <input value="<?= set_value('no_telp'); ?>" type="text" id="no_telp" name="no_telp" class="form-control" placeholder="Nomor Telepon">
-                        <?= form_error('no_telp', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="role">Role</label>
-                    <div class="col-md-6">
-                        <div class="custom-control custom-radio">
-                            <input <?= set_radio('role', 'kasir'); ?> value="kasir" type="radio" id="kasir" name="role" class="custom-control-input">
-                            <label class="custom-control-label" for="kasir">Kasir</label>
+                    <label class="col-md-3 text-md-right" for="Name">Nama</label>
+                    <div class="col-md-9">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"><i class="fa fa-fw fa-user"></i></span>
+                            </div>
+                            <input value="<?= set_value('Name'); ?>" name="Name" id="Name" type="text" class="form-control" placeholder="Nama">
                         </div>
-                        <div class="custom-control custom-radio">
-                            <input <?= set_radio('role', 'admincabang'); ?> value="admincabang" type="radio" id="admincabang" name="role" class="custom-control-input">
-                            <label class="custom-control-label" for="admincabang">Admin Cabang</label>
+                        <?= form_error('Name', '<small class="text-danger">', '</small>'); ?>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right" for="username">Username</label>
+                    <div class="col-md-9">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"><i class="fa fa-fw fa-user"></i></span>
+                            </div>
+                            <input value="<?= set_value('username'); ?>" name="username" id="username" type="text" class="form-control" placeholder="Username">
                         </div>
-                        <?= form_error('role', '<span class="text-danger small">', '</span>'); ?>
+                        <?= form_error('username', '<small class="text-danger">', '</small>'); ?>
                     </div>
                 </div>
-                <div class="row form-group" id="divCabang" style="display: none;">
-                    <label class="col-md-4 text-md-right" for="idcabang">Cabang</label>
-                    <div class="col-md-6">
-                        <!-- Tambahkan input field untuk cabang di sini -->
-                        <select name="idcabang" id="idcabang" class="form-control">
-                        <option value="">- Pilih Cabang -</option>
-                                <option value="<?= userdata('idcabang')?>"><?= userdata('namacabang')?></option>
-                             
-                        </select>
-                        <?= form_error('cabang', '<span class="text-danger small">', '</span>'); ?>
-                        <input type="hidden" name="namacabang" id="namacabang">
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right" for="phone_number">Nomor Telepon</label>
+                    <div class="col-md-9">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"><i class="fa fa-fw fa-phone"></i></span>
+                            </div>
+                            <input value="<?= set_value('phone_number'); ?>" name="phone_number" id="phone_number" type="number" class="form-control" placeholder="Nomor Telepon">
+                        </div>
+                        <?= form_error('phone_number', '<small class="text-danger">', '</small>'); ?>
                     </div>
                 </div>
-                <br>
-                <div class="row form-group justify-content-end">
-                    <div class="col-md-8">
-                        <button type="submit" class="btn btn-primary btn-icon-split">
-                            <span class="icon"><i class="fa fa-save"></i></span>
-                            <span class="text">Simpan</span>
-                        </button>
-                        <button type="reset" class="btn btn-secondary">
-                            Reset
-                        </button>
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right" for="password">Password</label>
+                    <div class="col-md-9">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"><i class="fa fa-fw fa-lock"></i></span>
+                            </div>
+                            <input name="password" id="password" type="password" class="form-control" placeholder="Password">
+                        </div>
+                        <?= form_error('password', '<small class="text-danger">', '</small>'); ?>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right" for="password2">Konfirmasi Password</label>
+                    <div class="col-md-9">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"><i class="fa fa-fw fa-lock"></i></span>
+                            </div>
+                            <input name="password2" id="password2" type="password" class="form-control" placeholder="Konfirmasi Password">
+                        </div>
+                        <?= form_error('password2', '<small class="text-danger">', '</small>'); ?>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right" for="account_type">Role</label>
+                    <div class="col-md-9">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"><i class="fa fa-fw fa-id-card"></i></span>
+                            </div>
+                            <select name="account_type" id="account_type" class="form-control">
+                                <option value="" selected disabled>Pilih Role</option>
+                                <option value="cashier">Kasir</option>
+                                <option value="branch_admin">Admin Cabang</option>
+                            </select>
+                        </div>
+                        <?= form_error('account_type', '<small class="text-danger">', '</small>'); ?>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right" for="status">Status</label>
+                    <div class="col-md-9">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"><i class="fa fa-fw fa-toggle-on"></i></span>
+                            </div>
+                            <select name="status" id="status" class="form-control">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <?= form_error('status', '<small class="text-danger">', '</small>'); ?>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right" for="photo">Foto</label>
+                    <div class="col-md-9">
+                        <input type="file" name="photo" id="photo" class="form-control">
+                        <small class="text-muted mt-2 d-block">Kosongkan jika tidak ingin upload foto. Sistem akan menggunakan foto default.</small>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-9 offset-md-3">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
                     </div>
                 </div>
                 <?= form_close(); ?>

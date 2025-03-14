@@ -33,10 +33,11 @@ class Admin_model extends CI_Model
 
     public function getUsersCabang($id, $branch_id)
     {
-        $this->db->where('id !=', $id);
-        $this->db->where('branch_id', $branch_id);
-        return $this->db->get('accounts')->result_array();
+    $this->db->where('id !=', $id);
+    $this->db->where('branch_id', $branch_id);
+    return $this->db->get('accounts')->result_array();
     }
+    
     public function getUsers()
     {
         $this->db->select('accounts.*, branch.branch_name as branch_name')

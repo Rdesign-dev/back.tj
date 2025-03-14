@@ -140,40 +140,58 @@ class Member extends CI_Controller {
         }
     }
     public function tambah_saveCabang()
-    {
-        $this->form_validation->set_rules("namamember","Nama Member","required|trim");
-        $this->form_validation->set_rules("nomor","Nomor","required|trim|callback_check_unique_number|min_length[11]");
-        if($this->form_validation->run() == FALSE){
-            $this->_has_login();
-            $data['title'] = "Tambah Member";
-            $this->template->load('templates/dashboard', 'member/add', $data);
-        }else{
-            $nomor = $this->input->post("nomor");
-            $namamember = $this->input->post("namamember");
-            $poin = 0;
-            $data = array(
-                'nomor' => $nomor,
-                'namamember' => $namamember,
-                'poin' => $poin,
-                'foto' => 'hero.png',
-                'tanggaldaftar' => date('Y-m-d H:i:s')
-            );
-            $this->db->insert('member',$data);
+{
+    $this->form_validation->set_rules("namamember", "Nama Member", "required|trim");
+    $this->form_validation->set_rules("nomor", "Nomor", "required|trim|callback_check_unique_number|min_length[11]");
+    
+    if ($this->form_validation->run() == FALSE) {
+        $this->_has_login();
+        $data['title'] = "Tambah Member";
+        $this->template->load('templates/cabang', 'member/addCabang', $data);
+    } else {
+        $data = array(
+            'name' => $this->input->post("namamember"),
+            'phone_number' => $this->input->post("nomor"),
+            'poin' => 0,
+            'balance' => 0,
+            'profile_pic' => 'profile_default.png',
+            'registration_time' => date('Y-m-d H:i:s')
+        );
+
+        // Insert into users table
+        if ($this->db->insert('users', $data)) {
+            $user_id = $this->db->insert_id();
+            
+            // Handle new member vouchers if needed
             $voucher_details = $this->voucher->find_all();
             foreach ($voucher_details as $voucher) {
-            if ($voucher['isNew'] == 'memberbaru') {
-                $kodevoucher = $voucher['kodevoucher'];
-                $poin = $voucher['poin'];
-                $dateRedeem = date('Y-m-d H:i:s');
-                $expired_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
-                $vouchergenerate = date('YmdHis') . $kodevoucher;
-                $this->vouchermember->insertVoucherNewMember($kodevoucher, $nomor, $poin, $dateRedeem, $expired_date, $vouchergenerate);
+                if ($voucher['isNew'] == 'memberbaru') {
+                    $kodevoucher = $voucher['kodevoucher'];
+                    $poin = $voucher['poin'];
+                    $dateRedeem = date('Y-m-d H:i:s');
+                    $expired_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
+                    $vouchergenerate = date('YmdHis') . $kodevoucher;
+                    
+                    // Update voucher_member table with user_id instead of phone number
+                    $this->vouchermember->insertVoucherNewMember(
+                        $kodevoucher, 
+                        $user_id, // Changed from phone number to user_id
+                        $poin, 
+                        $dateRedeem, 
+                        $expired_date, 
+                        $vouchergenerate
+                    );
+                }
             }
+
+            $this->session->set_flashdata('pesan', '<div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>');
+        } else {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger" role="alert">Gagal menambahkan data</div>');
         }
-            $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>');
-            redirect(base_url('member/indexCabang'));
-        }
+        
+        redirect(base_url('member/indexCabang'));
     }
+}
     public function check_unique_number($nomor){
         $existing_number = $this->member->get_by_nomor($nomor);
 

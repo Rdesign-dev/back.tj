@@ -5,7 +5,7 @@
                 <div class="row">
                     <div class="col">
                         <h4 class="h5 align-middle m-0 font-weight-bold text-primary">
-                            Form <?= $title; ?>
+                            Edit User
                         </h4>
                     </div>
                     <div class="col-auto">
@@ -21,77 +21,99 @@
                 </div>
             </div>
             <div class="card-body pb-2">
-                <?= $this->session->flashdata('pesan'); ?>
-                <?= form_open('', [], ['id_user' => $user['id_user']]); ?>
+                <?= form_open_multipart('', [], ['id' => $user['id']]); ?>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="username">Username</label>
-                    <div class="col-md-6">
-                        <input value="<?= set_value('username', $user['username']); ?>" type="text" id="username" name="username" class="form-control" placeholder="Username">
-                        <?= form_error('username', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <hr>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="nama">Nama</label>
-                    <div class="col-md-6">
-                        <input value="<?= set_value('nama', $user['nama']); ?>" type="text" id="nama" name="nama" class="form-control" placeholder="Nama">
-                        <?= form_error('nama', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="email">Email</label>
-                    <div class="col-md-6">
-                        <input value="<?= set_value('email', $user['email']); ?>" type="text" id="email" name="email" class="form-control" placeholder="Email">
-                        <?= form_error('email', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="no_telp">Nomor Telepon</label>
-                    <div class="col-md-6">
-                        <input value="<?= set_value('no_telp', $user['no_telp']); ?>" type="text" id="no_telp" name="no_telp" class="form-control" placeholder="Nomor Telepon">
-                        <?= form_error('no_telp', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="role">Role</label>
-                    <div class="col-md-6">
-                        <div class="custom-control custom-radio">
-                            <input <?= $user['role'] == 'kasir' ? 'checked' : ''; ?> <?= set_radio('role', 'kasir'); ?> value="kasir" type="radio" id="kasir" name="role" class="custom-control-input">
-                            <label class="custom-control-label" for="kasir">Kasir</label>
+                    <label class="col-md-3 text-md-right" for="username">Username</label>
+                    <div class="col-md-9">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
+                            </div>
+                            <input value="<?= set_value('username', $user['username']); ?>" name="username" id="username" type="text" class="form-control" placeholder="Username">
                         </div>
-                        <div class="custom-control custom-radio">
-                            <input <?= $user['role'] == 'admincabang' ? 'checked' : ''; ?> <?= set_radio('role', 'admincabang'); ?> value="admincabang" type="radio" id="admincabang" name="role" class="custom-control-input">
-                            <label class="custom-control-label" for="admincabang">Admin Cabang</label>
+                        <?= form_error('username', '<small class="text-danger">', '</small>'); ?>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right" for="Name">Nama</label>
+                    <div class="col-md-9">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
+                            </div>
+                            <input value="<?= set_value('Name', $user['Name']); ?>" name="Name" id="Name" type="text" class="form-control" placeholder="Nama">
                         </div>
-                        <?= form_error('role', '<span class="text-danger small">', '</span>'); ?>
+                        <?= form_error('Name', '<small class="text-danger">', '</small>'); ?>
                     </div>
                 </div>
-                <div class="row form-group" id="divCabang" style="display: none;">
-                    <label class="col-md-4 text-md-right" for="idcabang">Cabang</label>
-                    <div class="col-md-6">
-                        <!-- Tambahkan input field untuk cabang di sini -->
-                        <select name="idcabang" id="idcabang" class="form-control">
-                            <?php
-                            foreach ($cabang as $cg => $cbg){
-                                ?>
-                                <option value="<?= $cbg['id']?>"><?= $cbg['namacabang']?></option>
-                                <?php
-                                
-                            }
-                            ?>
-                        </select>
-                        <?= form_error('cabang', '<span class="text-danger small">', '</span>'); ?>
-                        <input type="hidden" name="namacabang" id="namacabang">
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right" for="phone_number">Nomor Telepon</label>
+                    <div class="col-md-9">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-fw fa-phone"></i></span>
+                            </div>
+                            <input value="<?= set_value('phone_number', $user['phone_number']); ?>" name="phone_number" id="phone_number" type="text" class="form-control" placeholder="Nomor Telepon">
+                        </div>
+                        <?= form_error('phone_number', '<small class="text-danger">', '</small>'); ?>
                     </div>
                 </div>
-                <br>
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right" for="account_type">Role</label>
+                    <div class="col-md-9">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
+                            </div>
+                            <select name="account_type" id="account_type" class="form-control">
+                                <option value="cashier" <?= $user['account_type'] == 'cashier' ? 'selected' : ''; ?>>Kasir</option>
+                                <option value="branch_admin" <?= $user['account_type'] == 'branch_admin' ? 'selected' : ''; ?>>Admin Cabang</option>
+                            </select>
+                        </div>
+                        <?= form_error('account_type', '<small class="text-danger">', '</small>'); ?>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right" for="status">Status</label>
+                    <div class="col-md-9">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-fw fa-toggle-on"></i></span>
+                            </div>
+                            <select name="status" id="status" class="form-control">
+                                <option value="Active" <?= $user['status'] == 'Active' ? 'selected' : ''; ?>>Active</option>
+                                <option value="Inactive" <?= $user['status'] == 'Inactive' ? 'selected' : ''; ?>>Inactive</option>
+                            </select>
+                        </div>
+                        <?= form_error('status', '<small class="text-danger">', '</small>'); ?>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right">Foto Saat Ini</label>
+                    <div class="col-md-9">
+                        <img src="<?= base_url('../ImageTerasJapan/Profpic/') . $user['photo'] ?>" alt="<?= $user['Name']; ?>" class="img-thumbnail mb-2" style="height: 100px">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-3 text-md-right" for="photo">Foto Baru</label>
+                    <div class="col-md-9">
+                        <input type="file" name="photo" id="photo" class="form-control">
+                        <small class="text-muted">Kosongkan jika tidak ingin upload foto. Sistem akan menggunakan foto yang ada.</small>
+                    </div>
+                </div>
                 <div class="row form-group justify-content-end">
-                    <div class="col-md-8">
+                    <div class="col-md-9">
                         <button type="submit" class="btn btn-primary btn-icon-split">
-                            <span class="icon"><i class="fa fa-save"></i></span>
-                            <span class="text">Simpan</span>
+                            <span class="icon">
+                                <i class="fa fa-save"></i>
+                            </span>
+                            <span class="text">
+                                Simpan
+                            </span>
                         </button>
-                        <button type="reset" class="btn btn-secondary">Reset</button>
+                        <button type="reset" class="btn btn-secondary">
+                            Reset
+                        </button>
                     </div>
                 </div>
                 <?= form_close(); ?>

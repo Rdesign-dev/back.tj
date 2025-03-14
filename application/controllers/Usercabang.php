@@ -14,38 +14,36 @@ class Usercabang extends CI_Controller
 
     public function index()
     {
-        $login_session_data = $this->session->userdata('login_session');
-        $idcabang = $login_session_data['idcabang'];
+        $login_session = $this->session->userdata('login_session');
+        $branch_id = $login_session['branch_id'];
         $data['title'] = "User Management";
-        $data['users'] = $this->admin->getUsersCabang(userdata('id_user'),$idcabang);
+        $data['users'] = $this->admin->getUsersCabang($login_session['id'], $branch_id);
         $this->template->load('templates/cabang', 'user/datacabang', $data);
     }
 
     private function _validasi($mode)
     {
-        $this->form_validation->set_rules('nama', 'Nama', 'required|trim');
-        $this->form_validation->set_rules('no_telp', 'Nomor Telepon', 'required|trim');
-        $this->form_validation->set_rules('role', 'Role', 'required|trim');
+        $this->form_validation->set_rules('Name', 'Nama', 'required|trim');
+        $this->form_validation->set_rules('phone_number', 'Nomor Telepon', 'required|trim');
+        $this->form_validation->set_rules('account_type', 'Role', 'required|trim');
         
-        if ($this->input->post('role') == 'kasir') {
-        $this->form_validation->set_rules('idcabang', 'Cabang', 'required|trim');
-        }else if($this->input->post('role') == 'admincabang'){
-        $this->form_validation->set_rules('idcabang', 'Cabang', 'required|trim');
-        }
         if ($mode == 'add') {
-            $this->form_validation->set_rules('username', 'Username', 'required|trim|is_unique[user.username]|alpha_numeric');
+            $this->form_validation->set_rules('username', 'Username', 'required|trim|is_unique[accounts.username]|alpha_numeric');
             $this->form_validation->set_rules('password', 'Password', 'required|min_length[3]|trim');
             $this->form_validation->set_rules('password2', 'Konfirmasi Password', 'matches[password]|trim');
         } else {
-            $db = $this->admin->get('user', ['id_user' => $this->input->post('id_user', true)]);
+            $id = $this->input->post('id', true);
             $username = $this->input->post('username', true);
-            $uniq_username = '';
-            if($db){
-            $uniq_username = $db['username'] == $username ? '' : '|is_unique[user.username]';
-            }
             
-
-            $this->form_validation->set_rules('username', 'Username', 'required|trim|alpha_numeric' . $uniq_username);
+            // Get current user data
+            $current_user = $this->admin->get('accounts', ['id' => $id]);
+            
+            // Only check username uniqueness if it changed
+            if ($current_user && $current_user['username'] != $username) {
+                $this->form_validation->set_rules('username', 'Username', 'required|trim|is_unique[accounts.username]|alpha_numeric');
+            } else {
+                $this->form_validation->set_rules('username', 'Username', 'required|trim|alpha_numeric');
+            }
         }
     }
 
@@ -55,32 +53,52 @@ class Usercabang extends CI_Controller
 
         if ($this->form_validation->run() == false) {
             $data['title'] = "Tambah User";
-            $data['cabang'] = $this->cabang->find_all();
             $this->template->load('templates/cabang', 'user/addcabang', $data);
         } else {
             $input = $this->input->post(null, true);
-            $cabang = null;
-            $namacabang = null;
-            if($input['role'] == 'kasir'){
-                $cabang = $input['idcabang'];
-                $namacabang = $input['namacabang'];
-            }else if($input['role'] == 'admincabang'){
-                $cabang = $input['idcabang'];
-                $namacabang = $input['namacabang'];
+            $login_session = $this->session->userdata('login_session');
+            $branch_id = $login_session['branch_id'];
+
+            // Generate random 5 digit number
+            $random_number = str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT);
+            
+            // Format filename: Prof-{nama}-{5 digit random}
+            $filename = 'Prof-' . str_replace(' ', '_', $input['Name']) . '-' . $random_number;
+
+            // Upload configuration
+            $config['upload_path']   = '../ImageTerasJapan/Profpic';
+            $config['allowed_types'] = 'gif|jpg|png|jpeg';
+            $config['max_size']      = 2048;
+            $config['file_name']     = $filename;
+
+            $this->load->library('upload', $config);
+
+            if ($this->upload->do_upload('photo')) {
+                $upload_data = $this->upload->data();
+                $photo = $upload_data['file_name'];
+            } else {
+                $photo = 'profile_default.png';
             }
+
             $input_data = [
-                'nama'          => $input['nama'],
                 'username'      => $input['username'],
-                'no_telp'       => $input['no_telp'],
-                'role'          => $input['role'],
-                'idcabang'       => $cabang,
-                'namacabang'    => $namacabang,
+                'phone_number'  => $input['phone_number'],
                 'password'      => password_hash($input['password'], PASSWORD_DEFAULT),
-                'created_at'    => time(),
-                'foto'          => 'user.png'
+                'Name'          => $input['Name'],
+                'account_type'  => $input['account_type'],
+                'branch_id'     => $branch_id, // Using branch_id from session
+                'status'        => $input['status'],
+                'photo'         => $photo
             ];
 
-            if ($this->admin->insert('user', $input_data)) {
+            // // Debug: View data before insert
+            // echo "<pre>";
+            // echo "Data to be inserted:\n";
+            // var_dump($input_data);
+            // echo "</pre>";
+            // die();
+
+            if ($this->admin->insert('accounts', $input_data)) {
                 set_pesan('data berhasil disimpan.');
                 redirect('usercabang');
             } else {
@@ -97,30 +115,54 @@ class Usercabang extends CI_Controller
 
         if ($this->form_validation->run() == false) {
             $data['title'] = "Edit User";
-            $data['cabang'] = $this->cabang->find_all();
-            $data['user'] = $this->admin->get('user', ['id_user' => $id]);
+            $data['user'] = $this->admin->get('accounts', ['id' => $id]);
             $this->template->load('templates/cabang', 'user/editcabang', $data);
         } else {
             $input = $this->input->post(null, true);
-            $cabang = null;
-            $namacabang = null;
-            if($input['role'] == 'kasir'){
-                $cabang = $input['idcabang'];
-                $namacabang = $input['namacabang'];
-            }else if($input['role'] == 'admincabang'){
-                $cabang = $input['idcabang'];
-                $namacabang = $input['namacabang'];
+            $login_session = $this->session->userdata('login_session');
+            
+            // Get old photo name for potential deletion
+            $old_photo = $this->admin->get('accounts', ['id' => $id])['photo'];
+
+            // Handle photo upload if new photo is provided
+            if (!empty($_FILES['photo']['name'])) {
+                // Generate random 5 digit number for new filename
+                $random_number = str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT);
+                $filename = 'Prof-' . str_replace(' ', '_', $input['Name']) . '-' . $random_number;
+
+                $config['upload_path']   = '../ImageTerasJapan/Profpic';
+                $config['allowed_types'] = 'gif|jpg|png|jpeg';
+                $config['max_size']      = 2048;
+                $config['file_name']     = $filename;
+
+                $this->load->library('upload', $config);
+
+                if ($this->upload->do_upload('photo')) {
+                    $upload_data = $this->upload->data();
+                    $photo = $upload_data['file_name'];
+                    
+                    // Delete old photo if it's not the default
+                    if ($old_photo != 'profile_default.png') {
+                        unlink('../ImageTerasJapan/Profpic/' . $old_photo);
+                    }
+                } else {
+                    $photo = $old_photo;
+                }
+            } else {
+                $photo = $old_photo;
             }
+
             $input_data = [
-                'nama'          => $input['nama'],
                 'username'      => $input['username'],
-                'no_telp'       => $input['no_telp'],
-                'role'          => $input['role'],
-                'idcabang'      => $cabang,
-                'namacabang'    => $namacabang
+                'phone_number'  => $input['phone_number'],
+                'Name'          => $input['Name'],
+                'account_type'  => $input['account_type'],
+                'branch_id'     => $login_session['branch_id'],
+                'status'        => $input['status'],
+                'photo'         => $photo
             ];
 
-            if ($this->admin->update('user', 'id_user', $id, $input_data)) {
+            if ($this->admin->update('accounts', 'id', $id, $input_data)) {
                 set_pesan('data berhasil diubah.');
                 redirect('usercabang');
             } else {
@@ -133,23 +175,46 @@ class Usercabang extends CI_Controller
     public function delete($getId)
     {
         $id = encode_php_tags($getId);
-        if ($this->admin->delete('user', 'id_user', $id)) {
-            set_pesan('data berhasil dihapus.');
+        
+        // Get photo name before deleting
+        $user = $this->admin->get('accounts', ['id' => $id]);
+        
+        if ($user) {
+            // Delete photo file if it's not the default
+            if ($user['photo'] != 'profile_default.png') {
+                $photo_path = '../ImageTerasJapan/Profpic/' . $user['photo'];
+                if (file_exists($photo_path)) {
+                    unlink($photo_path);
+                }
+            }
+            
+            // Delete user from database
+            $this->db->where('id', $id);
+            $delete_result = $this->db->delete('accounts');
+            
+            if ($delete_result) {
+                set_pesan('data berhasil dihapus.');
+            } else {
+                set_pesan('data gagal dihapus.', false);
+            }
         } else {
-            set_pesan('data gagal dihapus.', false);
+            set_pesan('data tidak ditemukan.', false);
         }
+        
         redirect('usercabang');
     }
 
-    public function toggle($getId)
+    // Add toggle status method
+    public function toggleStatus($getId)
     {
         $id = encode_php_tags($getId);
-        $status = $this->admin->get('user', ['id_user' => $id])['is_active'];
-        $toggle = $status ? 0 : 1; //Jika user aktif maka nonaktifkan, begitu pula sebaliknya
-        $pesan = $toggle ? 'user diaktifkan.' : 'user dinonaktifkan.';
+        $current_status = $this->admin->get('accounts', ['id' => $id])['status'];
+        $new_status = ($current_status == 'Active') ? 'Inactive' : 'Active';
 
-        if ($this->admin->update('user', 'id_user', $id, ['is_active' => $toggle])) {
-            set_pesan($pesan);
+        if ($this->admin->update('accounts', 'id', $id, ['status' => $new_status])) {
+            set_pesan('Status berhasil diubah.');
+        } else {
+            set_pesan('Status gagal diubah.', false);
         }
         redirect('usercabang');
     }

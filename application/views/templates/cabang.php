@@ -81,25 +81,25 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('transaksi/tambahTransaksiCabang'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('transaksicabang/tambahTransaksiCabang'); ?>">
                 <i class="fas fa-history"></i>
                     <span>Transaksi</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('transaksi/historyTransaksiCabang'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('transaksicabang/historyTransaksiCabang'); ?>">
                 <i class="fas fa-file-alt"></i>
                     <span>Riwayat Transaksi <?= userdata('namacabang') ?></span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('transaksi/saldoCabang'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('transaksicabang/saldoCabang'); ?>">
                 <i class="fas fa-money-bill-wave-alt"></i>
                     <span>Top Up Saldo</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('transaksi/getHistorysaldoCabang'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('transaksicabang/getHistorysaldoCabang'); ?>">
                 <i class="fas fa-file"></i>
                     <span>Riwayat Top Up Saldo</span>
                 </a>

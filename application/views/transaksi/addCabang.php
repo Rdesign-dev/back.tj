@@ -12,7 +12,7 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?php echo form_open_multipart('transaksi/cari_member_cabang', array('id' => 'memberForm')); ?>
+                <?php echo form_open_multipart('transaksiCabang/cari_member_cabang', array('id' => 'memberForm')); ?>
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nomor">Nomor Handphone</label>
                     <div class="col-md-6">
