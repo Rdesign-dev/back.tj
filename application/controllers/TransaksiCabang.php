@@ -61,6 +61,17 @@ class TransaksiCabang extends CI_Controller {
         $login_session = $this->session->userdata('login_session');
         $member_data = $this->session->userdata('member_data');
 
+        // // Debug data before insert
+        // var_dump([
+        //     'POST Data' => $this->input->post(),
+        //     'Session Data' => [
+        //         'login_session' => $login_session,
+        //         'member_data' => $member_data
+        //     ],
+        //     'Files' => $_FILES
+        // ]);
+        // die(); // Stop execution to see the dump
+
         if ($this->input->post('tukarVoucher')) {
             $this->form_validation->set_rules('kodevouchertukar', 'Voucher', 'required');
         } else {
@@ -108,27 +119,43 @@ class TransaksiCabang extends CI_Controller {
                             sprintf('%04d', $sequence);
 
             $payment_method_mapping = [
-                'CSH' => 'Cash',
-                'TFB' => 'Transfer Bank',
-                'BM' => 'Balance Member'
+                'CSH' => 'cash',
+                'TFB' => 'transferBank',
+                'BM' => 'Balance'
             ];
 
             $data = [
                 'transaction_codes' => $transaction_code,
                 'user_id' => $member_data->id,
-                'transaction_type' => $is_voucher ? 'Redeem Voucher' : 'Teras Japan Payment',
+                'transaction_type' => $is_voucher ? 'Redeem Voucher' : 'Teras Japan Payment', // Match enum exactly
                 'amount' => $is_voucher ? null : $amount,
                 'branch_id' => $login_session['branch_id'],
                 'account_cashier_id' => $login_session['id'],
-                'payment_method' => $is_voucher ? null : $payment_method_mapping[$payment_method],
+                'payment_method' => $is_voucher ? null : $payment_method_mapping[$payment_method], // Use lowercase values
                 'transaction_evidence' => $upload_data['file_name'],
                 'voucher_id' => $is_voucher ? $this->input->post('kodevouchertukar') : null,
                 'created_at' => $this->input->post('tanggaltransaksi')
             ];
 
+            // Debug data
+            // echo "<pre>";
+            // echo "Data to be inserted:\n";
+            // var_dump($data);
+            // echo "</pre>";
+            // die();
+
             $this->db->trans_start();
 
-            $this->db->insert('transactions', $data);
+            // Add debug logging
+            log_message('debug', 'Data to be inserted: ' . json_encode($data));
+
+            $insert_result = $this->db->insert('transactions', $data);
+            
+            if (!$insert_result) {
+                log_message('error', 'DB Error: ' . $this->db->error()['message']);
+                echo "DB Error: " . $this->db->error()['message'];
+                die();
+            }
 
             if (!$is_voucher && $data['transaction_type'] === 'Teras Japan Payment') {
                 $points_earned = floor($amount / 10000);
@@ -152,7 +179,9 @@ class TransaksiCabang extends CI_Controller {
             $this->db->trans_complete();
 
             if ($this->db->trans_status() === FALSE) {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Transaksi gagal</div>');
+                $error = $this->db->error();
+                log_message('error', 'Transaction failed: ' . json_encode($error));
+                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Transaksi gagal: ' . $error['message'] . '</div>');
             } else {
                 $this->session->set_flashdata('pesan', '<div class="alert alert-success">Transaksi berhasil</div>');
             }

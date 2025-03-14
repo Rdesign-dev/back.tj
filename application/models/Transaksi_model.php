@@ -3,10 +3,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Transaksi_model extends CI_Model {
 
-    public $table = "transaksi";
+    public $table = "transactions"; // Change from "transaksi" to "transactions"
 
     public function __construct() {
         parent::__construct();
+        $this->table = "transactions"; // Change from "transaksi" to "transactions"
     }
 
     public function getAllTransaksi() {

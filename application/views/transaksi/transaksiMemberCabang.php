@@ -53,20 +53,30 @@
                 </div>
 
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right">Tipe Transaksi</label>
+                    <label class="col-md-4 text-md-right">Kode Voucher</label>
                     <div class="col-md-6">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="tukarVoucher" name="tukarVoucher">
-                            <label class="custom-control-label" for="tukarVoucher">Tukar Voucher</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="checkbox" id="tukarVoucher" name="tukarVoucher">
+                                </div>
+                            </div>
+                            <select name="kodevouchertukar" id="kodevouchertukar" class="form-control" disabled>
+                                <option value="" selected>Pilih Voucher</option>
+                                <?php foreach ($unused_vouchers as $voucher): ?>
+                                    <option value="<?= $voucher->redeem_id ?>"><?= $voucher->kode_voucher ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
+                        <?= form_error('kodevouchertukar', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
 
-                <div id="normalTransaction">
+                <div class="payment-field">
                     <div class="row form-group">
                         <label class="col-md-4 text-md-right">Total</label>
                         <div class="col-md-6">
-                            <input type="number" name="total" class="form-control" min="1000">
+                            <input type="number" name="total" id="total" class="form-control" min="1000">
                             <small class="text-muted">Minimal transaksi Rp 1.000</small>
                         </div>
                     </div>
@@ -74,25 +84,13 @@
                     <div class="row form-group">
                         <label class="col-md-4 text-md-right">Metode Pembayaran</label>
                         <div class="col-md-6">
-                            <select name="payment_method" class="form-control">
+                            <select name="payment_method" id="payment_method" class="form-control">
+                                <option value="" selected>Pilih Metode</option>
                                 <option value="CSH">Cash</option>
                                 <option value="TFB">Transfer Bank</option>
                                 <option value="BM">Balance Member</option>
                             </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="voucherTransaction" style="display:none;">
-                    <div class="row form-group">
-                        <label class="col-md-4 text-md-right">Pilih Voucher</label>
-                        <div class="col-md-6">
-                            <select name="kodevouchertukar" class="form-control">
-                                <option value="">Pilih Voucher</option>
-                                <?php foreach ($unused_vouchers as $voucher): ?>
-                                <option value="<?= $voucher->redeem_id ?>"><?= $voucher->kode_voucher ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                            <?= form_error('payment_method', '<span class="text-danger small">', '</span>'); ?>
                         </div>
                     </div>
                 </div>
@@ -100,7 +98,7 @@
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right">Tanggal Transaksi</label>
                     <div class="col-md-6">
-                        <input type="datetime-local" name="tanggaltransaksi" class="form-control" required>
+                        <input type="datetime-local" name="tanggaltransaksi" id="tanggaltransaksi" class="form-control" required>
                     </div>
                 </div>
 
@@ -129,34 +127,53 @@
 </div>
 
 <script>
-$(document).ready(function() {
-    // Set default datetime to now
+document.addEventListener('DOMContentLoaded', function() {
+    const tukarVoucherCheckbox = document.getElementById('tukarVoucher');
+    const kodevouchertukar = document.getElementById('kodevouchertukar');
+    const paymentFields = document.querySelectorAll('.payment-field');
+    const payment_method = document.getElementById('payment_method');
+    const total = document.getElementById('total');
+
+    // Set default datetime
     document.getElementById('tanggaltransaksi').value = new Date().toISOString().slice(0, 16);
 
-    // Toggle transaction sections
-    $('#tukarVoucher').change(function() {
-        if ($(this).is(':checked')) {
-            $('#voucherTransaction').show();
-            $('#normalTransaction').hide();
+    tukarVoucherCheckbox.addEventListener('change', function() {
+        const isChecked = this.checked;
+        
+        // Toggle payment fields visibility
+        paymentFields.forEach(field => {
+            field.style.display = isChecked ? 'none' : 'block';
+        });
+
+        // Toggle voucher select enabled state
+        kodevouchertukar.disabled = !isChecked;
+
+        // Toggle required fields
+        payment_method.required = !isChecked;
+        total.required = !isChecked;
+        kodevouchertukar.required = isChecked;
+
+        // Reset values when toggling
+        if (!isChecked) {
+            kodevouchertukar.value = '';
         } else {
-            $('#voucherTransaction').hide();
-            $('#normalTransaction').show();
+            payment_method.value = '';
+            total.value = '';
         }
     });
 
     // Form validation
-    $('#transactionForm').submit(function(e) {
-        if (!$('#tukarVoucher').is(':checked')) {
-            let amount = $('input[name="total"]').val();
+    document.getElementById('transactionForm').addEventListener('submit', function(e) {
+        if (!tukarVoucherCheckbox.checked) {
+            const amount = parseInt(total.value);
             if (amount < 1000) {
                 e.preventDefault();
                 alert('Minimal transaksi Rp 1.000');
                 return;
             }
 
-            let payment_method = $('select[name="payment_method"]').val();
-            if (payment_method === 'BM') {
-                let balance = <?= $member->balance ?>;
+            if (payment_method.value === 'BM') {
+                const balance = <?= $member->balance ?>;
                 if (balance < amount) {
                     e.preventDefault();
                     alert('Saldo member tidak mencukupi');
