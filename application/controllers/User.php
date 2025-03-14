@@ -31,7 +31,7 @@ class User extends CI_Controller
         $this->form_validation->set_rules('username', 'Username', 'required|trim|alpha_numeric');
         $this->form_validation->set_rules('Name', 'Nama', 'required|trim');
         $this->form_validation->set_rules('phone_number', 'Nomor Telepon', 'required|trim');
-        $this->form_validation->set_rules('account_type', 'Role', 'required|trim');
+        $this->form_validation->set_rules('account_type', 'Role', 'required|trim|in_list[super_admin,admin_central,branch_admin,cashier]');
         $this->form_validation->set_rules('status', 'Status', 'required|trim');
 
         // Branch validation only for cashier and branch_admin
@@ -62,6 +62,18 @@ class User extends CI_Controller
             $input['password'] = password_hash($input['password'], PASSWORD_DEFAULT);
             unset($input['password2']); // Remove password confirmation
             
+            // Handle branch_id based on role type
+            switch ($input['account_type']) {
+                case 'super_admin':
+                case 'admin_central': // Added admin_central handling
+                    $input['branch_id'] = null;
+                    break;
+                case 'branch_admin':
+                case 'cashier':
+                    // Keep branch_id from form input
+                    break;
+            }
+
             // Handle photo upload
             if (!empty($_FILES['photo']['name'])) {
                 $config['upload_path']   = '../ImageTerasJapan/ProfPic/';
@@ -120,12 +132,26 @@ class User extends CI_Controller
         } else {
             $input = $this->input->post(null, true);
             
-            // If not cashier or branch_admin, set branch_id to null
-            if (!in_array($input['account_type'], ['cashier', 'branch_admin'])) {
-                $input['branch_id'] = null;
+            // Handle branch_id based on role type
+            switch ($input['account_type']) {
+                case 'super_admin':
+                case 'admin_central':
+                    $input['branch_id'] = null;
+                    break;
+                case 'branch_admin':
+                case 'cashier':
+                    // Branch_id from form
+                    if (empty($input['branch_id'])) {
+                        set_pesan('Cabang harus dipilih untuk Admin Cabang dan Kasir', false);
+                        redirect('user/edit/' . $id);
+                    }
+                    break;
+                default:
+                    $input['branch_id'] = null;
             }
 
-            // Remove id from input array since we're using it in the where clause
+            // Remove id from input since we're using it in where clause
+            $user_id = $input['id'];
             unset($input['id']);
 
             if ($this->admin->update('accounts', 'id', $id, $input)) {

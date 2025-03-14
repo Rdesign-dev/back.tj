@@ -70,7 +70,7 @@
                 </div>
                 
                 <div class="row form-group" id="totalDaysRow">
-                    <label class="col-md-4 text-md-right" for="total_days">Total Hari</label>
+                    <label class="col-md-4 text-md-right" for="total_days">Total Hari Aktif</label>
                     <div class="col-md-6">
                         <input value="<?= set_value('total_days', '30'); ?>" type="number" id="total_days" name="total_days" class="form-control" placeholder="Masukkan Total Hari">
                         <?= form_error('total_days', '<span class="text-danger small">', '</span>'); ?>

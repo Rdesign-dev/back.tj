@@ -16,8 +16,8 @@ class Iklan extends CI_Controller {
             $data['title'] = "Tambah Iklan";
             $this->template->load('templates/dashboard', 'iklan/add', $data);
         } else {
-            $config['upload_path'] = './fotoiklan/';
-            $config['allowed_types'] = 'gif|jpg|png|jpeg';
+            $config['upload_path'] = '..ImageTerasJapan/promo';
+            $config['allowed_types'] = 'gif|jpg|png|jpeg|avif';
             $this->load->library('upload', $config);
             
             if ($this->upload->do_upload('foto')) {

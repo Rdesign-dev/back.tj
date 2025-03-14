@@ -47,21 +47,19 @@ class Topup_model extends CI_Model {
 
     public function getTopupByIdCabang($branch_id)
     {
-        $this->db->select('
-            t.transaction_codes,
-            t.created_at,
-            t.amount as nominal,
-            u.name as member_name,
-            a.Name as cashier_name
-        ')
-        ->from('transactions t')
-        ->join('users u', 'u.id = t.user_id', 'left')
-        ->join('accounts a', 'a.id = t.account_cashier_id', 'left') // Changed from account_cashier to accounts
-        ->where('t.branch_id', $branch_id)
-        ->where('t.transaction_type', 'Balance Top-up')
-        ->order_by('t.created_at', 'DESC');
-
-        return $this->db->get()->result();
+        return $this->db->select('t.transaction_codes, 
+                                 t.created_at, 
+                                 u.name as member_name,
+                                 t.amount, 
+                                 a.Name as cashier_name')
+                ->from('transactions t')
+                ->join('users u', 'u.id = t.user_id')
+                ->join('accounts a', 'a.id = t.account_cashier_id')
+                ->where('t.branch_id', $branch_id)
+                ->where('t.transaction_type', 'Balance Top-up')
+                ->order_by('t.created_at', 'DESC')
+                ->get()
+                ->result();
     }
 
     private function generate_transaction_code($account_id) {

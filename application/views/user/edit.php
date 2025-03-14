@@ -106,79 +106,49 @@
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
 $(document).ready(function(){
-    // Tangkap perubahan pada radio button dengan name='account_type'
     $('input[name="account_type"]').change(function(){
-        // Periksa apakah yang dipilih adalah 'cashier'
-        if ($(this).val() === 'cashier') {
-            // Jika 'cashier', tampilkan field cabang
+        var selectedRole = $(this).val();
+        // Show branch field only for cashier and branch_admin
+        if (selectedRole === 'cashier' || selectedRole === 'branch_admin') {
             $('#divCabang').show();
-        } else if($(this).val() === 'branch_admin') {
-            $('#divCabang').show();
+            $('#branch_id').prop('required', true);
         } else {
-            // Jika 'admin' atau yang lainnya, sembunyikan field cabang
             $('#divCabang').hide();
+            $('#branch_id').prop('required', false);
+            $('#branch_id').val(''); // Clear branch selection for other roles
         }
     });
-        var initialRole = '<?= $user['account_type'] ?>';
-        if (initialRole === 'cashier') {
-            $('#divCabang').show();
-            // Set the initial selected value for the dropdown
-            $('#branch_id').val('<?= $user['branch_id'] ?>').change();
-        } else if(initialRole === 'branch_admin') {
-            $('#divCabang').show();
-            // Set the initial selected value for the dropdown
-            $('#branch_id').val('<?= $user['branch_id'] ?>').change();
-        }else {
-            $('#divCabang').hide();
-        }
-    $('#branch_id').change(function(){
-        // Ambil nilai ID cabang yang dipilih
-        var selectedBranchId = $(this).val();
 
-        // Temukan objek cabang berdasarkan ID
-        var selectedBranch = <?php echo json_encode($cabang); ?>.find(function(cabang) {
-            return cabang.id == selectedBranchId;
-        });
+    // Initial state setup
+    var initialRole = '<?= $user['account_type'] ?>';
+    if (initialRole === 'cashier' || initialRole === 'branch_admin') {
+        $('#divCabang').show();
+        $('#branch_id').val('<?= $user['branch_id'] ?>').change();
+    } else {
+        $('#divCabang').hide();
+        $('#branch_id').val('');
+    }
 
-        // Update value of the hidden input field with the branch name
-        $('#namacabang').val(selectedBranch.branch_name); // Ganti 'nama_cabang' dengan kunci yang sesuai dalam objek cabang
-    });
-
-    // Validasi form
+    // Form validation
     $('form').submit(function(event) {
         var isValid = true;
+        var selectedRole = $('input[name="account_type"]:checked').val();
 
-        // Validasi input fields
-        $(this).find('.form-control').each(function() {
-            if (!$(this).val().trim()) {
-                $(this).addClass('is-invalid');
-                isValid = false;
-            } else {
-                $(this).removeClass('is-invalid');
-            }
-        });
-
-        // Validasi radio button
-        if ($('input[name="account_type"]:checked').length === 0) {
+        // Basic validation
+        if (!selectedRole) {
             $('.custom-control').addClass('is-invalid');
             isValid = false;
-        } else {
-            $('.custom-control').removeClass('is-invalid');
         }
 
-        // Validasi cabang untuk role 'cashier'
-        if ($('input[name="account_type"]:checked').val() === 'cashier' && $('#branch_id').val() === '') {
+        // Branch validation only for specific roles
+        if ((selectedRole === 'cashier' || selectedRole === 'branch_admin') && !$('#branch_id').val()) {
             $('#divCabang').addClass('is-invalid');
             isValid = false;
-        } else if($('input[name="account_type"]:checked').val() === 'branch_admin' && $('#branch_id').val() === '') {
-            $('#divCabang').addClass('is-invalid');
-            isValid = false;
-        }else {
-            $('#divCabang').removeClass('is-invalid');
         }
 
         if (!isValid) {
             event.preventDefault();
+            alert('Mohon lengkapi semua field yang diperlukan');
         }
     });
 });

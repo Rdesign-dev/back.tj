@@ -62,7 +62,7 @@
                         </td>
                         <td class="column-payment"><?= $tran->payment_method ?? '-' ?></td>
                         <td class="column-voucher">
-                            <?php if($tran->transaction_type == 'Reedem Voucher'): ?>
+                            <?php if($tran->transaction_type == 'Redeem Voucher'): ?>  <!-- Perbaiki penulisan 'Redeem' -->
                                 <span class="badge badge-info"><?= $tran->kode_voucher ?? 'No Code' ?></span>
                             <?php else: ?>
                                 -

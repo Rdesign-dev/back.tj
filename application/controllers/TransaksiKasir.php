@@ -14,6 +14,7 @@ class TransaksiKasir extends CI_Controller {
         $this->load->model('cabang_model','cabang');
         $this->load->library('template');  // Add this line
         $this->load->library('form_validation');
+        $this->load->database(); // Add this line to ensure DB is loaded
     }
 
     public function cari_member_kasir()
@@ -25,7 +26,7 @@ class TransaksiKasir extends CI_Controller {
         } else {
             $nomor = $this->input->post('nomor');
             
-            // Cari user berdasarkan phone_number di tabel users
+            // First get the member data
             $member_data = $this->db->get_where('users', ['phone_number' => $nomor])->row();
 
             if (empty($member_data)) {
@@ -34,16 +35,16 @@ class TransaksiKasir extends CI_Controller {
                 return;
             }
 
-            $this->session->set_userdata('member_data', $member_data);
-            
-            // Get available vouchers for this user
+            // Then get available vouchers for this user
             $unused_vouchers = $this->db->select('redeem_id, kode_voucher')
-                                   ->from('redeem_voucher')
-                                   ->where('user_id', $member_data->id)
-                                   ->where('status', 'Available')
-                                   ->where('expires_at >', date('Y-m-d H:i:s'))
-                                   ->get()
-                                   ->result();
+                                ->from('redeem_voucher')
+                                ->where('status', 'Available')
+                                ->where('expires_at >', date('Y-m-d H:i:s'))
+                                ->where('user_id', $member_data->id)
+                                ->get()
+                                ->result();
+
+            $this->session->set_userdata('member_data', $member_data);
 
             $data['title'] = "Transaksi Member";
             $data['member'] = $member_data;
@@ -149,43 +150,49 @@ class TransaksiKasir extends CI_Controller {
             // echo "</pre>";
             // die();
 
-            // Begin transaction
-            $this->dbrc->trans_start();
+            // Begin transaction - Change from dbrc to db
+            $this->db->trans_start();
 
-            // Insert transaction
-            $this->db->insert('transactions', $data);
+            try {
+                // Insert transaction
+                $this->db->insert('transactions', $data);
 
-            // Award points for Teras Japan Payment
-            if (!$is_voucher && $data['transaction_type'] === 'Teras Japan Payment') {
-                $points_earned = floor($amount / 10000);
-                $new_points = $member_data->poin + $points_earned;
+                // Award points for Teras Japan Payment
+                if (!$is_voucher && $data['transaction_type'] === 'Teras Japan Payment') {
+                    $points_earned = floor($amount / 10000);
+                    $new_points = $member_data->poin + $points_earned;
 
-                $this->db->where('id', $member_data->id)
-                         ->update('users', ['poin' => $new_points]);
-            }
+                    $this->db->where('id', $member_data->id)
+                             ->update('users', ['poin' => $new_points]);
+                }
 
-            // Update balance if using balance payment
-            if (!$is_voucher && $payment_method === 'BM') {
-                $new_balance = $member_data->balance - $amount;
-                $this->db->where('id', $member_data->id)
-                         ->update('users', ['balance' => $new_balance]);
-            }
+                // Update balance if using balance payment
+                if (!$is_voucher && $payment_method === 'BM') {
+                    $new_balance = $member_data->balance - $amount;
+                    $this->db->where('id', $member_data->id)
+                             ->update('users', ['balance' => $new_balance]);
+                }
 
-            // Update voucher status if redeeming
-            if ($is_voucher) {
-                $this->db->where('redeem_id', $data['voucher_id'])
-                         ->update('redeem_voucher', ['status' => 'Used']);
-            }
+                // Update voucher status if redeeming
+                if ($is_voucher) {
+                    $this->db->where('redeem_id', $data['voucher_id'])
+                             ->update('redeem_voucher', ['status' => 'Used']);
+                }
 
-            $this->db->trans_complete();
+                $this->db->trans_complete();
 
-            if ($this->db->trans_status() === FALSE) {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Transaksi gagal</div>');
-            } else {
+                if ($this->db->trans_status() === FALSE) {
+                    throw new Exception('Transaction failed');
+                }
+
                 $this->session->set_flashdata('pesan', '<div class="alert alert-success">Transaksi berhasil</div>');
-            }
+                redirect('transaksikasir/tambahTransaksiKasir');
 
-            redirect('transaksikasir/tambahTransaksiKasir');
+            } catch (Exception $e) {
+                $this->db->trans_rollback();
+                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Transaksi gagal: ' . $e->getMessage() . '</div>');
+                redirect('transaksikasir/tambahTransaksiKasir');
+            }
         }
     }
 
@@ -204,6 +211,7 @@ class TransaksiKasir extends CI_Controller {
         $login_session = $this->session->userdata('login_session');
         
         $data['title'] = 'Riwayat Top Up Saldo';
+        // Change to use getTopupByIdCabang instead
         $data['trans'] = $this->topup->getTopupByIdCabang($login_session['branch_id']);
         
         $this->template->load('templates/kasir', 'topup/dataKasir', $data);

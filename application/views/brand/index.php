@@ -13,13 +13,13 @@
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
-            <div class="col-md-1 col-2 mb-3 d-flex align-items-center justify-content-center">
+            <!-- <div class="col-md-1 col-2 mb-3 d-flex align-items-center justify-content-center">
                 <a href="<?= base_url('brand/add') ?>" class="text-decoration-none"></a>
                     <div class="btn btn-primary border" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
                         <i class='bx bx-plus' style="font-size: 2rem;"></i>
                     </div>
                 </a>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="card shadow-sm mb-4 border-bottom-primary">
@@ -225,9 +225,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>
                     <a href="<?= base_url('brand/edit/' . $brand['id']) ?>" class="btn btn-circle btn-sm btn-warning"><i class="fa fa-fw fa-edit"></i></a>
                     <a onclick="return confirm('Yakin ingin menghapus data?')" href="<?= base_url('brand/delete/' . $brand['id']) ?>" class="btn btn-circle btn-sm btn-danger"><i class="fa fa-fw fa-trash"></i></a>
-                    <a href="<?= base_url('brand/addpromo/' . $brand['id']) ?>" class="btn btn-sm btn-primary">
-                        <i class="fa fa-plus"></i> Tambah Promo
-                    </a>
                 </td>
             </tr>`;
         brandTableBody.innerHTML = row;

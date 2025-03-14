@@ -3,11 +3,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Transaksi_model extends CI_Model {
 
-    public $table = "transactions"; // Change from "transaksi" to "transactions"
+    public $table = "transaksi";
 
     public function __construct() {
         parent::__construct();
-        $this->table = "transactions"; // Change from "transaksi" to "transactions"
     }
 
     public function getAllTransaksi() {
@@ -118,7 +117,7 @@ class Transaksi_model extends CI_Model {
         ->join('accounts a', 'a.id = t.account_cashier_id', 'left')
         ->join('redeem_voucher rv', 'rv.redeem_id = t.voucher_id', 'left')
         ->where('t.branch_id', $branch_id)
-        ->where_in('t.transaction_type', ['Teras Japan Payment', 'Reedem Voucher'])
+        ->where_in('t.transaction_type', ['Teras Japan Payment', 'Redeem Voucher'])
         ->order_by('t.created_at', 'DESC');
 
         return $this->db->get()->result();

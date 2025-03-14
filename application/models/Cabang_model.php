@@ -20,9 +20,22 @@ class Cabang_model extends CI_Model {
     }
 
     public function insert($data) {
-        // Insert data ke tabel 'produk'
+        // Get the maximum ID from the branch table
+        $max_id = $this->db->select_max('id')
+                           ->get($this->table)
+                           ->row()
+                           ->id;
+        
+        // Set the new ID (max + 1)
+        $new_id = ($max_id > 0) ? $max_id + 1 : 1;
+        
+        // Add the ID to the data array
+        $data['id'] = $new_id;
+        
+        // Insert data ke tabel branch
         return $this->db->insert($this->table, $data);
     }
+    
     public function updateJumlahTransaksi($branch_code, $totalTransaksi) {
         $this->db->where('branch_code', $branch_code);
         return $this->db->update('branch', array('transaction_count' => $totalTransaksi));

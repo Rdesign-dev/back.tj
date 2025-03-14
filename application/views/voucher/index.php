@@ -30,7 +30,7 @@
                     <th>Kategori</th>
                     <th>Deskripsi</th>
                     <th>Berlaku Sampai</th>
-                    <th>Total Hari</th>
+                    <th>Total Hari Aktif</th>
                     <th>Qty</th>
                     <th>Aksi</th>
                 </tr>

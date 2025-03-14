@@ -32,10 +32,14 @@
                             <td><?= $t->transaction_codes; ?></td>
                             <td><?= date('d-m-Y H:i', strtotime($t->created_at)); ?></td>
                             <td><?= $t->member_name; ?></td>
-                            <td>Rp <?= number_format($t->nominal, 0, ',', '.'); ?></td>
+                            <td>Rp <?= number_format($t->amount ?? 0, 0, ',', '.'); ?></td>
                             <td><?= $t->cashier_name; ?></td>
                         </tr>
-                        <?php endforeach; endif; ?>
+                        <?php endforeach; else: ?>
+                        <tr>
+                            <td colspan="6" class="text-center">Belum ada data top up</td>
+                        </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

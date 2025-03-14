@@ -28,37 +28,43 @@ class Cabang extends CI_Controller {
         $this->form_validation->set_rules('branch_code','Kode Cabang','required');
         $this->form_validation->set_rules('branch_name','Nama Cabang','required');
         $this->form_validation->set_rules('address','Alamat','required');
+        
         if($this->form_validation->run() == FALSE){
             $data['title'] = "Tambah cabang";
             $this->template->load('templates/dashboard', 'cabang/add', $data);
         } else {
-                $data = array(
-                    'branch_code' => $this->input->post('branch_code'),
-                    'branch_name' => $this->input->post('branch_name'),
-                    'address' => $this->input->post('address'),
-                    'transaction_count' => 0,
-                );
-                $this->db->insert('branch',$data);
+            $data = array(
+                'branch_code' => $this->input->post('branch_code'),
+                'branch_name' => $this->input->post('branch_name'),
+                'address' => $this->input->post('address'),
+                'transaction_count' => 0,
+            );
+            
+            // Use model's insert method instead of direct db insert
+            if($this->cabang->insert($data)) {
                 $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>');
-                redirect(base_url('cabang'));
+            } else {
+                $this->session->set_flashdata('pesan','<div class="alert alert-danger" role="alert">Gagal menambahkan data</div>');
             }
+            redirect(base_url('cabang'));
         }
+    }
         
-        public function getTransaksiCabang($branch_id)
-        {
-            $data['title'] = "Riwayat Transaksi Cabang";
-            
-            $this->db->select('t.transaction_codes, t.created_at, b.branch_name, t.amount, a.Name as cashier_name')
-                     ->from('transactions t')
-                     ->join('branch b', 'b.id = t.branch_id')
-                     ->join('accounts a', 'a.id = t.account_cashier_id')
-                     ->where('t.branch_id', $branch_id)
-                     ->where('t.transaction_type', 'Teras Japan Payment')
-                     ->order_by('t.created_at', 'DESC');
-                     
-            $data['trans'] = $this->db->get()->result_array();
-            $data['branch'] = $this->db->get_where('branch', ['id' => $branch_id])->row_array();
-            
-            $this->template->load('templates/dashboard', 'cabang/history', $data);
-        }
+    public function getTransaksiCabang($branch_id)
+    {
+        $data['title'] = "Riwayat Transaksi Cabang";
+        
+        $this->db->select('t.transaction_codes, t.created_at, b.branch_name, t.amount, a.Name as cashier_name')
+                 ->from('transactions t')
+                 ->join('branch b', 'b.id = t.branch_id')
+                 ->join('accounts a', 'a.id = t.account_cashier_id')
+                 ->where('t.branch_id', $branch_id)
+                 ->where('t.transaction_type', 'Teras Japan Payment')
+                 ->order_by('t.created_at', 'DESC');
+                 
+        $data['trans'] = $this->db->get()->result_array();
+        $data['branch'] = $this->db->get_where('branch', ['id' => $branch_id])->row_array();
+        
+        $this->template->load('templates/dashboard', 'cabang/history', $data);
+    }
 }
