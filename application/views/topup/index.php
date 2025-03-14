@@ -26,30 +26,31 @@
             </thead>
             <tbody>
                 <?php if (!empty($trans)) : ?>
-                    <?php $no = 1; foreach ($trans as $tran) : ?>
-                    <tr>
-                        <td><?= $no++; ?></td>
-                        <td><?= $tran->transaction_codes ?></td>
-                        <td><?= date('d/m/Y H:i', strtotime($tran->created_at)) ?></td>
-                        <td><?= $tran->branch_name ?></td>
-                        <td><?= $tran->member_name ?></td>
-                        <td><?= $tran->cashier_name ?></td>
-                        <td>Rp <?= number_format($tran->amount, 0, ',', '.') ?></td>
-                        <td><?= $tran->payment_method ?></td>
-                        <td>
-                            <?php if($tran->transaction_evidence && $tran->transaction_evidence != 'struk.png'): ?>
-                                <img src="<?= base_url('../ImageTerasJapan/transaction_evidence/' . $tran->transaction_evidence) ?>" 
-                                     alt="Transfer Evidence" width="150px" height="100px">
-                            <?php else: ?>
-                                <span class="text-muted">Cash Payment</span>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
+                <?php $no = 1; foreach ($trans as $tran) : ?>
+                <tr>
+                    <td><?= $no++; ?></td>
+                    <td><?= $tran->transaction_codes ?></td>
+                    <td><?= date('d/m/Y H:i', strtotime($tran->created_at)) ?></td>
+                    <td><?= $tran->branch_name ?></td>
+                    <td><?= $tran->member_name ?></td>
+                    <td><?= $tran->cashier_name ?></td>
+                    <td>Rp <?= number_format($tran->amount, 0, ',', '.') ?></td>
+                    <td><?= $tran->payment_method ?></td>
+                    <td>
+                        <?php if($tran->transaction_evidence != null): ?>
+                        <img src='http://localhost/ImageTerasJapan/transaction_proof/<?php echo $tran->transaction_evidence; ?>'
+                            alt="Transfer Evidence" width="150" height="100">
+                        <?php else: ?>
+                        <img src='http://localhost/ImageTerasJapan/transaction_proof/struk.png' alt="Transfer Evidence"
+                            width="150" height="100">
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
                 <?php else: ?>
-                    <tr>
-                        <td colspan="9" class="text-center">Tidak ada data topup</td>
-                    </tr>
+                <tr>
+                    <td colspan="9" class="text-center">Tidak ada data topup</td>
+                </tr>
                 <?php endif; ?>
             </tbody>
         </table>

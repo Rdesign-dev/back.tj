@@ -75,7 +75,8 @@
                     </h4>
                 </div>
                 <div class="col-auto">
-                    <a href="<?= base_url('brand/addpromo') ?>" class="btn btn-sm btn-primary btn-icon-split">
+                    <!-- Change this button to be initially hidden and show when a brand is selected -->
+                    <a href="#" id="addPromoButton" class="btn btn-sm btn-primary btn-icon-split" style="display: none;">
                         <span class="icon">
                             <i class="fas fa-plus"></i>
                         </span>
@@ -94,6 +95,7 @@
                         <th>Deskripsi</th>
                         <th>Status</th>
                         <th>Points</th>
+                        <th>Tersedia Sejak</th>
                         <th>Batas Waktu</th>
                         <th>Gambar</th>
                         <th>Aksi</th>
@@ -105,6 +107,7 @@
             </table>
         </div>
     </div>
+
 
 <style>
 .brand-image {
@@ -142,9 +145,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const brandImages = document.querySelectorAll('.brand-image');
     const brandTableBody = document.getElementById('brandTableBody');
     const promoTableBody = document.getElementById('promoTableBody');
+    const addPromoButton = document.getElementById('addPromoButton');
+    let selectedBrandId = null;
 
     // Update the fetchBrandData function
     async function fetchBrandData(brandId) {
+        selectedBrandId = brandId; // Store the selected brand ID
+        
+        // Show and update the Add Promo button
+        addPromoButton.style.display = 'inline-block';
+        addPromoButton.href = `${BASE_URL}brand/addpromo/${brandId}`;
+        
         try {
             const [brandResponse, promoResponse] = await Promise.all([
                 fetch(`${BASE_URL}brand/get_brand_details/${brandId}`, {
@@ -183,7 +194,10 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error:', error);
             brandTableBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
-            promoTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
+            promoTableBody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
+            
+            // Hide the Add Promo button if there's an error
+            addPromoButton.style.display = 'none';
         }
     }
 
@@ -209,8 +223,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${brand.wa || '-'}</td>
                 <td>${brand.web || '-'}</td>
                 <td>
-                    <a href="${BASE_URL}brand/edit/${brand.id}" class="btn btn-circle btn-sm btn-warning"><i class="fa fa-fw fa-edit"></i></a>
-                    <a onclick="return confirm('Yakin ingin menghapus data?')" href="${BASE_URL}brand/delete/${brand.id}" class="btn btn-circle btn-sm btn-danger"><i class="fa fa-fw fa-trash"></i></a>
+                    <a href="<?= base_url('brand/edit/' . $brand['id']) ?>" class="btn btn-circle btn-sm btn-warning"><i class="fa fa-fw fa-edit"></i></a>
+                    <a onclick="return confirm('Yakin ingin menghapus data?')" href="<?= base_url('brand/delete/' . $brand['id']) ?>" class="btn btn-circle btn-sm btn-danger"><i class="fa fa-fw fa-trash"></i></a>
+                    <a href="<?= base_url('brand/addpromo/' . $brand['id']) ?>" class="btn btn-sm btn-primary">
+                        <i class="fa fa-plus"></i> Tambah Promo
+                    </a>
                 </td>
             </tr>`;
         brandTableBody.innerHTML = row;
@@ -229,7 +246,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         </span>
                     </td>
                     <td>${promo.points_required}</td>
-                    <td>${promo.valid_until || '-'}</td>
+                    <td>${promo.available_from ? new Date(promo.available_from).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) : '-'}</td>
+                    <td>${promo.valid_until ? new Date(promo.valid_until).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) : '-'}</td>
                     <td>
                         <img src="${BASE_URL}../ImageTerasJapan/promo/${promo.promo_image}" 
                              alt="${promo.promo_name}" 
@@ -247,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </td>
                 </tr>`;
         });
-        promoTableBody.innerHTML = rows || '<tr><td colspan="7" class="text-center">Tidak ada promo untuk brand ini</td></tr>';
+        promoTableBody.innerHTML = rows || '<tr><td colspan="8" class="text-center">Tidak ada promo untuk brand ini</td></tr>';
     }
 
     brandImages.forEach(img => {

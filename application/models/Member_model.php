@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Member_model extends CI_Model{
 
-    public $table = "member";
+    public $table = "users"; // Changed from member to users
 
     public function __construct(){
         parent::__construct();
@@ -14,16 +14,22 @@ class Member_model extends CI_Model{
     }
 
     public function find_all(){
-        return $this->db->select('id, name, phone_number, email, balance, poin, registration_time')
-                    ->from('users')
-                    ->order_by('registration_time', 'DESC')
-                    ->get()
-                    ->result_array();
+        return $this->db->select('
+            name as namamember, 
+            phone_number as nomor, 
+            poin,
+            balance as saldo, 
+            registration_time as tanggaldaftar
+        ')
+        ->from('users')
+        ->order_by('registration_time', 'DESC')
+        ->get()
+        ->result_array();
     }
 
-    public function update($id,$data){
-        $this->db->where('id',$id);
-        return $this->db->update('users', $data);
+    public function update($data, $id) 
+    {
+        return $this->db->update('users', $data, ['id' => $id]);
     }
 
     public function delete($id){
@@ -34,29 +40,25 @@ class Member_model extends CI_Model{
     public function tambahPoin($idmember, $poin) {
         $this->db->where('id', $idmember);
         $this->db->set('poin', 'poin+' . $poin, FALSE);
-        $this->db->update('member');
+        $this->db->update('users');
     }
 
-    public function get_by_nomor($nomor)
-    {
-        return $this->db->get_where('member',array('nomor' => $nomor))->row();
+    public function get_by_nomor($nomor) {
+        return $this->db->get_where('users', ['phone_number' => $nomor])->row();
     }
 
-    public function get_by_email($email)
-    {
-        return $this->db->get_where('member',array('email' => $email))->row();
+    public function get_by_email($email) {
+        return $this->db->get_where('users', ['email' => $email])->row();
     }
 
     public function find_by_nohp($nohp){
-        $result = $this->db->query("SELECT * from member where nomor = $nohp")->result_array();
-        return $result;
+        return $this->db->get_where('users', ['phone_number' => $nohp])->result_array();
     }
 
     public function cari_detail_id($nomor){
-        $this->db->where('nomor', $nomor);
-        $query = $this->db->get('member');
-
-        return $query->row();
+        return $this->db->where('phone_number', $nomor)
+                       ->get('users')
+                       ->row();
     }
     
     public function cari_transaksi_id($id){
@@ -69,20 +71,20 @@ class Member_model extends CI_Model{
     }
 
     public function cari_member($keyword) {
-        $this->db->like('namamember', $keyword);
-        $this->db->or_like('nomor', $keyword);
+        $this->db->like('name', $keyword);
+        $this->db->or_like('phone_number', $keyword);
         $this->db->or_like('email', $keyword);
     
-        return $this->db->get('member')->result_array();
+        return $this->db->get('users')->result_array();
     }
 
     public function updateMemberSaldo($nomor, $nominal) {
-        $saldo_sekarang = $this->db->get_where('member', array('nomor' => $nomor))->row()->saldo;
+        $saldo_sekarang = $this->db->get_where('users', ['phone_number' => $nomor])->row()->balance;
         
         $saldo_baru = $saldo_sekarang + $nominal;
 
-        $this->db->where('nomor', $nomor);
-        $this->db->update('member', array('saldo' => $saldo_baru));
+        $this->db->where('phone_number', $nomor);
+        $this->db->update('users', array('balance' => $saldo_baru));
 
         return $saldo_baru;
     }
@@ -91,6 +93,14 @@ class Member_model extends CI_Model{
         return $this->db->get_where('users', ['id' => $id])->row_array();
     }
 
+    public function get_member($id) {
+        return $this->db->select('id, name, phone_number, email, address, gender, 
+                                birthdate, city, profile_pic')
+                        ->from('users')
+                        ->where('id', $id)
+                        ->get()
+                        ->row_array();
+    }
 
     public function get_login_history() 
     {

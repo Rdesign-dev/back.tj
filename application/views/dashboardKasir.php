@@ -8,7 +8,7 @@
                         <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $transaksi; ?></div>
                     </div>
                     <div class="col-auto">
-                        <i class="fas fa-history fa-2x text-gray-300"></i>
+                        <i class="fas fa-history fa-2x text-gray-300"></i>  
                     </div>
                 </div>
             </div>
@@ -21,7 +21,7 @@
             <div class="card-body">
                 <div class="chart-container">
                     <canvas id="monthlyTransactionChart"></canvas>
-                </div>
+                </div>  
             </div>
         </div>
     </div>
@@ -29,30 +29,32 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     var ctx = document.getElementById('monthlyTransactionChart').getContext('2d');
-    var monthlyTransactionData = <?= $monthlyTransactionData; ?>;
+    var monthlyTransactionData = <?= $monthlyTransactionData ?? '[]' ?>; // Tambahkan null coalescing
 
-    var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: monthlyTransactionData.map(entry => entry.month),
-            datasets: [{
-                label: 'Transaksi Bulanan',
-                data: monthlyTransactionData.map(entry => entry.count),
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+    if (monthlyTransactionData && monthlyTransactionData.length > 0) {
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: monthlyTransactionData.map(entry => entry.month),
+                datasets: [{
+                    label: 'Transaksi Bulanan',
+                    data: monthlyTransactionData.map(entry => entry.count),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
             },
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
 </script>
 
 

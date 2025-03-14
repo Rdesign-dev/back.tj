@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title><?= $title; ?> | Kasir Resto</title>
+    <title><?= $title ?? 'Teras Japan' ?></title>
     <link rel="icon" href="<?= base_url(); ?>assets/img/terasjapan.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
@@ -72,7 +72,7 @@
             
              <!-- Nav Item - Dashboard -->
              <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('transaksi/tambahTransaksiKasir'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('transaksikasir/tambahTransaksiKasir'); ?>">
                 <i class="fas fa-history"></i>
                     <span>Transaksi</span>
                 </a>
@@ -84,13 +84,13 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('transaksi/historyTransaksiKasir'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('transaksikasir/historyTransaksiKasir'); ?>">
                 <i class="fas fa-file-alt"></i>
                     <span>Riwayat Transaksi <?= userdata('namacabang') ?></span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('transaksi/getHistorysaldoKasir'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('transaksikasir/getHistorysaldoKasir'); ?>">
                 <i class="fas fa-file"></i>
                     <span>Riwayat Top Up Saldo</span>
                 </a>
@@ -190,10 +190,7 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                    <!-- Page Heading -->
-                    <h1 class="h3 mb-4 text-gray-800"><?= $title; ?></h1>
-
-                    <?= $contents; ?>
+                    <?= $contents ?>
 
                 </div>
                 <!-- /.container-fluid -->

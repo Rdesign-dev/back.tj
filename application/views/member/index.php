@@ -24,6 +24,7 @@
             <thead>
                 <tr>
                     <th>No.</th>
+                    <th>Foto</th>
                     <th>Nama</th>
                     <th>No. Telepon</th>
                     <th>Email</th>
@@ -41,6 +42,12 @@
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
+                            <td>
+                                <img src="<?= base_url('../ImageTerasJapan/ProfPic/' . ($member['profile_pic'] ?? 'default.png')) ?>" 
+                                    alt="<?= $member['name'] ?>" 
+                                    class="img-thumbnail" 
+                                    width="50">
+                            </td>
                             <td><?= $member['name']; ?></td>
                             <td><?= $member['phone_number']; ?></td>
                             <td><?= $member['email'] ?? '-'; ?></td>

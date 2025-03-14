@@ -1,113 +1,86 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <div class="card border-0 mb-4" style="background: rgba(255,255,255,0.7);">
-            <div class="card-header border-0 py-3" style="background: rgba(255,255,255,0.4);">
+        <div class="card shadow-sm mb-4 border-bottom-primary">
+            <div class="card-header bg-white py-3">
                 <div class="row">
                     <div class="col">
                         <h4 class="h5 align-middle m-0 font-weight-bold text-primary">
-                            Edit Data Member
+                            Form Edit Member
                         </h4>
-                    </div>
-                    <div class="col-auto">
-                        <a href="<?= base_url('member') ?>" class="btn btn-sm btn-secondary btn-icon-split">
-                            <span class="icon">
-                                <i class="fa fa-arrow-left"></i>
-                            </span>
-                            <span class="text">
-                                Kembali
-                            </span>
-                        </a>
                     </div>
                 </div>
             </div>
-            <div class="card-body pb-2">
+            <div class="card-body">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?= form_open_multipart('', [], ['nomor' => $member['nomor']]); ?>
-                <!-- Tambahkan input hidden untuk menyimpan ID member -->
+                <?= form_open_multipart('member/edit/' . $member['id'], ['id' => 'editForm']); ?>
                 <div class="row form-group">
-                    <label class="col-md-3 text-md-right" for="foto">Foto</label>
+                    <label class="col-md-4 text-md-right" for="foto">Foto</label>
                     <div class="col-md-6">
-                        <div class="row">
-                            <div class="col-12">
-                            <?php if ($member) : ?>
-                                <img src="https://terasjapan.com/fotouser/<?= $member['foto'] ?>" alt="User" class="rounded-circle shadow-sm img-thumbnail">
-                                <?php endif; ?>
-                            </div>
-                            <div class="col-12 mt-1">
-                                <input type="file" name="foto" id="foto" class="form-control">
-                                <?= form_error('foto', '<small class="text-danger">', '</small>'); ?>
-                            </div>
-                        </div>
+                        <img src="<?= base_url('../ImageTerasJapan/ProfPic/' . ($member['profile_pic'] ?? 'default.png')) ?>" 
+                             alt="Profile Picture" width="100" class="mb-3">
+                        <input type="file" name="foto" id="foto" class="form-control">
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="namamember">Nama Member</label>
+                    <label class="col-md-4 text-md-right" for="nama">Nama Member</label>
                     <div class="col-md-6">
-                    <?php if ($member) : ?>
-                                <!-- Tampilkan nilai yang akan di-edit -->
-                        <input type="text" id="namamember" name="namamember" value="<?= set_value('namamember', $member['namamember']); ?>" class="form-control" placeholder="Masukkan Nama Member">
-                        <?= form_error('namamember', '<span class="text-danger small">', '</span>'); ?>
-                        
+                        <input value="<?= set_value('nama', $member['name']); ?>" type="text" id="nama" name="nama" class="form-control" placeholder="Nama Member">
+                        <?= form_error('nama', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="nomor">Nomor Handphone</label>
+                    <label class="col-md-4 text-md-right" for="phone">Nomor Handphone</label>
                     <div class="col-md-6">
-                        <input type="text" id="nomor" name="nomor" class="form-control" placeholder="nomor" value="<?= set_value('nomor', $member['nomor']); ?>">
-                        <?= form_error('nomor', '<span class="text-danger small">', '</span>'); ?>
+                        <input value="<?= set_value('phone', $member['phone_number']); ?>" type="text" id="phone" name="phone" class="form-control" placeholder="Nomor Handphone">
+                        <?= form_error('phone', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="alamat">Alamat</label>
                     <div class="col-md-6">
-                        <textarea name="alamat" id="alamat" cols="20" class="form-control" rows="10"><?= $member['alamat'];?></textarea>
+                        <textarea id="alamat" name="alamat" class="form-control" placeholder="Alamat"><?= set_value('alamat', $member['address']); ?></textarea>
                         <?= form_error('alamat', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="email">Email</label>
                     <div class="col-md-6">
-                        <input type="email" id="email" name="email" class="form-control" placeholder="email" value="<?= set_value('email', $member['email']); ?>">
+                        <input value="<?= set_value('email', $member['email']); ?>" type="email" id="email" name="email" class="form-control" placeholder="Email">
                         <?= form_error('email', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="jeniskelamin">Jenis Kelamin</label>
+                    <label class="col-md-4 text-md-right" for="gender">Jenis Kelamin</label>
                     <div class="col-md-6">
-                                <select name="jeniskelamin" id="jeniskelamin" class="form-control">
-                                    <option value="" <?php echo ($member['jeniskelamin'] == '') ? 'selected' : ''; ?>>Pilih Jenis Kelamin</option>
-                                        <option value="L" <?php echo ($member['jeniskelamin'] == 'L') ? 'selected' : ''; ?>>Laki-Laki</option>
-                                        <option value="P" <?php echo ($member['jeniskelamin'] == 'P') ? 'selected' : ''; ?>>Perempuan</option>
-                                </select>
+                        <select id="gender" name="gender" class="form-control">
+                            <option value="">- Pilih -</option>
+                            <option value="male" <?= $member['gender'] == 'male' ? 'selected' : ''; ?>>Laki-laki</option>
+                            <option value="female" <?= $member['gender'] == 'female' ? 'selected' : ''; ?>>Perempuan</option>
+                        </select>
+                        <?= form_error('gender', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="tanggallahir">Tanggal Lahir</label>
+                    <label class="col-md-4 text-md-right" for="birthdate">Tanggal Lahir</label>
                     <div class="col-md-6">
-                        <input type="date" id="tanggallahir" name="tanggallahir" class="form-control" placeholder="tanggallahir" value="<?= set_value('tanggallahir', $member['tanggallahir']); ?>">
-                        <?= form_error('tanggallahir', '<span class="text-danger small">', '</span>'); ?>
+                        <input value="<?= set_value('birthdate', $member['birthdate']); ?>" type="date" id="birthdate" name="birthdate" class="form-control">
+                        <?= form_error('birthdate', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="tempatlahir">Tempat Lahir</label>
+                    <label class="col-md-4 text-md-right" for="city">Kota</label>
                     <div class="col-md-6">
-                        <input type="text" id="tempatlahir" name="tempatlahir" class="form-control" placeholder="tempatlahir" value="<?= set_value('tempatlahir', $member['tempatlahir']); ?>">
-                        <?= form_error('tempatlahir', '<span class="text-danger small">', '</span>'); ?>
+                        <input value="<?= set_value('city', $member['city']); ?>" type="text" id="city" name="city" class="form-control" placeholder="Kota">
+                        <?= form_error('city', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
+                <input type="hidden" name="old_image" value="<?= $member['profile_pic'] ?>">
                 <div class="row form-group justify-content-end">
                     <div class="col-md-8">
-                        <button type="submit" class="btn btn-primary btn-icon-split">
-                            <span class="icon"><i class="fa fa-save"></i></span>
-                            <span class="text">Update</span>
-                        </button>
-                        <button type="reset" class="btn btn-secondary btn-icon-split">
-                        <span class="icon"><i class="fas fa-backspace"></i></span>
-                            <span class="text">Reset</span>
-                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
+                        <button type="reset" class="btn btn-secondary btn-sm">Reset</button>
                     </div>
                 </div>
-                <?php endif; ?>
                 <?= form_close(); ?>
             </div>
         </div>
