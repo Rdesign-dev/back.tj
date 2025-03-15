@@ -1,4 +1,3 @@
-
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow-sm mb-4 border-bottom-primary">
@@ -10,7 +9,8 @@
                         </h4>
                     </div>
                     <div class="col-auto">
-                        <a href="<?= base_url('transaksi/saldoCabang') ?>" class="btn btn-sm btn-secondary btn-icon-split">
+                        <!-- Updated back button URL -->
+                        <a href="<?= base_url('transaksicabang/saldoCabang') ?>" class="btn btn-sm btn-secondary btn-icon-split">
                             <span class="icon">
                                 <i class="fa fa-arrow-left"></i>
                             </span>
@@ -23,64 +23,53 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?php echo form_open_multipart('transaksi/convert_and_updateSaldoMemberCabang'); ?>
+                <!-- Updated form action URL -->
+                <?php echo form_open_multipart('transaksicabang/convert_and_updateSaldoCabang'); ?>
                 
+                <!-- Member info first -->
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="nomor">Nomor Member</label>
+                    <div class="col-md-6">
+                        <input type="text" name="nomor" id="nomor" value="<?= $member->phone_number ?? '' ?>" class="form-control" readonly>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="nama">Nama Member</label>
+                    <div class="col-md-6">
+                        <input type="text" name="nama" id="nama" value="<?= $member->name ?? '' ?>" class="form-control" readonly>
+                    </div>
+                </div>
+
+                <!-- Top up form -->
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nominal">Nominal TopUp</label>
                     <div class="col-md-6">
-                        <input type="text" id="nominal" name="nominal" class="form-control">
+                        <input type="text" id="nominal" name="nominal" class="form-control" placeholder="Minimal Rp 10.000">
                         <?= form_error('nominal', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
+
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="metode">Metode Pembayaran</label>
                     <div class="col-md-6">
-                        <select name="metode" id="metode">
+                        <select name="metode" id="metode" class="form-control">
                             <option value="">- Pilih Metode Pembayaran -</option>
-                            <option value="transfer">Transfer Bank</option>
-                            <option value="qrisbca">Qris BCA</option>
-                            <option value="qris">Qris Non BCA</option>
+                            <option value="cash">Cash</option>
+                            <option value="transferBank">Transfer Bank</option>
                         </select>
                         <?= form_error('metode', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-                <div class="row form-group">
+
+                <div class="row form-group" id="buktiDiv" style="display:none;">
                     <label class="col-md-4 text-md-right" for="bukti">Bukti Pembayaran</label>
                     <div class="col-md-6">
                         <input type="file" id="bukti" name="bukti" class="form-control">
                         <?= form_error('bukti', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="nomor">Nomor Member</label>
-                    <div class="col-md-6">
-                        <?php if(isset($member)){
-                            foreach($member as $mb => $data){
-                                ?>
-                                <input type="text" name="nomor" id="nomor" value="<?=$data['nomor']?>" class="form-control" readonly>
-                                <?php
-                            }
-                        }
-                        ?>
-                        
-                        <?= form_error('nomor', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="nama">Nama Member</label>
-                    <div class="col-md-6">
-                        <?php if(isset($member)){
-                            foreach($member as $mb => $data){
-                                ?>
-                                <input type="text" name="nama" id="nama" value="<?=$data['namamember']?>" class="form-control" readonly>
-                                <?php
-                            }
-                        }
-                        ?>
-                        
-                        <?= form_error('nama', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
+
                 <br>
                 <div class="row form-group justify-content-end">
                     <div class="col-md-8">
@@ -89,7 +78,7 @@
                             <span class="text">Simpan</span>
                         </button>
                         <button type="reset" class="btn btn-secondary btn-icon-split">
-                        <span class="icon"><i class="fas fa-backspace"></i></span>
+                            <span class="icon"><i class="fas fa-backspace"></i></span>
                             <span class="text">Reset</span>
                         </button>
                     </div>
@@ -99,3 +88,30 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const metodeSelect = document.getElementById('metode');
+    const buktiDiv = document.getElementById('buktiDiv');
+    const nominalInput = document.getElementById('nominal');
+    const form = document.querySelector('form');
+
+    // Show/hide bukti upload based on payment method
+    metodeSelect.addEventListener('change', function() {
+        buktiDiv.style.display = this.value === 'transferBank' ? 'flex' : 'none';
+    });
+
+    // Format nominal with thousand separator
+    nominalInput.addEventListener('input', function(e) {
+        let value = this.value.replace(/[^\d]/g, '');
+        if (value === '') return;
+        this.value = new Intl.NumberFormat('id-ID').format(value);
+    });
+
+    // Before form submit, remove formatting
+    form.addEventListener('submit', function(e) {
+        let cleanValue = nominalInput.value.replace(/[^\d]/g, '');
+        nominalInput.value = cleanValue;
+    });
+});
+</script>

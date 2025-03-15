@@ -78,3 +78,5 @@ $route['transaksicabang/convert_and_updateCabang'] = 'transaksicabang/convert_an
 $route['transaksicabang/historyTransaksiCabang'] = 'transaksicabang/historyTransaksiCabang';
 $route['transaksicabang/saldoCabang'] = 'transaksicabang/saldoCabang';
 $route['transaksicabang/getHistorysaldoCabang'] = 'transaksicabang/getHistorysaldoCabang';
+$route['transaksicabang/cari_memberSaldo'] = 'transaksicabang/cari_memberSaldo';
+$route['transaksicabang/convert_and_updateSaldoCabang'] = 'transaksicabang/convert_and_updateSaldoCabang';

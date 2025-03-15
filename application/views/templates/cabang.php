@@ -93,7 +93,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('transaksicabang/saldoCabang'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('transaksicabang/saldo'); ?>">
                 <i class="fas fa-money-bill-wave-alt"></i>
                     <span>Top Up Saldo</span>
                 </a>

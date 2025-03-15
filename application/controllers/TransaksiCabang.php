@@ -215,4 +215,280 @@ class TransaksiCabang extends CI_Controller {
         $data['title'] = "Top Up Saldo";
         $this->template->load('templates/cabang', 'transaksi/transaksiMemberSaldoCabang', $data);
     }
+
+    public function convert_and_updateSaldoCabang() {
+        $login_session = $this->session->userdata('login_session');
+        $account_id = $login_session['id'];
+        $branch_id = $login_session['branch_id'];
+    
+        // Set validation rules
+        $this->form_validation->set_rules('nominal', 'Nominal', 'required|numeric|greater_than_equal_to[10000]');
+        $this->form_validation->set_rules('metode', 'Metode Pembayaran', 'required|in_list[cash,transferBank]');
+        if($this->input->post('metode') == 'transferBank') {
+            $this->form_validation->set_rules('bukti', 'Bukti Transfer', 'callback_file_check');
+        }
+    
+        if($this->form_validation->run() == FALSE) {
+            $data['title'] = "Top Up Saldo";
+            $data['member'] = $this->session->userdata('member_data');
+            $this->template->load('templates/cabang', 'transaksi/transaksiMemberSaldoCabang', $data);
+            return;
+        }
+    
+        $this->db->trans_start();
+    
+        try {
+            $nominal = str_replace(',', '', $this->input->post('nominal'));
+            $nominal = floatval($nominal);
+            $phone_number = $this->input->post('nomor');
+            
+            $user = $this->db->select('id, balance')
+                            ->where('phone_number', $phone_number)
+                            ->get('users')
+                            ->row();
+    
+            if(!$user) {
+                throw new Exception('Member tidak ditemukan');
+            }
+    
+            // Handle file upload if transfer
+            $evidence_filename = 'struk.png';
+            if($this->input->post('metode') == 'transferBank') {
+                $config['upload_path'] = '../ImageTerasJapan/transaction_proof/';
+                $config['allowed_types'] = 'gif|jpg|png|jpeg';
+                $config['max_size'] = 10240;
+                $config['file_name'] = 'TRXBT' . $phone_number . mt_rand(1000, 9999);
+    
+                $this->load->library('upload', $config);
+    
+                if(!$this->upload->do_upload('bukti')) {
+                    throw new Exception('Gagal upload bukti: ' . $this->upload->display_errors('',''));
+                }
+    
+                $upload_data = $this->upload->data();
+                $evidence_filename = $upload_data['file_name'];
+            }
+    
+            $sequence = $this->transaksi->getNextSequence();
+            $payment_method = $this->input->post('metode');
+            $payment_code = ($payment_method == 'cash') ? 'CSH' : 'TFB';
+    
+            // Generate transaction code using kasir format + BT for Balance Top-up
+            $transaction_code = "TX" . $login_session['branch_id'] . 
+                              $login_session['id'] . 
+                              "BT" . 
+                              $payment_code . 
+                              date('dmy') . 
+                              sprintf('%04d', $sequence);
+    
+            $transaction_data = [
+                'transaction_codes' => $transaction_code,
+                'user_id' => $user->id,
+                'transaction_type' => 'Balance Top-up',
+                'amount' => number_format($nominal, 2, '.', ''),
+                'branch_id' => $branch_id,
+                'account_cashier_id' => $account_id,
+                'payment_method' => $payment_method,
+                'transaction_evidence' => $evidence_filename,
+                'created_at' => date('Y-m-d H:i:s')
+            ];
+    
+            $this->db->insert('transactions', $transaction_data);
+    
+            // Update user balance
+            $current_balance = floatval($user->balance);
+            $new_balance = $current_balance + $nominal;
+            
+            $this->db->where('id', $user->id)
+                     ->update('users', ['balance' => number_format($new_balance, 2, '.', '')]);
+    
+            $this->db->trans_complete();
+    
+            if ($this->db->trans_status() === FALSE) {
+                throw new Exception('Gagal melakukan transaksi');
+            }
+    
+            $this->session->set_flashdata('pesan', '<div class="alert alert-success">Top up saldo berhasil</div>');
+            redirect('transaksicabang/getHistorysaldoCabang');
+    
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>');
+            redirect('transaksicabang/saldoCabang');
+        }
+    }
+
+    public function saldo() {
+        $data['title'] = "Top Up Saldo";
+        $data['member'] = $this->member->find_all();
+        $this->template->load('templates/cabang', 'transaksi/addSaldoCabang', $data);
+    }
+
+    public function cari_memberSaldo() {
+        $this->form_validation->set_rules('nohp','NomorHp','required');
+        if($this->form_validation->run() == false) {
+            $data['title'] = "Top Up Saldo";
+            $this->template->load('templates/cabang', 'transaksi/addSaldoCabang', $data);
+        } else {
+            $nohp = $this->input->post('nohp');
+            $member = $this->db->get_where('users', ['phone_number' => $nohp])->row();
+            
+            if($member) {
+                $this->session->set_userdata('member_data', $member);
+                $data['member'] = $member;
+                $data['title'] = "Topup Saldo Member";
+                $this->template->load('templates/cabang', 'transaksi/transaksiMemberSaldoCabang', $data);
+            } else {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Member tidak ditemukan</div>');
+                redirect('transaksicabang/saldoCabang');
+            }
+        }
+    }
+
+    public function convert_and_updateSaldoMember() {
+        $login_session = $this->session->userdata('login_session');
+        $account_id = $login_session['id'];
+        $branch_id = $login_session['branch_id'];
+
+        // Set validation rules
+        $this->form_validation->set_rules('nominal', 'Nominal', 'required|numeric|greater_than_equal_to[10000]');
+        $this->form_validation->set_rules('metode', 'Metode Pembayaran', 'required|in_list[cash,transferBank]');
+        if($this->input->post('metode') == 'transferBank') {
+            $this->form_validation->set_rules('bukti', 'Bukti Transfer', 'callback_file_check');
+        }
+
+        if($this->form_validation->run() == FALSE) {
+            $data['title'] = "Top Up Saldo";
+            $data['member'] = $this->session->userdata('member_data');
+            $this->template->load('templates/cabang', 'transaksi/transaksiMemberSaldoCabang', $data);
+            return;
+        }
+
+        // Start transaction
+        $this->db->trans_start();
+
+        try {
+            $nominal = str_replace(',', '', $this->input->post('nominal')); // Remove thousand separators
+            $nominal = floatval($nominal); // Convert to float for decimal handling
+            $phone_number = $this->input->post('nomor');
+            
+            // Get current user data with precise balance
+            $user = $this->db->select('id, balance')
+                            ->where('phone_number', $phone_number)
+                            ->get('users')
+                            ->row();
+
+            if(!$user) {
+                throw new Exception('Member tidak ditemukan');
+            }
+
+            // Handle file upload if transfer
+            $evidence_filename = 'struk.png';
+            if($this->input->post('metode') == 'transferBank') {
+                $config['upload_path'] = '../ImageTerasJapan/transaction_proof/';
+                $config['allowed_types'] = 'gif|jpg|png|jpeg';
+                $config['max_size'] = 10240; // 10MB
+                $config['file_name'] = 'TRXBT' . $phone_number . mt_rand(1000, 9999);
+
+                $this->load->library('upload', $config);
+
+                if(!$this->upload->do_upload('bukti')) {
+                    throw new Exception('Gagal upload bukti: ' . $this->upload->display_errors('',''));
+                }
+
+                $upload_data = $this->upload->data();
+                $evidence_filename = $upload_data['file_name'];
+            }
+
+            // Prepare transaction data with proper decimal handling
+            $transaction_data = [
+                'transaction_codes' => $this->generate_transaction_code($account_id, 'Balance Top-up'),
+                'user_id' => $user->id,
+                'transaction_type' => 'Balance Top-up',
+                'amount' => number_format($nominal, 2, '.', ''), // Ensure 2 decimal places
+                'branch_id' => $branch_id,
+                'account_cashier_id' => $account_id,
+                'payment_method' => $this->input->post('metode'),
+                'transaction_evidence' => $evidence_filename,
+                'created_at' => date('Y-m-d H:i:s')
+            ];
+
+                    // Add debug output
+            echo "<pre>";
+            echo "Data to be inserted:\n";
+            var_dump($transaction_data);
+            echo "\nUser data:\n";
+            var_dump($user);
+            echo "\nSession data:\n";
+            var_dump($login_session);
+            die();
+
+            // Insert transaction
+            $this->db->insert('transactions', $transaction_data);
+
+            // Calculate new balance with proper decimal handling
+            $current_balance = floatval($user->balance);
+            $new_balance = $current_balance + $nominal;
+
+            // Debug output
+            echo "<pre>";
+            echo "Current balance: " . $current_balance . "\n";
+            echo "Nominal: " . $nominal . "\n";
+            echo "New balance: " . $new_balance . "\n";
+            echo "</pre>";
+            die();
+
+            // Update user balance using precise decimal
+            $this->db->where('id', $user->id)
+                ->update('users', [
+                'balance' => number_format($new_balance, 2, '.', '')
+                ]);
+
+            $this->db->trans_complete();
+
+            if ($this->db->trans_status() === FALSE) {
+                throw new Exception('Gagal melakukan transaksi');
+            }
+
+            $this->session->set_flashdata('pesan', '<div class="alert alert-success">Top up saldo berhasil</div>');
+            redirect('transaksi/getHistorysaldo');
+
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>');
+            redirect('transaksi/saldo');
+        }
+    }
+
+    private function generate_transaction_code($account_id, $transaction_type) {
+        $login_session = $this->session->userdata('login_session');
+        $sequence = $this->transaksi->getNextSequence();
+        
+        // Get transaction type code
+        $type_code = '';
+        switch($transaction_type) {
+            case 'Balance Top-up':
+                $type_code = 'BT';
+                break;
+            case 'Teras Japan Payment':
+                $type_code = 'TJP';
+                break;
+            case 'Redeem Voucher':
+                $type_code = 'RV';
+                break;
+        }
+
+        // Get payment method code
+        $payment_method = $this->input->post('metode');
+        $payment_code = ($payment_method == 'cash') ? 'CSH' : 'TFB';
+
+        // Generate code format: TX{branch_id}{account_id}{type_code}{payment_code}{date}{sequence}
+        return "TX" . $login_session['branch_id'] . 
+               $login_session['id'] . 
+               $type_code . 
+               $payment_code . 
+               date('dmy') . 
+               sprintf('%04d', $sequence);
+    }
 }
+

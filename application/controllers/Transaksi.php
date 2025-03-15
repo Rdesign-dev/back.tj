@@ -372,11 +372,19 @@ public function convert_and_updateSaldoMember() {
         $current_balance = floatval($user->balance);
         $new_balance = $current_balance + $nominal;
 
+        // // Debug output
+        // echo "<pre>";
+        // echo "Current balance: " . $current_balance . "\n";
+        // echo "Nominal: " . $nominal . "\n";
+        // echo "New balance: " . $new_balance . "\n";
+        // echo "</pre>";
+        // die();
+
         // Update user balance using precise decimal
         $this->db->where('id', $user->id)
-                 ->update('users', [
-                     'balance' => number_format($new_balance, 2, '.', '')
-                 ]);
+            ->update('users', [
+            'balance' => number_format($new_balance, 2, '.', '')
+            ]);
 
         $this->db->trans_complete();
 
