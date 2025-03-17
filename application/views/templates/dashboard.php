@@ -123,6 +123,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link pb-0" href="<?= base_url('FAQ'); ?>">
+                <i class="fas fa-file-invoice-dollar"></i>
+                    <span>FAQ</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('bantuan'); ?>">
                 <i class="fas fa-tasks"></i>
                     <span>Pusat Bantuan</span>
