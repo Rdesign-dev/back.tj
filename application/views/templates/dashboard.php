@@ -4,7 +4,7 @@
 <head>
 
     <meta charset="utf-8">
-    
+
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -26,25 +26,27 @@
     <!-- DataTables -->
     <link href="<?= base_url(); ?>assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="<?= base_url(); ?>assets/vendor/datatables/buttons/css/buttons.bootstrap4.min.css" rel="stylesheet">
-    <link href="<?= base_url(); ?>assets/vendor/datatables/responsive/css/responsive.bootstrap4.min.css" rel="stylesheet">
+    <link href="<?= base_url(); ?>assets/vendor/datatables/responsive/css/responsive.bootstrap4.min.css"
+        rel="stylesheet">
     <link href="<?= base_url(); ?>assets/vendor/gijgo/css/gijgo.min.css" rel="stylesheet">
-    
-    
+
+
 
     <style>
-        #accordionSidebar,
-        .topbar {
-            z-index: 1;
-        }
-        
-        .is-invalid {
-            border-color: #dc3545 !important;
-        }
+    #accordionSidebar,
+    .topbar {
+        z-index: 1;
+    }
 
-        .text-danger {
-            color: #dc3545;
-        }
-        .chart-container {
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+
+    .text-danger {
+        color: #dc3545;
+    }
+
+    .chart-container {
         position: relative;
         width: 100%;
         height: auto;
@@ -61,12 +63,16 @@
         <ul class="navbar-nav bg-white sidebar sidebar-light accordion shadow-sm" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex text-white align-items-center bg-primary justify-content-center" style="background-image: url('<?= base_url() ?>assets/img/merah.png'); background-size: cover; background-position: center;" href="">
+            <a class="sidebar-brand d-flex text-white align-items-center bg-primary justify-content-center"
+                style="background-image: url('<?= base_url() ?>assets/img/merah.png'); background-size: cover; background-position: center;"
+                href="">
                 <div class="sidebar-brand-icon">
-                <img src="<?= base_url() ?>assets/img/terasjapan.png" alt="Admin Logo" style="width: 24px; height: 24px; object-fit: cover;" class="mr-2">
-            <div class="sidebar-brand-text mx-2">Admin resto</div>
-            </div></a>
-            
+                    <img src="<?= base_url() ?>assets/img/terasjapan.png" alt="Admin Logo"
+                        style="width: 24px; height: 24px; object-fit: cover;" class="mr-2">
+                    <div class="sidebar-brand-text mx-2">Admin resto</div>
+                </div>
+            </a>
+
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
@@ -76,101 +82,101 @@
                 </a>
             </li>
 
-            
+
 
             <?php if (is_admin()) : ?>
-                <!-- Divider -->
-                <hr class="sidebar-divider">
+            <!-- Divider -->
+            <hr class="sidebar-divider">
 
-                <!-- Heading -->
-                <div class="sidebar-heading">
-                    Super Admin
-                </div>
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Super Admin
+            </div>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('cabang'); ?>">
-                <i class="fas fa-store"></i>
+                    <i class="fas fa-store"></i>
                     <span>Cabang</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('iklan'); ?>">
-                <i class="fas fa-clone"></i>
+                    <i class="fas fa-clone"></i>
                     <span>Promo Mingguan</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('banner'); ?>">
-                <i class="fas fa-clone"></i>
+                    <i class="fas fa-clone"></i>
                     <span>Banner</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('brand'); ?>">
-                <i class="fas fa-clone"></i>
+                    <i class="fas fa-clone"></i>
                     <span>Brand Detail Dan Promo</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('blog'); ?>">
-                <i class="fas fa-blog"></i>
+                    <i class="fas fa-blog"></i>
                     <span>Berita dan acara</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('voucher'); ?>">
-                <i class="fas fa-file-invoice-dollar"></i>
+                    <i class="fas fa-file-invoice-dollar"></i>
                     <span>Voucher</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('FAQ'); ?>">
-                <i class="fas fa-file-invoice-dollar"></i>
+                    <i class="fas fa-file-invoice-dollar"></i>
                     <span>FAQ</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('bantuan'); ?>">
-                <i class="fas fa-tasks"></i>
+                    <i class="fas fa-tasks"></i>
                     <span>Pusat Bantuan</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('content'); ?>">
-                <i class="fas fa-file-contract"></i>
+                    <i class="fas fa-file-contract"></i>
                     <span>Konten PopUp</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('laporan'); ?>">
-                <i class="fas fa-file-pdf"></i>
+                    <i class="fas fa-file-pdf"></i>
                     <span>Laporan Transaksi</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('undian/inputPoinUndian'); ?>">
-                <i class="fas fa-gift"></i>
+                    <i class="fas fa-gift"></i>
                     <span>Input Poin Undian</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('undian'); ?>">
-                <i class="fas fa-gift"></i>
+                    <i class="fas fa-gift"></i>
                     <span>Data Undian</span>
                 </a>
             </li>
-            
+
             <?php endif; ?>
             <hr class="sidebar-divider d-none d-md-block">
             <div class="sidebar-heading">
                 Admin Pusat
             </div>
             <li class="nav-item">
-                    <a class="nav-link pb-0" href="<?= base_url('user'); ?>">
-                        <i class="fas fa-fw fa-user-plus"></i>
-                        <span>User Management</span>
-                    </a>
-                </li>
-                <li class="nav-item">
+                <a class="nav-link pb-0" href="<?= base_url('user'); ?>">
+                    <i class="fas fa-fw fa-user-plus"></i>
+                    <span>User Management</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('member'); ?>">
                     <i class="fas fa-fw fa-users"></i>
                     <span>Member</span>
@@ -178,31 +184,31 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('transaksi'); ?>">
-                <i class="fas fa-history"></i>
+                    <i class="fas fa-history"></i>
                     <span>Transaksi</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('transaksi/historyTransaksi'); ?>">
-                <i class="fas fa-file-alt"></i>
+                    <i class="fas fa-file-alt"></i>
                     <span>Riwayat Transaksi</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('transaksi/saldo'); ?>">
-                <i class="fas fa-money-bill-wave-alt"></i>
+                    <i class="fas fa-money-bill-wave-alt"></i>
                     <span>Top Up Saldo</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('transaksi/getHistorysaldo'); ?>">
-                <i class="fas fa-file"></i>
+                    <i class="fas fa-file"></i>
                     <span>Riwayat Top Up Saldo</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('member/getLoggingMember'); ?>">
-                <i class="fas fa-history"></i>
+                    <i class="fas fa-history"></i>
                     <span>Tracking Login</span>
                 </a>
             </li>
@@ -225,7 +231,8 @@
             <div id="content">
 
                 <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-dark bg-primary topbar mb-4 static-top shadow-sm" style="background-image: url('<?= base_url() ?>assets/img/merah.png'); background-size: cover; background-position: center;">
+                <nav class="navbar navbar-expand navbar-dark bg-primary topbar mb-4 static-top shadow-sm"
+                    style="background-image: url('<?= base_url() ?>assets/img/merah.png'); background-size: cover; background-position: center;">
                     <!-- Sidebar Toggle (Topbar) -->
                     <button id="sidebarToggleTop" class="btn btn-link bg-transparent d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars text-white"></i>
@@ -236,15 +243,18 @@
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-lg-inline small text-capitalize">
                                     <?= userdata('name'); // Menggunakan 'name' bukan 'nama' ?>
                                 </span>
-                                <img class="img-profile rounded-circle" 
-                                src="../ImageTerasJapan/ProfPic/<?php echo userdata('photo'); ?>" alt="Foto Profil">
+                                <img class="img-profile rounded-circle"
+                                    src="http://localhost/ImageTerasJapan/ProfPic/<?php echo userdata('photo'); ?>"
+                                    alt="Foto Profil">
                             </a>
                             <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="<?= base_url('profile'); ?>">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
@@ -288,7 +298,7 @@
             <footer class="sticky-footer bg-light">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                    <span>Copyright &copy; Admin Resto &bull; Amigos Group 2024</span>
+                        <span>Copyright &copy; Admin Resto &bull; Amigos Group 2024</span>
                     </div>
                 </div>
             </footer>
@@ -306,7 +316,8 @@
     </a>
 
     <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -325,8 +336,8 @@
     </div>
 
     <!-- Bootstrap core JavaScript-->
-    
-    
+
+
     <script src="<?= base_url(); ?>assets/vendor/jquery/jquery.min.js"></script>
     <script src="<?= base_url(); ?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
@@ -354,112 +365,119 @@
     <script src="<?= base_url(); ?>assets/vendor/datatables/responsive/js/dataTables.responsive.min.js"></script>
     <script src="<?= base_url(); ?>assets/vendor/datatables/responsive/js/responsive.bootstrap4.min.js"></script>
     <script src="<?= base_url(); ?>assets/vendor/gijgo/js/gijgo.min.js"></script>
-    
-    
+
+
 </body>
 <script>
 $(function() {
-            var start = moment().subtract(29, 'days');
-            var end = moment();
+    var start = moment().subtract(29, 'days');
+    var end = moment();
 
-            function cb(start, end) {
-                $('#tangal').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-            }
-
-            $('#tanggal').daterangepicker({
-                startDate: start,
-                endDate: end,
-                ranges: {
-                    'Hari ini': [moment(), moment()],
-                    'Kemarin': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
-                    '7 hari terakhir': [moment().subtract(6, 'days'), moment()],
-                    '30 hari terakhir': [moment().subtract(29, 'days'), moment()],
-                    'Bulan ini': [moment().startOf('month'), moment().endOf('month')],
-                    'Bulan lalu': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                    'Tahun ini': [moment().startOf('year'), moment().endOf('year')],
-                    'Tahun lalu': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
-                }
-            }, cb);
-
-            cb(start, end);
-        });
-    $(document).ready(function() {
-            var table = $('#dataTable').DataTable({
-                buttons: ['copy', 'csv', 'print', 'excel', 'pdf'],
-                dom: "<'row px-2 px-md-4 pt-2'<'col-md-3'l><'col-md-5 text-center'B><'col-md-4'f>>" +
-                    "<'row'<'col-md-12'tr>>" +
-                    "<'row px-2 px-md-4 py-3'<'col-md-5'i><'col-md-7'p>>",
-                lengthMenu: [
-                    [5, 10, 25, 50, 100, -1],
-                    [5, 10, 25, 50, 100, "All"]
-                ],
-                columnDefs: [{
-                    targets: -1,
-                    orderable: false,
-                    searchable: false
-                }]
-            });
-
-            table.buttons().container().appendTo('#dataTable_wrapper .col-md-5:eq(0)');
-        });
-    
-    $(document).ready(function() {
-        // Function to toggle voucher code field visibility
-        function toggleVoucherCodeField() {
-            var isChecked = $('#tukarVoucher').prop('checked');
-            if (isChecked) {
-                $('#divKodevoucher').show();
-                $('#kodevouchertukar').prop('disabled', false);
-            } else {
-                $('#divKodevoucher').hide();
-                $('#kodevouchertukar').prop('disabled', true);
-            }
-        }
-
-        // Initial state check
-        toggleVoucherCodeField();
-
-        // Event handler for checkbox change
-        $('#tukarVoucher').change(function() {
-            toggleVoucherCodeField();
-        });
-    });
-    function clearCacheAndCookies() {
-        document.cookie.split(";").forEach(function(c) {
-            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-        });
-        localStorage.clear();
+    function cb(start, end) {
+        $('#tangal').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
     }
-    tinymce.init({
-        selector: '#syarat',
-         plugins: 'advlist autolink lists link image charmap print preview anchor',
-            toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image',
-            content_css: 'assets/tinymce/js/tinymce/skins/content/default/content.min.css'
-    })
-    tinymce.init({
-        selector: '#syarattukar',
-         plugins: 'advlist autolink lists link image charmap print preview anchor',
-            toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image',
-            content_css: 'assets/tinymce/js/tinymce/skins/content/default/content.min.css'
-    })
-    tinymce.init({
-        selector: '#isi',
-         plugins: 'advlist autolink lists link image charmap print preview anchor',
-            toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image',
-            content_css: 'assets/tinymce/js/tinymce/skins/content/default/content.min.css'
-    })
-    tinymce.init({
-        selector: '#konten',
-         plugins: 'advlist autolink lists link image charmap print preview anchor',
-            toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image',
-            content_css: 'assets/tinymce/js/tinymce/skins/content/default/content.min.css'
-    })
-    tinymce.init({
-        selector: '#kontenBlog',
-         plugins: 'advlist autolink lists link image charmap print preview anchor',
-            toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image',
-            content_css: 'assets/tinymce/js/tinymce/skins/content/default/content.min.css'
-    })
+
+    $('#tanggal').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+            'Hari ini': [moment(), moment()],
+            'Kemarin': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf(
+                'day')],
+            '7 hari terakhir': [moment().subtract(6, 'days'), moment()],
+            '30 hari terakhir': [moment().subtract(29, 'days'), moment()],
+            'Bulan ini': [moment().startOf('month'), moment().endOf('month')],
+            'Bulan lalu': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month')
+                .endOf('month')
+            ],
+            'Tahun ini': [moment().startOf('year'), moment().endOf('year')],
+            'Tahun lalu': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year')
+                .endOf('year')
+            ]
+        }
+    }, cb);
+
+    cb(start, end);
+});
+$(document).ready(function() {
+    var table = $('#dataTable').DataTable({
+        buttons: ['copy', 'csv', 'print', 'excel', 'pdf'],
+        dom: "<'row px-2 px-md-4 pt-2'<'col-md-3'l><'col-md-5 text-center'B><'col-md-4'f>>" +
+            "<'row'<'col-md-12'tr>>" +
+            "<'row px-2 px-md-4 py-3'<'col-md-5'i><'col-md-7'p>>",
+        lengthMenu: [
+            [5, 10, 25, 50, 100, -1],
+            [5, 10, 25, 50, 100, "All"]
+        ],
+        columnDefs: [{
+            targets: -1,
+            orderable: false,
+            searchable: false
+        }]
+    });
+
+    table.buttons().container().appendTo('#dataTable_wrapper .col-md-5:eq(0)');
+});
+
+$(document).ready(function() {
+    // Function to toggle voucher code field visibility
+    function toggleVoucherCodeField() {
+        var isChecked = $('#tukarVoucher').prop('checked');
+        if (isChecked) {
+            $('#divKodevoucher').show();
+            $('#kodevouchertukar').prop('disabled', false);
+        } else {
+            $('#divKodevoucher').hide();
+            $('#kodevouchertukar').prop('disabled', true);
+        }
+    }
+
+    // Initial state check
+    toggleVoucherCodeField();
+
+    // Event handler for checkbox change
+    $('#tukarVoucher').change(function() {
+        toggleVoucherCodeField();
+    });
+});
+
+function clearCacheAndCookies() {
+    document.cookie.split(";").forEach(function(c) {
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() +
+            ";path=/");
+    });
+    localStorage.clear();
+}
+tinymce.init({
+    selector: '#syarat',
+    plugins: 'advlist autolink lists link image charmap print preview anchor',
+    toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image',
+    content_css: 'assets/tinymce/js/tinymce/skins/content/default/content.min.css'
+})
+tinymce.init({
+    selector: '#syarattukar',
+    plugins: 'advlist autolink lists link image charmap print preview anchor',
+    toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image',
+    content_css: 'assets/tinymce/js/tinymce/skins/content/default/content.min.css'
+})
+tinymce.init({
+    selector: '#isi',
+    plugins: 'advlist autolink lists link image charmap print preview anchor',
+    toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image',
+    content_css: 'assets/tinymce/js/tinymce/skins/content/default/content.min.css'
+})
+tinymce.init({
+    selector: '#konten',
+    plugins: 'advlist autolink lists link image charmap print preview anchor',
+    toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image',
+    content_css: 'assets/tinymce/js/tinymce/skins/content/default/content.min.css'
+})
+tinymce.init({
+    selector: '#kontenBlog',
+    plugins: 'advlist autolink lists link image charmap print preview anchor',
+    toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image',
+    content_css: 'assets/tinymce/js/tinymce/skins/content/default/content.min.css'
+})
 //     tinymce.init({
 //     selector: '#syarat',
 //     plugins: 'ai tinycomments mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',

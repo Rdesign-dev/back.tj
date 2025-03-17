@@ -9,13 +9,14 @@
             <div class="card-body">
                 <?= $this->session->flashdata('pesan'); ?>
                 <?= form_open_multipart('', [], ['id' => $user['id']]); ?>
-                
+
                 <div class="row form-group">
                     <label class="col-md-3 text-md-right" for="photo">Foto</label>
                     <div class="col-md-9">
                         <div class="row">
                             <div class="col-3">
-                                <img src="<?= base_url() ?>../ImageTerasJapan/ProfPic/<?= $user['photo']; ?>" alt="<?= $user['Name']; ?>" class="rounded-circle shadow-sm img-thumbnail">
+                                <img src="http://localhost/ImageTerasJapan/ProfPic/<?= $user['photo']; ?>"
+                                    alt="<?= $user['Name']; ?>" class="rounded-circle shadow-sm img-thumbnail">
                             </div>
                             <div class="col-9">
                                 <input type="file" name="photo" id="photo">
@@ -32,7 +33,8 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                             </div>
-                            <input value="<?= set_value('username', $user['username']); ?>" name="username" id="username" type="text" class="form-control" placeholder="Username...">
+                            <input value="<?= set_value('username', $user['username']); ?>" name="username"
+                                id="username" type="text" class="form-control" placeholder="Username...">
                         </div>
                         <?= form_error('username', '<small class="text-danger">', '</small>'); ?>
                     </div>
@@ -45,7 +47,8 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                             </div>
-                            <input value="<?= set_value('Name', $user['Name']); ?>" name="Name" id="Name" type="text" class="form-control" placeholder="Nama Anda...">
+                            <input value="<?= set_value('Name', $user['Name']); ?>" name="Name" id="Name" type="text"
+                                class="form-control" placeholder="Nama Anda...">
                         </div>
                         <?= form_error('Name', '<small class="text-danger">', '</small>'); ?>
                     </div>
@@ -57,7 +60,8 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa fa-fw fa-phone"></i></span>
                             </div>
-                            <input value="<?= set_value('phone_number', $user['phone_number']); ?>" name="phone_number" id="phone_number" type="text" class="form-control" placeholder="Nomor Telepon...">
+                            <input value="<?= set_value('phone_number', $user['phone_number']); ?>" name="phone_number"
+                                id="phone_number" type="text" class="form-control" placeholder="Nomor Telepon...">
                         </div>
                         <?= form_error('phone_number', '<small class="text-danger">', '</small>'); ?>
                     </div>

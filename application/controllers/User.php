@@ -76,7 +76,7 @@ class User extends CI_Controller
 
             // Handle photo upload
             if (!empty($_FILES['photo']['name'])) {
-                $config['upload_path']   = '../ImageTerasJapan/ProfPic/';
+                $config['upload_path']   = $_SERVER['DOCUMENT_ROOT'] . '/ImageTerasJapan/ProfPic/';
                 $config['allowed_types'] = 'gif|jpg|jpeg|png';
                 $config['max_size']      = 10000;
                 $config['file_name']     = 'profile_' . time();
@@ -87,10 +87,10 @@ class User extends CI_Controller
                     $input['photo'] = $this->upload->data('file_name');
                 } else {
                     set_pesan('gagal mengupload foto: ' . $this->upload->display_errors(), false);
-                    $input['photo'] = 'profile_default.png';
+                    $input['photo'] = 'default.jpg';
                 }
             } else {
-                $input['photo'] = 'profile_default.png';
+                $input['photo'] = 'default.jpg';
             }
             
             // If not cashier or branch_admin, set branch_id to null
