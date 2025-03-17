@@ -6,77 +6,120 @@ class Content extends CI_Controller {
     public function __construct() {
         parent::__construct();
         cek_login();
-        $this->load->model('Content_model','content');
-        $this->load->model('Admin_model','admin');
-    }
-
-    public function tambahs(){
-        $data['title'] = "Tambah Content";
-        $this->template->load('templates/dashboard', 'content/add', $data);
+        $this->load->model('Content_model', 'content');
     }
 
     public function index() {
-        // Mengambil data produk dari model
-        $data['title'] = "Management Content";
-        $data['contents'] = $this->content->find_all();
-
-        // Memuat tampilan daftar produk
-        $this->template->load('templates/dashboard', 'content/index', $data);
+        $data['title'] = "Content Management";
+        $data['content'] = $this->content->get_all_content();
+        $this->template->load('templates/dashboard', 'content/data', $data);
     }
 
-    public function tambah_save(){
-        //validasi server side
-        $this->form_validation->set_rules('konten','Konten','required');
-        if($this->form_validation->run() == FALSE){
-            //validasi menemukan error
-            $data['title'] = "Tambah Content";
+    public function add() {
+        $this->_validasi();
+        
+        if ($this->form_validation->run() == false) {
+            $data['title'] = "Add Content";
             $this->template->load('templates/dashboard', 'content/add', $data);
         } else {
-                $config['upload_path'] = '../fotokonten/';
-                $config['allowed_types'] = 'gif|jpg|png|PNG|jpeg|JPEG|svg';
-                $config['max_size'] = 1048576;
-                $config['max_width'] = 10000;
-                $config['max_height'] = 10000;
-                $this->load->library('upload', $config);
-                if(!$this->upload->do_upload('gambar')){
-                    $data['title'] = "Tambah Content";
-                    $this->template->load('templates/dashboard', 'content/add', $data);
-                }else{
-                $gambar = $this->upload->data();
-                $gambar = $gambar['file_name'];
-                $konten = $this->input->post('konten');
-                $data = array(
-                    'gambar' => $gambar,
-                    'konten' => $konten,
-                );
-                var_dump($data);
-                $this->db->insert('content',$data);
-                $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>');
-                redirect(base_url('content'));
+            $input = $this->input->post(null, true);
+            
+            // Get file extension
+            $file_ext = pathinfo($_FILES['Image']['name'], PATHINFO_EXTENSION);
+            
+            // Create filename from name field and timestamp
+            $filename = url_title($input['name'], 'dash', true) . '_' . time() . '.' . $file_ext;
+            
+            $config['upload_path']      = '../ImageTerasJapan/contentpopup/';
+            $config['allowed_types']    = 'gif|jpg|jpeg|png|JPEG|PNG';
+            $config['file_name']        = $filename; // Set custom filename
+            $config['max_size']         = '2048';
+            $config['overwrite']        = true;
+
+            $this->load->library('upload', $config);
+
+            if (!$this->upload->do_upload('Image')) {
+                set_pesan('Error: ' . $this->upload->display_errors(), false);
+                redirect('content/add');
+            } else {
+                $input['Image'] = $filename;
+                $input['status'] = 'Active';
+
+                $save = $this->content->insert_content($input);
+                if ($save) {
+                    set_pesan('Data berhasil disimpan');
+                    redirect('content');
+                } else {
+                    set_pesan('Gagal menyimpan data', false);
+                    redirect('content/add');
                 }
-                
             }
         }
-        public function delete($getId)
-        {
-        $id = encode_php_tags($getId);
-        if ($this->admin->delete('content', 'id', $id)) {
-            set_pesan('data berhasil dihapus.');
-        } else {
-            set_pesan('data gagal dihapus.', false);
-        }
-        redirect('content');
-        }
-        public function toggle($getId)
-        {
-        $id = encode_php_tags($getId);
-        $status = $this->admin->get('content', ['id' => $id])['isActive'];
-        $toggle = $status ? 0 : 1; //Jika user aktif maka nonaktifkan, begitu pula sebaliknya
-        $pesan = $toggle ? 'Konten diaktifkan.' : 'Konten dinonaktifkan.';
+    }
 
-        if ($this->admin->update('content', 'id', $id, ['isActive' => $toggle])) {
-            set_pesan($pesan);
+    public function edit($getId) {
+        $id = encode_php_tags($getId);
+        $this->_validasi();
+
+        if ($this->form_validation->run() == false) {
+            $data['title'] = "Edit Content";
+            $data['content'] = $this->content->get_content_by_id($id);
+            $this->template->load('templates/dashboard', 'content/edit', $data);
+        } else {
+            $input = $this->input->post(null, true);
+            
+            if (!empty($_FILES['Image']['name'])) {
+                // Get file extension
+                $file_ext = pathinfo($_FILES['Image']['name'], PATHINFO_EXTENSION);
+                
+                // Create filename from name field and timestamp
+                $filename = url_title($input['name'], 'dash', true) . '_' . time() . '.' . $file_ext;
+                
+                $config['upload_path']      = '../ImageTerasJapan/contentpopup/';
+                $config['allowed_types']    = 'gif|jpg|jpeg|png|JPEG|PNG';
+                $config['file_name']        = $filename; // Set custom filename
+                $config['max_size']         = '2048';
+                $config['overwrite']        = true;
+
+                $this->load->library('upload', $config);
+                
+                if ($this->upload->do_upload('Image')) {
+                    $old_image = $this->content->get_content_by_id($id)['Image'];
+                    $file_path = '../ImageTerasJapan/contentpopup/' . $old_image;
+                    if (file_exists($file_path)) {
+                        unlink($file_path);
+                    }
+                    $input['Image'] = $filename;
+                } else {
+                    set_pesan('Error: ' . $this->upload->display_errors(), false);
+                    redirect('content/edit/' . $id);
+                }
+            }
+
+            $update = $this->content->update_content($id, $input);
+            if ($update) {
+                set_pesan('Data berhasil diupdate');
+                redirect('content');
+            } else {
+                set_pesan('Gagal mengupdate data', false);
+                redirect('content/edit/' . $id);
+            }
+        }
+    }
+
+    private function _validasi() {
+        $this->form_validation->set_rules('name', 'Name', 'required|trim');
+        $this->form_validation->set_rules('link', 'Link', 'required|trim');
+    }
+
+    public function toggle($getId) {
+        $id = encode_php_tags($getId);
+        $toggle = $this->content->toggle_status($id);
+        if ($toggle) {
+            set_pesan('Status berhasil diubah.');
+        } else {
+            set_pesan('Gagal mengubah status.', false);
         }
         redirect('content');
-        }
+    }
 }
