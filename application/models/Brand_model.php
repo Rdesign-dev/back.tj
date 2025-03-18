@@ -162,4 +162,14 @@ class Brand_model extends CI_Model {
     public function delete_voucher($id) {
         return $this->db->delete('rewards', ['id' => $id]);
     }
+
+    public function get_brand_vouchers($brand_id) {
+        return $this->db->select('r.id, r.title, r.image_name, r.points_required, 
+                                 r.category, r.description, r.valid_until, 
+                                 r.total_days, r.qty')
+                        ->from('rewards r')
+                        ->where('r.brand_id', $brand_id)
+                        ->get()
+                        ->result_array();
+    }
 }

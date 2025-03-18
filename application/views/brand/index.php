@@ -107,7 +107,7 @@
         </div>
     </div>
 
-    <div class="card shadow-sm mb-4 border-bottom-primary">
+<div class="card shadow-sm mb-4 border-bottom-primary">
     <div class="card-header bg-white py-3">
         <div class="row">
             <div class="col">
@@ -116,9 +116,9 @@
                 </h4>
             </div>
             <div class="col-auto">
-                <a href="<?= base_url('voucher/tambahs') ?>" class="btn btn-sm btn-primary btn-icon-split">
+                <a href="#" id="addVoucherButton" class="btn btn-sm btn-primary btn-icon-split" style="display: none;">
                     <span class="icon">
-                    <i class="fas fa-plus-circle"></i>
+                        <i class="fas fa-plus-circle"></i>
                     </span>
                     <span class="text">
                         Tambah Voucher Brand
@@ -128,7 +128,7 @@
         </div>
     </div>
     <div class="table-responsive">
-        <table class="table table-striped dt-responsive nowrap" id="dataTable">
+        <table class="table table-striped dt-responsive nowrap" id="voucherTable">
             <thead>
                 <tr>
                     <th width="30">No.</th>
@@ -143,60 +143,12 @@
                     <th>Aksi</th>
                 </tr>
             </thead>
-            <tbody>
-                <?php
-                $no = 1;
-                if ($vouchers) :
-                    foreach ($vouchers as $voucher) :
-                        ?>
-                        <tr>
-                            <td><?= $no++; ?></td>
-                            <td><?= $voucher['title']; ?></td>
-                            <td>
-                                <?php if(!empty($voucher['image_name'])): ?>
-                                    <img src="<?= base_url('../ImageTerasJapan/reward/' . $voucher['image_name']) ?>" 
-                                         alt="Voucher Image" 
-                                         width="150px" 
-                                         height="100px"
-                                         class="img-thumbnail">
-                                <?php else: ?>
-                                    <span class="text-muted">No image</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><?= $voucher['points_required']; ?></td>
-                            <td>
-                                <?php
-                                if ($voucher['category'] == 'oldmember') {
-                                    echo "Member Biasa";
-                                } elseif ($voucher['category'] == 'newmember') {
-                                    echo "Member Baru";
-                                } elseif($voucher['category'] == 'code'){
-                                    echo "Kode Referal";
-                                } else {
-                                    echo "Undefined";
-                                }
-                                ?>
-                            </td>
-                            <td><?= $voucher['description']; ?></td>
-                            <td><?= date('d-m-Y', strtotime($voucher['valid_until'])); ?></td>
-                            <td><?= $voucher['total_days']; ?></td>
-                            <td><?= $voucher['qty']; ?></td>
-                            <td>
-                                <a href="<?= base_url('voucher/edit_voucher/') . $voucher['id'] ?>" class="btn btn-circle btn-sm btn-warning"><i class="fa fa-fw fa-edit"></i></a>
-                                <a onclick="return confirm('Yakin ingin menghapus data?')" href="<?= base_url('voucher/delete/') . $voucher['id'] ?>" class="btn btn-circle btn-sm btn-danger"><i class="fa fa-fw fa-trash"></i></a>
-                            </td>
-                        </tr>
-                    <?php endforeach;
-                    else : ?>
-                    <tr>
-                        <td colspan="10" class="text-center">Silahkan tambahkan Voucher Brand</td>
-                    </tr>
-                <?php endif; ?>
+            <tbody id="voucherTableBody">
+                <!-- Voucher data will be loaded here -->
             </tbody>
         </table>
     </div>
 </div>
-
 
 <style>
 .brand-image {
@@ -235,6 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const brandTableBody = document.getElementById('brandTableBody');
     const promoTableBody = document.getElementById('promoTableBody');
     const addPromoButton = document.getElementById('addPromoButton');
+    const addVoucherButton = document.getElementById('addVoucherButton');
     let selectedBrandId = null;
 
     // Update the fetchBrandData function
@@ -244,9 +197,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show and update the Add Promo button
         addPromoButton.style.display = 'inline-block';
         addPromoButton.href = `${BASE_URL}brand/addpromo/${brandId}`;
+        addVoucherButton.style.display = 'inline-block';
+        addVoucherButton.href = `${BASE_URL}brand/add_voucher/${brandId}`;
         
         try {
-            const [brandResponse, promoResponse] = await Promise.all([
+            const [brandResponse, promoResponse, voucherResponse] = await Promise.all([
                 fetch(`${BASE_URL}brand/get_brand_details/${brandId}`, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
@@ -255,6 +210,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     method: 'GET'
                 }),
                 fetch(`${BASE_URL}brand/get_brand_promos/${brandId}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    method: 'GET'
+                }),
+                fetch(`${BASE_URL}brand/get_brand_vouchers/${brandId}`, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json'
@@ -269,9 +231,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!promoResponse.ok) {
                 throw new Error(`Promo fetch failed: ${promoResponse.status}`);
             }
+            if (!voucherResponse.ok) {
+                throw new Error(`Voucher fetch failed: ${voucherResponse.status}`);
+            }
 
             const brandData = await brandResponse.json();
             const promoData = await promoResponse.json();
+            const voucherData = await voucherResponse.json();
 
             if (brandData.error) {
                 throw new Error(brandData.error);
@@ -279,11 +245,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
             updateBrandTable(brandData);
             updatePromoTable(promoData);
+            updateVoucherTable(voucherData);
 
         } catch (error) {
             console.error('Error:', error);
             brandTableBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
             promoTableBody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
+            document.getElementById('voucherTableBody').innerHTML = 
+            '<tr><td colspan="10" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
             
             // Hide the Add Promo button if there's an error
             addPromoButton.style.display = 'none';
@@ -363,6 +332,68 @@ document.addEventListener('DOMContentLoaded', function() {
                 </tr>`;
         });
         promoTableBody.innerHTML = rows || '<tr><td colspan="7" class="text-center">Tidak ada promo untuk brand ini</td></tr>';
+    }
+
+    function updateVoucherTable(vouchers) {
+        const tbody = document.getElementById('voucherTableBody');
+        if (!vouchers || vouchers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" class="text-center">Tidak ada voucher untuk brand ini</td></tr>';
+            return;
+        }
+    
+        let rows = '';
+        vouchers.forEach((voucher, index) => {
+            rows += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${voucher.title}</td>
+                    <td>
+                        ${voucher.image_name ? 
+                            `<img src="${BASE_URL}../ImageTerasJapan/reward/${voucher.image_name}" 
+                                  alt="Voucher Image" 
+                                  width="150px" 
+                                  height="100px"
+                                  class="img-thumbnail">` : 
+                            '<span class="text-muted">No image</span>'}
+                    </td>
+                    <td>${voucher.points_required}</td>
+                    <td>${getCategoryLabel(voucher.category)}</td>
+                    <td>${voucher.description || '-'}</td>
+                    <td>${formatDate(voucher.valid_until)}</td>
+                    <td>${voucher.total_days || '-'}</td>
+                    <td>${voucher.qty}</td>
+                    <td>
+                        <a href="${BASE_URL}brand/edit_voucher/${voucher.id}" 
+                           class="btn btn-circle btn-sm btn-warning">
+                            <i class="fa fa-fw fa-edit"></i>
+                        </a>
+                        <a onclick="return confirm('Yakin ingin menghapus data?')" 
+                           href="${BASE_URL}brand/delete_voucher/${voucher.id}" 
+                           class="btn btn-circle btn-sm btn-danger">
+                            <i class="fa fa-fw fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>`;
+        });
+        tbody.innerHTML = rows;
+    }
+    
+    function getCategoryLabel(category) {
+        switch(category) {
+            case 'oldmember': return 'Member Biasa';
+            case 'newmember': return 'Member Baru';
+            case 'code': return 'Kode Referal';
+            default: return 'Undefined';
+        }
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
     }
 
     brandImages.forEach(img => {

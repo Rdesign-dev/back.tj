@@ -9,12 +9,14 @@ class Topup_model extends CI_Model {
 
     public function getAllTopup() {
         $this->db->select('t.transaction_codes, t.created_at, t.amount, 
-                         t.payment_method, t.transaction_evidence,
-                         u.name as member_name, a.Name as cashier_name')
+                         GROUP_CONCAT(CONCAT(tp.payment_method, " (", tp.amount, ")") SEPARATOR " & ") as payment_details,
+                         t.transaction_evidence, u.name as member_name, a.Name as cashier_name')
                  ->from('transactions t')
                  ->join('users u', 'u.id = t.user_id')
                  ->join('accounts a', 'a.id = t.account_cashier_id')
+                 ->join('transaction_payments tp', 'tp.transaction_id = t.transaction_id')
                  ->where('t.transaction_type', 'Balance Top-up')
+                 ->group_by('t.transaction_id')
                  ->order_by('t.created_at', 'DESC');
         return $this->db->get()->result();
     }
@@ -34,7 +36,26 @@ class Topup_model extends CI_Model {
         $this->db->trans_start();
         
         // Insert ke tabel transactions
-        $this->db->insert('transactions', $data);
+        $this->db->insert('transactions', [
+            'transaction_codes' => $data['transaction_codes'],
+            'user_id' => $data['user_id'],
+            'transaction_type' => 'Balance Top-up',
+            'amount' => $data['amount'],
+            'branch_id' => $data['branch_id'],
+            'account_cashier_id' => $data['account_cashier_id'],
+            'transaction_evidence' => $data['transaction_evidence'],
+            'created_at' => $data['created_at']
+        ]);
+        
+        // Get transaction_id yang baru dibuat
+        $transaction_id = $this->db->insert_id();
+        
+        // Insert ke tabel transaction_payments
+        $this->db->insert('transaction_payments', [
+            'transaction_id' => $transaction_id,
+            'payment_method' => $data['payment_method'],
+            'amount' => $data['amount']
+        ]);
         
         // Update balance user
         $this->db->set('balance', 'balance + ' . $data['amount'], FALSE)
@@ -51,12 +72,15 @@ class Topup_model extends CI_Model {
                                  t.created_at, 
                                  u.name as member_name,
                                  t.amount, 
-                                 a.Name as cashier_name')
+                                 a.Name as cashier_name,
+                                 GROUP_CONCAT(CONCAT(tp.payment_method, " (", tp.amount, ")") SEPARATOR " & ") as payment_details')
                 ->from('transactions t')
                 ->join('users u', 'u.id = t.user_id')
                 ->join('accounts a', 'a.id = t.account_cashier_id')
+                ->join('transaction_payments tp', 'tp.transaction_id = t.transaction_id')
                 ->where('t.branch_id', $branch_id)
                 ->where('t.transaction_type', 'Balance Top-up')
+                ->group_by('t.transaction_id')
                 ->order_by('t.created_at', 'DESC')
                 ->get()
                 ->result();

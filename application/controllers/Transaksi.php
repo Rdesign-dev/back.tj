@@ -358,10 +358,9 @@ public function convert_and_updateSaldoMember() {
             'transaction_codes' => $this->generate_transaction_code($account_id, 'Balance Top-up'),
             'user_id' => $user->id,
             'transaction_type' => 'Balance Top-up',
-            'amount' => number_format($nominal, 2, '.', ''), // Ensure 2 decimal places
+            'amount' => $nominal,
             'branch_id' => $branch_id,
             'account_cashier_id' => $account_id,
-            'payment_method' => $this->input->post('metode'),
             'transaction_evidence' => $evidence_filename,
             'created_at' => date('Y-m-d H:i:s')
         ];
@@ -378,6 +377,15 @@ public function convert_and_updateSaldoMember() {
 
         // Insert transaction
         $this->db->insert('transactions', $transaction_data);
+        $transaction_id = $this->db->insert_id();
+
+        // Insert into transaction_payments
+        $payment_data = [
+            'transaction_id' => $transaction_id,
+            'payment_method' => $this->input->post('metode'),
+            'amount' => $nominal
+        ];
+        $this->db->insert('transaction_payments', $payment_data);
 
         // Calculate new balance with proper decimal handling
         $current_balance = floatval($user->balance);
@@ -430,20 +438,29 @@ public function convert_and_updateSaldoMember() {
 }
 
 public function getHistorysaldo() {
-    $data['title'] = "Data TopUp Saldo Member";
+    $data['title'] = "History Top Up Saldo";
     
-    $this->db->select('t.transaction_codes, t.created_at, t.amount as nominal, 
-                       t.payment_method as metode, t.transaction_evidence as bukti,
-                       u.name as namamember, a.Name as nama')
+    $this->db->select('t.transaction_codes, 
+                       t.created_at, 
+                       t.amount,  
+                       t.transaction_evidence,
+                       COALESCE(b.branch_name, "Pusat") as branch_name, 
+                       u.name as member_name, 
+                       a.Name as cashier_name,
+                       GROUP_CONCAT(CONCAT(tp.payment_method, " (Rp ", FORMAT(tp.amount, 0), ")") SEPARATOR " & ") as payment_method')
              ->from('transactions t')
              ->join('users u', 'u.id = t.user_id')
              ->join('accounts a', 'a.id = t.account_cashier_id')
+             ->join('branch b', 'b.id = t.branch_id', 'left')  // Ubah menjadi LEFT JOIN
+             ->join('transaction_payments tp', 'tp.transaction_id = t.transaction_id')
              ->where('t.transaction_type', 'Balance Top-up')
+             ->group_by('t.transaction_id, t.transaction_codes, t.created_at, t.amount, 
+                        t.transaction_evidence, b.branch_name, u.name, a.Name')
              ->order_by('t.created_at', 'DESC');
              
-    $data['tops'] = $this->db->get()->result();
+    $data['trans'] = $this->db->get()->result();
     
-    $this->template->load('templates/dashboard', 'topup/data', $data);
+    $this->template->load('templates/dashboard', 'topup/index', $data);
 }
 
 private function generate_transaction_code($account_id, $transaction_type) {

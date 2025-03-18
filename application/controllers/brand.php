@@ -90,6 +90,17 @@ class Brand extends CI_Controller {
         }
     }
 
+    public function get_brand_vouchers($brand_id) {
+        try {
+            $vouchers = $this->brand->get_brand_vouchers($brand_id);
+            header('Content-Type: application/json');
+            echo json_encode($vouchers);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+    }
+
     public function edit($id) {
         $data['title'] = "Edit Brand";
         $data['brand'] = $this->brand->get_by_id($id);
@@ -406,51 +417,24 @@ class Brand extends CI_Controller {
         echo $this->db->last_query();
     }
 
-    public function add_voucher() {
-        $data['title'] = "Tambah Voucher";
-        
-        $this->form_validation->set_rules('title', 'Judul', 'required|trim');
-        $this->form_validation->set_rules('points_required', 'Poin', 'required|numeric');
-        $this->form_validation->set_rules('category', 'Kategori', 'required');
-        $this->form_validation->set_rules('description', 'Deskripsi', 'required');
-        $this->form_validation->set_rules('valid_until', 'Berlaku Sampai', 'required');
-        $this->form_validation->set_rules('qty', 'Qty', 'required|numeric');
-        
-        if ($this->form_validation->run() == false) {
-            $this->template->load('templates/dashboard', 'brand/add_voucher', $data);
-        } else {
-            $input = $this->input->post(null, true);
-            
-            // Handle image upload
-            if (!empty($_FILES['image']['name'])) {
-                $config['upload_path'] = '../ImageTerasJapan/reward/';
-                $config['allowed_types'] = 'gif|jpg|png|jpeg';
-                $config['max_size'] = 2048;
-                $config['file_name'] = 'voucher-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
-                
-                $this->load->library('upload', $config);
-                
-                if ($this->upload->do_upload('image')) {
-                    $input['image_name'] = $this->upload->data('file_name');
-                } else {
-                    $this->session->set_flashdata('pesan', '<div class="alert alert-danger">' . $this->upload->display_errors() . '</div>');
-                    redirect('brand/add_voucher');
-                }
-            }
-            
-            // Calculate total days
-            $now = time();
-            $valid_until = strtotime($input['valid_until']);
-            $input['total_days'] = ceil(($valid_until - $now) / (60 * 60 * 24));
-            
-            if ($this->brand->insert_voucher($input)) {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Voucher berhasil ditambahkan!</div>');
-                redirect('brand');
-            } else {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Voucher gagal ditambahkan!</div>');
-                redirect('brand/add_voucher');
-            }
+    public function add_voucher($brand_id = null) {
+        if (!$brand_id) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Brand ID tidak ditemukan!</div>');
+            redirect('brand');
         }
+    
+        // Validate brand exists
+        $brand = $this->brand->get_by_id($brand_id);
+        if (!$brand) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Brand tidak ditemukan!</div>');
+            redirect('brand');
+        }
+    
+        $data['title'] = "Tambah Voucher";
+        $data['brand'] = $brand;
+        $data['brand_id'] = $brand_id;
+        
+        $this->template->load('templates/dashboard', 'brand/add_voucher', $data);
     }
 
     public function edit_voucher($id) {
@@ -525,5 +509,126 @@ class Brand extends CI_Controller {
         }
         
         redirect('brand');
+    }
+
+    public function save_voucher() {
+        $brand_id = $this->input->post('brand_id');
+        
+        if (!$brand_id) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Brand ID tidak ditemukan!</div>');
+            redirect('brand');
+        }
+    
+        // Validasi form
+        $this->form_validation->set_rules('title', 'Judul Voucher', 'required|trim');
+        $this->form_validation->set_rules('points_required', 'Poin', 'required|numeric|greater_than[0]');
+        $this->form_validation->set_rules('category', 'Kategori', 'required|in_list[newmember,oldmember,code]');
+        $this->form_validation->set_rules('description', 'Deskripsi', 'required');
+        $this->form_validation->set_rules('valid_until', 'Berlaku Sampai', 'required');
+        $this->form_validation->set_rules('qty', 'Jumlah Voucher', 'required|numeric|greater_than[0]');
+    
+        if ($this->form_validation->run() == false) {
+            $data['title'] = "Tambah Voucher";
+            $data['brand_id'] = $brand_id;
+            $data['brand'] = $this->brand->get_by_id($brand_id);
+            $this->template->load('templates/dashboard', 'brand/add_voucher', $data);
+        } else {
+            $data = [
+                'title' => $this->input->post('title'),
+                'points_required' => $this->input->post('points_required'),
+                'category' => $this->input->post('category'),
+                'description' => $this->input->post('description'),
+                'valid_until' => $this->input->post('valid_until'),
+                'qty' => $this->input->post('qty'),
+                'brand_id' => $brand_id,
+                'total_days' => ceil((strtotime($this->input->post('valid_until')) - time()) / (60 * 60 * 24))
+            ];
+    
+            // Handle image upload
+            if (!empty($_FILES['image']['name'])) {
+                $config['upload_path'] = '../ImageTerasJapan/reward/';
+                $config['allowed_types'] = 'gif|jpg|png|jpeg';
+                $config['max_size'] = 5120; // 5MB
+                $config['file_name'] = 'voucher-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
+    
+                $this->load->library('upload', $config);
+    
+                if ($this->upload->do_upload('image')) {
+                    $data['image_name'] = $this->upload->data('file_name');
+                } else {
+                    $this->session->set_flashdata('pesan', '<div class="alert alert-danger">' . $this->upload->display_errors() . '</div>');
+                    redirect('brand/add_voucher/' . $brand_id);
+                }
+            }
+    
+            if ($this->brand->insert_voucher($data)) {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Voucher berhasil ditambahkan!</div>');
+                redirect('brand');
+            } else {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Gagal menambahkan voucher!</div>');
+                redirect('brand/add_voucher/' . $brand_id);
+            }
+        }
+    }
+
+    public function update_voucher($id) {
+        $voucher = $this->brand->get_voucher_by_id($id);
+        
+        if (!$voucher) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Data tidak ditemukan!</div>');
+            redirect('brand');
+        }
+    
+        $this->form_validation->set_rules('title', 'Judul Voucher', 'required|trim');
+        $this->form_validation->set_rules('points_required', 'Poin', 'required|numeric|greater_than[0]');
+        $this->form_validation->set_rules('category', 'Kategori', 'required|in_list[newmember,oldmember,code]');
+        $this->form_validation->set_rules('description', 'Deskripsi', 'required');
+        $this->form_validation->set_rules('valid_until', 'Berlaku Sampai', 'required');
+        $this->form_validation->set_rules('qty', 'Jumlah Voucher', 'required|numeric|greater_than[0]');
+    
+        if ($this->form_validation->run() == false) {
+            $data['title'] = "Edit Voucher";
+            $data['voucher'] = $voucher;
+            $this->template->load('templates/dashboard', 'brand/edit_voucher', $data);
+        } else {
+            $data = [
+                'title' => $this->input->post('title'),
+                'points_required' => $this->input->post('points_required'),
+                'category' => $this->input->post('category'),
+                'description' => $this->input->post('description'),
+                'valid_until' => $this->input->post('valid_until'),
+                'qty' => $this->input->post('qty'),
+                'total_days' => ceil((strtotime($this->input->post('valid_until')) - time()) / (60 * 60 * 24))
+            ];
+    
+            // Handle image upload
+            if (!empty($_FILES['image']['name'])) {
+                $config['upload_path'] = '../ImageTerasJapan/reward/';
+                $config['allowed_types'] = 'gif|jpg|png|jpeg';
+                $config['max_size'] = 5120; // 5MB
+                $config['file_name'] = 'voucher-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
+    
+                $this->load->library('upload', $config);
+    
+                if ($this->upload->do_upload('image')) {
+                    // Delete old image if exists
+                    if ($voucher['image_name'] && file_exists($config['upload_path'] . $voucher['image_name'])) {
+                        unlink($config['upload_path'] . $voucher['image_name']);
+                    }
+                    $data['image_name'] = $this->upload->data('file_name');
+                } else {
+                    $this->session->set_flashdata('pesan', '<div class="alert alert-danger">' . $this->upload->display_errors() . '</div>');
+                    redirect('brand/edit_voucher/' . $id);
+                }
+            }
+    
+            if ($this->brand->update_voucher($id, $data)) {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Voucher berhasil diupdate!</div>');
+                redirect('brand');
+            } else {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Gagal mengupdate voucher!</div>');
+                redirect('brand/edit_voucher/' . $id);
+            }
+        }
     }
 }
