@@ -245,10 +245,10 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-lg-inline small text-capitalize">
+                                <span class="mr-2 d-lg-inline small text-capitalize font-weight-bold text-white" style="font-size: 1rem; color: #ffffff;">
                                     <?= userdata('name'); // Menggunakan 'name' bukan 'nama' ?>
                                 </span>
-                                <img class="img-profile rounded-circle"
+                                <img class="img-profile rounded-circle ml-2"
                                     src="http://localhost/ImageTerasJapan/ProfPic/<?php echo userdata('photo'); ?>"
                                     alt="Foto Profil">
                             </a>
