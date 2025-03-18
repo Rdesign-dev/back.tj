@@ -31,19 +31,6 @@ class Transaksi_model extends CI_Model {
         return $query->result_array();
     }
 
-    // public function getHistoryTransaksiDetails() 
-    // {
-    //     $this->db->select('t.*, b.branch_name as namacabang, u.name as member_name, a.Name as cashier_name');
-    //     $this->db->from('transactions t');
-    //     $this->db->join('branch b', 'b.id = t.branch_id', 'left');
-    //     $this->db->join('users u', 'u.id = t.user_id', 'left');
-    //     $this->db->join('accounts a', 'a.id = t.account_cashier_id', 'left');
-    //     $this->db->where_in('t.transaction_type', ['Teras Japan Payment', 'Reedem Voucher']);
-    //     $this->db->order_by('t.created_at', 'DESC');
-        
-    //     $query = $this->db->get();
-    //     return $query->result();
-    // }
     public function insert($data) {
         // Insert data into the 'transaksi' table
         return $this->db->insert($this->table, $data);
@@ -121,5 +108,80 @@ class Transaksi_model extends CI_Model {
         ->order_by('t.created_at', 'DESC');
 
         return $this->db->get()->result();
+    }
+
+    // Add new method to insert transaction with split payments
+    public function insertTransactionWithPayments($transaction_data, $payments_data) {
+        $this->db->trans_start();
+
+        try {
+            // Insert main transaction
+            $this->db->insert('transactions', $transaction_data);
+            $transaction_id = $this->db->insert_id();
+
+            // Insert all payment records
+            foreach ($payments_data as $payment) {
+                $payment['transaction_id'] = $transaction_id;
+                $this->db->insert('transaction_payments', $payment);
+            }
+
+            $this->db->trans_complete();
+            return $this->db->trans_status();
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+            throw $e;
+        }
+    }
+
+    // Modify existing method to include payment details
+    public function getTransaksiByIdWithPayments($id) {
+        $transaction = $this->db->get_where('transactions', ['transaction_id' => $id])->row();
+        
+        if ($transaction) {
+            $payments = $this->db->get_where('transaction_payments', 
+                ['transaction_id' => $id])->result();
+            $transaction->payments = $payments;
+        }
+
+        return $transaction;
+    }
+
+    // Modify history transaction to include payment details
+    public function getHistoryTransaksiDetails() {
+        $this->db->select('t.transaction_id, t.transaction_codes, t.created_at, 
+                           t.transaction_type, t.amount as total_amount, 
+                           t.transaction_evidence, b.branch_name, 
+                           u.name as member_name, a.Name as cashier_name, 
+                           rv.kode_voucher, 
+                           GROUP_CONCAT(CONCAT(tp.payment_method, "(",tp.amount,")") SEPARATOR " & ") as payment_details');
+        $this->db->from('transactions t');
+        $this->db->join('branch b', 'b.id = t.branch_id', 'left');
+        $this->db->join('users u', 'u.id = t.user_id', 'left');
+        $this->db->join('accounts a', 'a.id = t.account_cashier_id', 'left');
+        $this->db->join('redeem_voucher rv', 'rv.redeem_id = t.voucher_id', 'left');
+        $this->db->join('transaction_payments tp', 'tp.transaction_id = t.transaction_id', 'left');
+        $this->db->where_in('t.transaction_type', ['Teras Japan Payment', 'Redeem Voucher']);
+        $this->db->group_by('t.transaction_id');
+        $this->db->order_by('t.created_at', 'DESC');
+        
+        return $this->db->get()->result();
+    }
+
+    // Add method to validate balance for payment
+    public function validateUserBalance($user_id, $amount) {
+        $user = $this->db->select('balance')
+                        ->where('id', $user_id)
+                        ->get('users')
+                        ->row();
+                        
+        return ($user && $user->balance >= $amount);
+    }
+
+    // Add method to update user balance
+    public function updateUserBalance($user_id, $amount, $is_deduct = true) {
+        $operator = $is_deduct ? '-' : '+';
+        $this->db->set('balance', "balance {$operator} {$amount}", false);
+        $this->db->where('id', $user_id);
+        return $this->db->update('users');
     }
 }

@@ -106,21 +106,66 @@
                     <div class="row form-group">
                         <label class="col-md-4 text-md-right" for="total">Total</label>
                         <div class="col-md-6">
-                            <input value="<?= set_value('total'); ?>" type="text" id="total" name="total"
-                                class="form-control" placeholder="Masukkan Total Contoh: 10000" pattern="[0-9]+"
-                                title="Hanya boleh diisi oleh angka, dan minimal 4 digit angka">
+                            <input value="<?= set_value('total'); ?>" type="number" id="total" name="total"
+                                class="form-control" placeholder="Masukkan Total" min="0">
                             <span class="text-danger small"><?= form_error('total'); ?></span>
                         </div>
                     </div>
 
                     <div class="row form-group">
-                        <label class="col-md-4 text-md-right" for="payment_method">Metode Pembayaran</label>
+                        <label class="col-md-4 text-md-right">Split Bill</label>
                         <div class="col-md-6">
-                            <select name="payment_method" id="payment_method" class="form-control">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="splitBill" name="splitBill">
+                                <label class="custom-control-label" for="splitBill">Ya, gunakan split bill</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="row form-group">
+                        <label class="col-md-4 text-md-right" for="primary_payment_method">
+                            <span id="payment_method_label">Metode Pembayaran</span>
+                        </label>
+                        <div class="col-md-6">
+                            <select name="primary_payment_method" id="primary_payment_method" class="form-control">
                                 <option value="cash">Cash</option>
                                 <option value="transferBank">Transfer Bank</option>
                                 <option value="Balance">Saldo</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <!-- Payment Amount -->
+                    <div class="row form-group">
+                        <label class="col-md-4 text-md-right" for="primary_amount">
+                            <span id="payment_amount_label">Jumlah Pembayaran</span>
+                        </label>
+                        <div class="col-md-6">
+                            <input type="number" id="primary_amount" name="primary_amount" class="form-control" 
+                                placeholder="Masukkan jumlah pembayaran" min="0">
+                            <span class="text-danger small" id="primary_amount_error"></span>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Payment Section (initially hidden) -->
+                    <div id="secondary_payment_section" style="display:none;">
+                        <div class="row form-group">
+                            <label class="col-md-4 text-md-right">Sisa yang Harus Dibayar</label>
+                            <div class="col-md-6">
+                                <input type="text" id="remaining_amount" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-md-4 text-md-right" for="secondary_payment_method">Metode Pembayaran Kedua</label>
+                            <div class="col-md-6">
+                                <select name="secondary_payment_method" id="secondary_payment_method" class="form-control">
+                                    <option value="cash">Cash</option>
+                                    <option value="transferBank">Transfer Bank</option>
+                                    <option value="Balance">Saldo</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -155,89 +200,139 @@
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Get all required elements
+    // Element selections
     const tukarVoucherCheckbox = document.getElementById('tukarVoucher');
     const divKodevoucher = document.getElementById('divKodevoucher');
     const nonVoucherFields = document.getElementById('nonVoucherFields');
     const memberForm = document.getElementById('memberForm');
     const totalInput = document.getElementById('total');
-    const paymentMethodSelect = document.getElementById('payment_method');
     const fotobillInput = document.getElementById('fotobill');
+    const splitBillCheckbox = document.getElementById('splitBill');
+    const primaryAmountInput = document.getElementById('primary_amount');
+    const remainingAmountInput = document.getElementById('remaining_amount');
+    const secondaryPaymentSection = document.getElementById('secondary_payment_section');
+    const primaryPaymentMethod = document.getElementById('primary_payment_method');
+    const secondaryPaymentMethod = document.getElementById('secondary_payment_method');
+    const paymentMethodLabel = document.getElementById('payment_method_label');
+    const paymentAmountLabel = document.getElementById('payment_amount_label');
 
-    // Function to toggle fields
-    function toggleFields(isVoucherMode) {
+    // Function to toggle voucher fields
+    function toggleVoucherFields(isVoucherMode) {
         divKodevoucher.style.display = isVoucherMode ? 'block' : 'none';
         nonVoucherFields.style.display = isVoucherMode ? 'none' : 'block';
-
+        
         // Handle form validation requirements
+        totalInput.required = !isVoucherMode;
         if (isVoucherMode) {
-            totalInput.required = false;
             totalInput.value = '';
-            paymentMethodSelect.required = false;
-            paymentMethodSelect.value = 'cash'; // default value
-        } else {
-            totalInput.required = true;
-            paymentMethodSelect.required = true;
+            splitBillCheckbox.checked = false;
+            secondaryPaymentSection.style.display = 'none';
         }
     }
 
-    // Initial state
-    toggleFields(tukarVoucherCheckbox.checked);
+    // Calculate remaining amount for split bill
+    function calculateRemaining() {
+        const total = parseFloat(totalInput.value) || 0;
+        const primaryAmount = parseFloat(primaryAmountInput.value) || 0;
+        
+        if (splitBillCheckbox.checked && total > 0) {
+            const remaining = total - primaryAmount;
+            remainingAmountInput.value = remaining.toFixed(2);
+            
+            // Validate primary amount
+            if (primaryAmount >= total) {
+                primaryAmountInput.classList.add('is-invalid');
+                document.getElementById('primary_amount_error').textContent = 
+                    'Jumlah pembayaran utama harus lebih kecil dari total';
+            } else {
+                primaryAmountInput.classList.remove('is-invalid');
+                document.getElementById('primary_amount_error').textContent = '';
+            }
+        }
+    }
 
-    // Handle checkbox changes
-    tukarVoucherCheckbox.addEventListener('change', function() {
-        toggleFields(this.checked);
+    // Event Listeners
+    tukarVoucherCheckbox.addEventListener('change', () => toggleVoucherFields(tukarVoucherCheckbox.checked));
+    
+    splitBillCheckbox.addEventListener('change', function() {
+        // Update labels based on split bill checkbox
+        paymentMethodLabel.textContent = this.checked ? 'Metode Pembayaran Utama' : 'Metode Pembayaran';
+        paymentAmountLabel.textContent = this.checked ? 'Jumlah Pembayaran Utama' : 'Jumlah Pembayaran';
+        
+        if (this.checked) {
+            // Show secondary payment section immediately when split bill is checked
+            secondaryPaymentSection.style.display = 'block';
+            // Reset values
+            primaryAmountInput.value = '';
+            remainingAmountInput.value = totalInput.value; // Set initial remaining amount to total
+            // Enable secondary payment method
+            secondaryPaymentMethod.disabled = false;
+            calculateRemaining();
+        } else {
+            secondaryPaymentSection.style.display = 'none';
+            remainingAmountInput.value = '';
+        }
+    });
+
+    totalInput.addEventListener('input', calculateRemaining);
+    primaryAmountInput.addEventListener('input', calculateRemaining);
+
+    // Handle payment method changes
+    primaryPaymentMethod.addEventListener('change', function() {
+        const selectedMethod = this.value;
+        secondaryPaymentMethod.value = '';
+        Array.from(secondaryPaymentMethod.options).forEach(option => {
+            option.disabled = option.value === selectedMethod;
+        });
+        calculateRemaining();
     });
 
     // Form validation
-    memberForm.addEventListener("submit", function(event) {
+    memberForm.addEventListener('submit', function(e) {
         let isValid = true;
 
-        // Validate based on mode
         if (!tukarVoucherCheckbox.checked) {
-            // Normal transaction mode
+            // Normal transaction validation
             if (!totalInput.value.trim()) {
-                totalInput.classList.add("is-invalid");
+                totalInput.classList.add('is-invalid');
                 isValid = false;
             }
-            if (!paymentMethodSelect.value) {
-                paymentMethodSelect.classList.add("is-invalid");
-                isValid = false;
+
+            if (splitBillCheckbox.checked) {
+                const total = parseFloat(totalInput.value) || 0;
+                const primaryAmount = parseFloat(primaryAmountInput.value) || 0;
+                
+                if (primaryAmount >= total || primaryAmount <= 0 || !secondaryPaymentMethod.value) {
+                    isValid = false;
+                    alert('Pastikan:\n- Jumlah pembayaran utama lebih kecil dari total\n- Metode pembayaran kedua sudah dipilih');
+                }
             }
         } else {
-            // Voucher mode
+            // Voucher mode validation
             if (!document.getElementById('kodevouchertukar').value) {
-                document.getElementById('kodevouchertukar').classList.add("is-invalid");
+                document.getElementById('kodevouchertukar').classList.add('is-invalid');
                 isValid = false;
             }
         }
 
-        // Always validate file upload
         if (!fotobillInput.value.trim()) {
-            fotobillInput.classList.add("is-invalid");
+            fotobillInput.classList.add('is-invalid');
             isValid = false;
         }
 
         if (!isValid) {
-            event.preventDefault();
+            e.preventDefault();
         }
     });
 
     // Remove invalid class on input
-    totalInput.addEventListener("input", function() {
-        this.classList.remove("is-invalid");
+    [totalInput, fotobillInput, document.getElementById('kodevouchertukar')].forEach(element => {
+        element?.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
     });
 
-    paymentMethodSelect.addEventListener("change", function() {
-        this.classList.remove("is-invalid");
-    });
-
-    document.getElementById('kodevouchertukar').addEventListener("change", function() {
-        this.classList.remove("is-invalid");
-    });
-
-    fotobillInput.addEventListener("input", function() {
-        this.classList.remove("is-invalid");
-    });
+    // Initialize
+    toggleVoucherFields(tukarVoucherCheckbox.checked);
 });
 </script>

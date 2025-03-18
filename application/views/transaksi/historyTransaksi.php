@@ -31,7 +31,7 @@
                     <th>Nama Member</th>
                     <th>Nama Kasir</th>
                     <th class="column-payment">Total</th>
-                    <th class="column-payment">Metode Pembayaran</th>
+                    <th class="column-payment">Detail Pembayaran</th>
                     <th class="column-voucher">Kode Voucher (Redeem)</th>
                     <th>Foto Bill</th>
                 </tr>
@@ -55,12 +55,27 @@
                         <td><?= $tran->cashier_name ?? '-' ?></td>
                         <td class="column-payment">
                             <?php if($tran->transaction_type == 'Teras Japan Payment'): ?>
-                                Rp <?= number_format($tran->amount, 0, ',', '.') ?>
+                                Rp <?= number_format($tran->total_amount, 0, ',', '.') ?>
                             <?php else: ?>
                                 -
                             <?php endif; ?>
                         </td>
-                        <td class="column-payment"><?= $tran->payment_method ?? '-' ?></td>
+                        <td class="column-payment">
+                            <?php 
+                            if($tran->transaction_type == 'Teras Japan Payment'): 
+                                $payments = explode(" & ", $tran->payment_details);
+                                foreach($payments as $payment) {
+                                    $method = explode("(", $payment);
+                                    $amount = str_replace(")", "", $method[1]);
+                                    echo '<span class="badge badge-info mr-1">';
+                                    echo $method[0] . ' (Rp ' . number_format($amount, 0, ',', '.') . ')';
+                                    echo '</span>';
+                                }
+                            else: 
+                                echo '-';
+                            endif; 
+                            ?>
+                        </td>
                         <td class="column-voucher">
                             <?php if($tran->transaction_type == 'Redeem Voucher'): ?>  <!-- Perbaiki penulisan 'Redeem' -->
                                 <span class="badge badge-info"><?= $tran->kode_voucher ?? 'No Code' ?></span>

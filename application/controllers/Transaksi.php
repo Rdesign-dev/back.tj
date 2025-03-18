@@ -102,11 +102,14 @@ class Transaksi extends CI_Controller {
         $this->form_validation->set_rules('nocabang', 'Nama Cabang', 'required');
         $this->form_validation->set_rules('nomor', 'Nomor Member', 'required');
         $this->form_validation->set_rules('nama', 'Nama Member', 'required');
-    
-        if ($this->input->post('tukarVoucher')) {
-            $this->form_validation->set_rules('kodevouchertukar', 'Kode Voucher', 'required');
+        $this->form_validation->set_rules('total', 'Total', 'required|numeric');
+        
+        // Additional validation for split bill
+        if ($this->input->post('splitBill')) {
+            $this->form_validation->set_rules('primary_payment_method', 'Metode Pembayaran Utama', 'required');
+            $this->form_validation->set_rules('primary_amount', 'Jumlah Pembayaran Utama', 'required|numeric|less_than['.$this->input->post('total').']');
+            $this->form_validation->set_rules('secondary_payment_method', 'Metode Pembayaran Kedua', 'required|differs[primary_payment_method]');
         } else {
-            $this->form_validation->set_rules('total', 'Total', 'required|numeric');
             $this->form_validation->set_rules('payment_method', 'Metode Pembayaran', 'required');
         }
     
@@ -133,60 +136,89 @@ class Transaksi extends CI_Controller {
             $upload_data = $this->upload->data();
             
             $data = [
-                'transaction_codes' => $this->generate_transaction_code($account_id),
+                'transaction_codes' => $this->generate_transaction_code($account_id, $this->input->post('tukarVoucher') ? 'Redeem Voucher' : 'Teras Japan Payment'),
                 'user_id' => $user_id,
                 'transaction_type' => $this->input->post('tukarVoucher') ? 'Redeem Voucher' : 'Teras Japan Payment',
                 'amount' => $this->input->post('total'),
                 'branch_id' => $this->input->post('nocabang'),
                 'account_cashier_id' => $account_id,
-                'payment_method' => $this->input->post('tukarVoucher') ? null : $this->input->post('payment_method'),
                 'transaction_evidence' => $upload_data['file_name'],
                 'created_at' => $this->input->post('tanggaltransaksi')
             ];
-    
-            if ($this->input->post('tukarVoucher')) {
-                // Ambil redeem_id berdasarkan kode_voucher
-                $kode_voucher = $this->input->post('kodevouchertukar');
-                $voucher = $this->db->get_where('redeem_voucher', ['kode_voucher' => $kode_voucher])->row();
-                
-                if (!$voucher) {
-                    $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Voucher tidak ditemukan</div>');
-                    redirect('transaksi/add');
-                    return;
-                }
-                
-                // Set voucher_id dengan redeem_id (bukan kode_voucher)
-                $data['voucher_id'] = $voucher->redeem_id;
-                
-                // Update voucher status
-                $this->updateVoucherStatus($kode_voucher);
-            }
-    
-            // Start database transaction
-            $this->db->trans_start();
 
-            // Insert transaction data
-            if ($this->db->insert('transactions', $data)) {
-                // If transaction uses voucher, update voucher status
+            try {
+                // Upload file handling remains the same
+                $upload_data = $this->upload->data();
+                
+                // Prepare transaction data - removed payment_method field
+                $transaction_data = [
+                    'transaction_codes' => $this->generate_transaction_code($account_id, $this->input->post('tukarVoucher') ? 'Redeem Voucher' : 'Teras Japan Payment'),
+                    'user_id' => $user_id,
+                    'transaction_type' => $this->input->post('tukarVoucher') ? 'Redeem Voucher' : 'Teras Japan Payment',
+                    'amount' => $this->input->post('total'),
+                    'branch_id' => $this->input->post('nocabang'),
+                    'account_cashier_id' => $account_id,
+                    'transaction_evidence' => $upload_data['file_name'],
+                    'created_at' => $this->input->post('tanggaltransaksi')
+                ];
+        
+                // Start transaction
+                $this->db->trans_start();
+        
+                // Insert main transaction
+                $this->db->insert('transactions', $transaction_data);
+                $transaction_id = $this->db->insert_id();
+        
+                // Handle payment records
+                if ($this->input->post('splitBill')) {
+                    // Insert primary payment
+                    $primary_payment = [
+                        'transaction_id' => $transaction_id,
+                        'payment_method' => $this->input->post('primary_payment_method'),
+                        'amount' => $this->input->post('primary_amount')
+                    ];
+                    $this->db->insert('transaction_payments', $primary_payment);
+        
+                    // Calculate and insert secondary payment
+                    $secondary_amount = $this->input->post('total') - $this->input->post('primary_amount');
+                    $secondary_payment = [
+                        'transaction_id' => $transaction_id,
+                        'payment_method' => $this->input->post('secondary_payment_method'),
+                        'amount' => $secondary_amount
+                    ];
+                    $this->db->insert('transaction_payments', $secondary_payment);
+                } else {
+                    // Single payment method
+                    $payment_data = [
+                        'transaction_id' => $transaction_id,
+                        'payment_method' => $this->input->post('payment_method'),
+                        'amount' => $this->input->post('total')
+                    ];
+                    $this->db->insert('transaction_payments', $payment_data);
+                }
+        
+                // Handle voucher if needed
                 if ($this->input->post('tukarVoucher')) {
                     $kode_voucher = $this->input->post('kodevouchertukar');
                     $this->updateVoucherStatus($kode_voucher);
                 }
-
-                // Increment transaction count for the selected branch
-                $branch_id = $this->input->post('nocabang');
-                $this->incrementBranchTransactionCount($branch_id);
-
-                // Complete the transaction
+        
+                // Increment transaction count
+                $this->incrementBranchTransactionCount($this->input->post('nocabang'));
+        
                 $this->db->trans_complete();
-
+        
                 if ($this->db->trans_status() === FALSE) {
-                    $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Transaksi gagal: Error database</div>');
-                    redirect('transaksi/add');
-                } else {
-                    $this->session->set_flashdata('pesan', '<div class="alert alert-success">Transaksi berhasil disimpan</div>');
-                    redirect('transaksi/historyTransaksi');
+                    throw new Exception('Gagal melakukan transaksi');
                 }
+        
+                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Transaksi berhasil disimpan</div>');
+                redirect('transaksi/historyTransaksi');
+        
+            } catch (Exception $e) {
+                $this->db->trans_rollback();
+                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>');
+                redirect('transaksi/add');
             }
         }
     }
@@ -210,28 +242,7 @@ class Transaksi extends CI_Controller {
 	    }
         public function historyTransaksi() {
     $data['title'] = "History Transaksi";
-    
-    $data['trans'] = $this->db->select('t.*, 
-                                    b.branch_name, 
-                                    u.name as member_name, 
-                                    a.Name as cashier_name, 
-                                    rv.kode_voucher')  // Select kode_voucher dari redeem_voucher
-            ->from('transactions t')
-            ->join('users u', 'u.id = t.user_id', 'left')
-            ->join('branch b', 'b.id = t.branch_id', 'left')
-            ->join('accounts a', 'a.id = t.account_cashier_id', 'left')
-            ->join('redeem_voucher rv', 'rv.redeem_id = t.voucher_id', 'left')  // Join berdasarkan redeem_id = voucher_id
-            ->where_in('t.transaction_type', ['Teras Japan Payment', 'Redeem Voucher'])
-            ->order_by('t.created_at', 'DESC')
-            ->get()
-            ->result();
-
-    // Debug untuk melihat hasil query
-    // echo "<pre>";
-    // print_r($this->db->last_query());
-    // print_r($data['trans']);
-    // die();
-            
+    $data['trans'] = $this->transaksi->getHistoryTransaksiDetails();
     $this->template->load('templates/dashboard', 'transaksi/historyTransaksi', $data);
 }
         public function historyTransaksiKasir()
@@ -437,8 +448,14 @@ public function getHistorysaldo() {
 
 private function generate_transaction_code($account_id, $transaction_type) {
     $date = date('dmy');
-    $payment_method = $this->input->post('metode');
-    $payment_code = ($payment_method == 'cash') ? 'CSH' : 'TF';
+    
+    // Get payment method - handle both regular and split bill scenarios
+    $payment_method = $this->input->post('splitBill') 
+        ? $this->input->post('primary_payment_method')
+        : $this->input->post('payment_method');
+        
+    $payment_code = ($payment_method == 'cash') ? 'CSH' : 
+                   ($payment_method == 'Balance' ? 'BAL' : 'TF');
     
     // Add transaction type code
     $type_code = '';
@@ -452,6 +469,8 @@ private function generate_transaction_code($account_id, $transaction_type) {
         case 'Redeem Voucher':
             $type_code = 'RV';
             break;
+        default:
+            $type_code = 'TJP'; // Default to Teras Japan Payment
     }
     
     $random = mt_rand(1000, 9999);
