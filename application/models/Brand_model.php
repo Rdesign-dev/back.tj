@@ -43,8 +43,6 @@ class Brand_model extends CI_Model {
             brand_promo.promo_desc,
             brand_promo.promo_image,
             brand_promo.status,
-            brand_promo.qty,
-            brand_promo.points_required,
             brand_promo.available_from,
             brand_promo.valid_until
         ')

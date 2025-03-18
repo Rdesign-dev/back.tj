@@ -376,8 +376,6 @@ class Brand extends CI_Controller {
     {
         $this->form_validation->set_rules('promo_name', 'Nama Promo', 'required|trim');
         $this->form_validation->set_rules('promo_desc', 'Deskripsi', 'required|trim');
-        $this->form_validation->set_rules('points_required', 'Points Required', 'required|numeric|greater_than_equal_to[0]');
-        $this->form_validation->set_rules('qty', 'Quantity', 'numeric|greater_than_equal_to[0]');
         $this->form_validation->set_rules('available_from', 'Tersedia Sejak', 'required');
         $this->form_validation->set_rules('valid_until', 'Masa Berlaku', 'required');
         

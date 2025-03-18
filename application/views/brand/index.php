@@ -94,7 +94,6 @@
                         <th>Nama Promo</th>
                         <th>Deskripsi</th>
                         <th>Status</th>
-                        <th>Points</th>
                         <th>Tersedia Sejak</th>
                         <th>Batas Waktu</th>
                         <th>Gambar</th>
@@ -242,7 +241,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             ${promo.status}
                         </span>
                     </td>
-                    <td>${promo.points_required}</td>
                     <td>${promo.available_from ? new Date(promo.available_from).toLocaleDateString('id-ID', {
                         day: 'numeric',
                         month: 'long',
@@ -274,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </td>
                 </tr>`;
         });
-        promoTableBody.innerHTML = rows || '<tr><td colspan="8" class="text-center">Tidak ada promo untuk brand ini</td></tr>';
+        promoTableBody.innerHTML = rows || '<tr><td colspan="7" class="text-center">Tidak ada promo untuk brand ini</td></tr>';
     }
 
     brandImages.forEach(img => {
