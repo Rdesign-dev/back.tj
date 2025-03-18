@@ -143,4 +143,25 @@ class Brand_model extends CI_Model {
         
         return $this->db->trans_status() && $result;
     }
+
+    public function get_all_vouchers() {
+        return $this->db->get('rewards')->result_array();
+    }
+
+    public function get_voucher_by_id($id) {
+        return $this->db->get_where('rewards', ['id' => $id])->row_array();
+    }
+
+    public function insert_voucher($data) {
+        return $this->db->insert('rewards', $data);
+    }
+
+    public function update_voucher($id, $data) {
+        $this->db->where('id', $id);
+        return $this->db->update('rewards', $data);
+    }
+
+    public function delete_voucher($id) {
+        return $this->db->delete('rewards', ['id' => $id]);
+    }
 }
