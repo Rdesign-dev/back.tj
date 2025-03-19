@@ -131,10 +131,20 @@ class Member extends CI_Controller {
             $this->db->insert('users', $member_data);
             $user_id = $this->db->insert_id();
 
+            // Debug user insertion
+            echo "<pre>User Data:";
+            var_dump($member_data);
+            echo "User ID: " . $user_id . "</pre>";
+
             // Ambil semua reward untuk member baru
             $new_member_rewards = $this->db->where('category', 'newmember')
                                          ->get('rewards')
                                          ->result_array();
+
+            // Debug rewards data
+            echo "<pre>Rewards Data:";
+            var_dump($new_member_rewards);
+            echo "</pre>";
 
             // Generate dan assign voucher untuk setiap reward
             foreach ($new_member_rewards as $reward) {
@@ -152,12 +162,12 @@ class Member extends CI_Controller {
                 // Hitung tanggal expired berdasarkan total_days
                 $expires_at = date('Y-m-d H:i:s', strtotime("+{$reward['total_days']} days"));
 
-                // Insert ke redeem_voucher
+                // Prepare voucher data
                 $voucher_data = array(
                     'user_id' => $user_id,
                     'reward_id' => $reward['id'],
                     'brand_id' => $reward['brand_id'],
-                    'points_used' => 0, // Karena gratis untuk member baru
+                    'points_used' => 0,
                     'redeem_date' => date('Y-m-d H:i:s'),
                     'status' => 'Available',
                     'qr_code_url' => $qr_url,
@@ -165,7 +175,18 @@ class Member extends CI_Controller {
                     'expires_at' => $expires_at
                 );
 
-                $this->db->insert('redeem_voucher', $voucher_data);
+                // Debug voucher data before insert
+                echo "<pre>Voucher Data for Reward {$reward['id']}:";
+                var_dump($voucher_data);
+                echo "</pre>";
+
+                // Try to insert and show result
+                $insert_result = $this->db->insert('redeem_voucher', $voucher_data);
+                echo "Insert Result for Reward {$reward['id']}: ";
+                var_dump($insert_result);
+                echo "<br>Last Query: " . $this->db->last_query();
+                echo "<br>DB Error: " . $this->db->error()['message'];
+                echo "<hr>";
             }
 
             $this->db->trans_complete();
@@ -181,7 +202,8 @@ class Member extends CI_Controller {
             $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>');
         }
         
-        redirect('member/indexKasir');
+        // Comment out redirect temporarily to see debug output
+        // redirect('member/indexKasir');
     }
 }
     public function tambah_saveCabang()
