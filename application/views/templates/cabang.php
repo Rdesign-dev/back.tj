@@ -50,10 +50,12 @@
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex text-white align-items-center bg-primary justify-content-center" style="background-image: url('<?= base_url() ?>assets/img/merah.png'); background-size: cover; background-position: center;" href="">
                 <div class="sidebar-brand-icon">
-                <img src="<?= base_url() ?>assets/img/terasjapan.png" alt="Admin Logo" style="width: 24px; height: 24px; object-fit: cover;" class="mr-2">
-            <div class="sidebar-brand-text mx-2">Admin resto</div>
-            </div></a>
-            
+                    <img src="<?= base_url() ?>assets/img/terasjapan.png" alt="Admin Logo" style="width: 24px; height: 24px; object-fit: cover;" class="mr-2">
+                    <div class="sidebar-brand-text mx-2">
+                        Admin Cabang <?= userdata('namacabang'); ?>
+                    </div>
+                </div>
+            </a>
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
@@ -83,7 +85,7 @@
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('transaksicabang/tambahTransaksiCabang'); ?>">
                 <i class="fas fa-history"></i>
-                    <span>Transaksi</span>
+                    <span>Tambah Transaksi</span>
                 </a>
             </li>
             <li class="nav-item">

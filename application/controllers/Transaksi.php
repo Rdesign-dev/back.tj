@@ -252,7 +252,7 @@ class Transaksi extends CI_Controller {
         public function historyTransaksi() {
     $data['title'] = "History Transaksi";
     
-    // Modify the query to include voucher information
+    // Modified query to filter and order by transaction_id
     $data['trans'] = $this->db->select('t.*, b.branch_name, u.name as member_name, 
                     a.Name as cashier_name, rv.kode_voucher,
                     GROUP_CONCAT(CONCAT(tp.payment_method, " (", tp.amount, ")") SEPARATOR " & ") as payment_details,
@@ -263,8 +263,9 @@ class Transaksi extends CI_Controller {
              ->join('accounts a', 'a.id = t.account_cashier_id', 'left')
              ->join('redeem_voucher rv', 'rv.redeem_id = t.voucher_id', 'left')
              ->join('transaction_payments tp', 'tp.transaction_id = t.transaction_id', 'left')
+             ->where('t.transaction_type', 'Teras Japan Payment')
              ->group_by('t.transaction_id')
-             ->order_by('t.created_at', 'DESC')
+             ->order_by('t.transaction_id', 'DESC')
              ->get()
              ->result();
     

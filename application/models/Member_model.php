@@ -43,8 +43,11 @@ class Member_model extends CI_Model{
         $this->db->update('users');
     }
 
-    public function get_by_nomor($nomor) {
-        return $this->db->get_where('users', ['phone_number' => $nomor])->row();
+    public function get_by_nomor($nomor)
+    {
+        return $this->db->where('phone_number', $nomor)
+                        ->get('users')
+                        ->row();
     }
 
     public function get_by_email($email) {
@@ -55,10 +58,14 @@ class Member_model extends CI_Model{
         return $this->db->get_where('users', ['phone_number' => $nohp])->result_array();
     }
 
-    public function cari_detail_id($nomor){
-        return $this->db->where('phone_number', $nomor)
-                       ->get('users')
-                       ->row();
+    public function cari_detail_id($phone_number) 
+    {
+        return $this->db->select('id, name, phone_number, email, address, gender, 
+                                 birthdate, city, profile_pic, balance, poin')
+                        ->from('users')
+                        ->where('phone_number', $phone_number)
+                        ->get()
+                        ->row();
     }
     
     public function cari_transaksi_id($id){

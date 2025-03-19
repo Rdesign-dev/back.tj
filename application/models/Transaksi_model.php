@@ -84,30 +84,26 @@ class Transaksi_model extends CI_Model {
         return $this->db->get()->result();
     }
 
-    public function getTransaksiByIdCabangWithDetails($branch_id) 
-    {
-        $this->db->select('
-            t.transaction_codes,
-            t.created_at,
-            t.transaction_type,
-            t.amount,
-            t.payment_method,
-            t.transaction_evidence,
-            u.name as member_name,
-            b.branch_name,
-            a.Name as cashier_name,
-            rv.kode_voucher
-        ')
-        ->from('transactions t')
-        ->join('users u', 'u.id = t.user_id', 'left')
-        ->join('branch b', 'b.id = t.branch_id', 'left')
-        ->join('accounts a', 'a.id = t.account_cashier_id', 'left')
-        ->join('redeem_voucher rv', 'rv.redeem_id = t.voucher_id', 'left')
-        ->where('t.branch_id', $branch_id)
-        ->where_in('t.transaction_type', ['Teras Japan Payment', 'Redeem Voucher'])
-        ->order_by('t.created_at', 'DESC');
-
-        return $this->db->get()->result();
+    public function getTransaksiByIdCabangWithDetails($branch_id) {
+        return $this->db->select('t.transaction_codes, t.created_at, t.transaction_type, 
+                            t.amount, t.transaction_evidence, 
+                            GROUP_CONCAT(CONCAT(tp.payment_method, " (", tp.amount, ")") SEPARATOR " & ") as payment_details,
+                            u.name as member_name, 
+                            b.branch_name, 
+                            a.Name as cashier_name,
+                            rv.kode_voucher')
+                    ->from('transactions t')
+                    ->join('users u', 'u.id = t.user_id', 'left')
+                    ->join('branch b', 'b.id = t.branch_id', 'left')
+                    ->join('accounts a', 'a.id = t.account_cashier_id', 'left')
+                    ->join('redeem_voucher rv', 'rv.redeem_id = t.voucher_id', 'left')
+                    ->join('transaction_payments tp', 'tp.transaction_id = t.transaction_id', 'left')
+                    ->where('t.branch_id', $branch_id)
+                    ->where_in('t.transaction_type', ['Teras Japan Payment', 'Redeem Voucher'])
+                    ->group_by('t.transaction_id')
+                    ->order_by('t.created_at', 'DESC')
+                    ->get()
+                    ->result();
     }
 
     // Add new method to insert transaction with split payments
@@ -183,5 +179,26 @@ class Transaksi_model extends CI_Model {
         $this->db->set('balance', "balance {$operator} {$amount}", false);
         $this->db->where('id', $user_id);
         return $this->db->update('users');
+    }
+
+    public function getTransaksiDetails($phone_number) 
+    {
+        return $this->db->select('t.transaction_codes as kodetransaksi, 
+                                t.created_at as tanggaltransaksi,
+                                t.amount as total,
+                                b.branch_name as namacabang,
+                                a.Name as nama,
+                                GROUP_CONCAT(CONCAT(tp.payment_method, " (Rp ", FORMAT(tp.amount, 0), ")") SEPARATOR " & ") as metodebayar')
+                        ->from('transactions t')
+                        ->join('users u', 'u.id = t.user_id')
+                        ->join('branch b', 'b.id = t.branch_id')
+                        ->join('accounts a', 'a.id = t.account_cashier_id')
+                        ->join('transaction_payments tp', 'tp.transaction_id = t.transaction_id', 'left')
+                        ->where('u.phone_number', $phone_number)
+                        ->where('t.transaction_type', 'Teras Japan Payment')
+                        ->group_by('t.transaction_id')
+                        ->order_by('t.created_at', 'DESC')
+                        ->get()
+                        ->result();
     }
 }

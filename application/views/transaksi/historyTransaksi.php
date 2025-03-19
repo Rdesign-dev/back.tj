@@ -26,59 +26,42 @@
                     <th>No</th>
                     <th>Kode Transaksi</th>
                     <th>Tanggal Transaksi</th>
-                    <th>Tipe Transaksi</th>
                     <th>Nama Cabang</th>
                     <th>Nama Member</th>
                     <th>Nama Kasir</th>
-                    <th class="column-payment">Total</th>
-                    <th class="column-payment">Detail Pembayaran</th>
-                    <th class="column-voucher">Kode Voucher (Redeem)</th>
+                    <th>Total</th>
+                    <th>Detail Pembayaran</th>
+                    <th>Kode Voucher</th>
                     <th>Foto Bill</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
                 $no = 1;
-                foreach ($trans as $tr => $tran) : ?>
+                foreach ($trans as $tran) : ?>
                     <tr>
                         <td><?= $no++; ?></td>
                         <td><?= $tran->transaction_codes ?></td>
                         <td><?= date('d/m/Y H:i', strtotime($tran->created_at)) ?></td>
-                        <td>
-                            <?php 
-                            $badge_class = $tran->transaction_type == 'Teras Japan Payment' ? 'badge-primary' : 'badge-success';
-                            ?>
-                            <span class="badge <?= $badge_class ?>"><?= $tran->transaction_type ?></span>
-                        </td>
                         <td><?= $tran->branch_name ?? '-' ?></td>
                         <td><?= $tran->member_name ?></td>
                         <td><?= $tran->cashier_name ?? '-' ?></td>
-                        <td class="column-payment">
-                            <?php if($tran->transaction_type == 'Teras Japan Payment'): ?>
-                                Rp <?= number_format($tran->total_amount, 0, ',', '.') ?>
-                            <?php else: ?>
-                                -
-                            <?php endif; ?>
-                        </td>
-                        <td class="column-payment">
+                        <td>Rp <?= number_format($tran->total_amount, 0, ',', '.') ?></td>
+                        <td>
                             <?php 
-                            if($tran->transaction_type == 'Teras Japan Payment'): 
-                                $payments = explode(" & ", $tran->payment_details);
-                                foreach($payments as $payment) {
-                                    $method = explode("(", $payment);
-                                    $amount = str_replace(")", "", $method[1]);
-                                    echo '<span class="badge badge-info mr-1">';
-                                    echo $method[0] . ' (Rp ' . number_format($amount, 0, ',', '.') . ')';
-                                    echo '</span>';
-                                }
-                            else: 
-                                echo '-';
-                            endif; 
+                            $payments = explode(" & ", $tran->payment_details);
+                            foreach($payments as $payment) {
+                                $method = explode("(", $payment);
+                                $amount = str_replace(")", "", $method[1]);
+                                echo '<span class="badge badge-info mr-1">';
+                                echo $method[0] . ' (Rp ' . number_format($amount, 0, ',', '.') . ')';
+                                echo '</span>';
+                            }
                             ?>
                         </td>
-                        <td class="column-voucher">
+                        <td>
                             <?php 
-                            if ($tran->voucher_id): // Cek apakah transaksi menggunakan voucher
+                            if ($tran->voucher_id): 
                                 echo '<span class="badge badge-info">' . ($tran->kode_voucher ?? 'No Code') . '</span>';
                             else:
                                 echo '-';

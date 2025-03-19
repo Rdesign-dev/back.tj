@@ -16,7 +16,7 @@
                     <th width="30">No.</th>
                     <th>Nomor Handphone</th>
                     <th>Nama Member</th>
-                    <th>Email</th>
+                    <th>Waktu</th>
                 </tr>
             </thead>
             <tbody>

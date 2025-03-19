@@ -105,40 +105,85 @@ class Member extends CI_Controller {
         }
     }
     public function tambah_save_kasir()
-    {
-        $this->form_validation->set_rules("namamember","Nama Member","required|trim");
-        $this->form_validation->set_rules("nomor","Nomor","required|trim|callback_check_unique_number|min_length[11]");
-        if($this->form_validation->run() == false){
-            $this->_has_login();
-            $data['title'] = "Tambah Member";
-            $this->template->load('templates/kasir', 'member/addKasir', $data);
-        }else{
-            $nomor = $this->input->post("nomor");
-            $namamember = $this->input->post("namamember");
-            $poin = 0;
-            $data = array(
-                'nomor' => $nomor,
-                'namamember' => $namamember,
-                'poin' => $poin,
-                'foto' => 'hero.png',
-                'tanggaldaftar' => date('Y-m-d H:i:s')
+{
+    $this->_has_login();
+    
+    $this->form_validation->set_rules("namamember", "Nama Member", "required|trim");
+    $this->form_validation->set_rules("nomor", "Nomor", "required|trim|callback_check_unique_number|min_length[11]");
+    
+    if ($this->form_validation->run() == false) {
+        $data['title'] = "Tambah Member";
+        $this->template->load('templates/kasir', 'member/addKasir', $data);
+    } else {
+        try {
+            $this->db->trans_start();
+
+            // Insert member baru
+            $member_data = array(
+                'name' => $this->input->post("namamember", true),
+                'phone_number' => $this->input->post("nomor", true),
+                'poin' => 0,
+                'balance' => 0,
+                'profile_pic' => 'profile.jpg',
+                'registration_time' => date('Y-m-d H:i:s')
             );
-            $this->db->insert('member',$data);
-            $voucher_details = $this->voucher->find_all();
-            foreach ($voucher_details as $voucher) {
-            if ($voucher['isNew'] == 'memberbaru') {
-                $kodevoucher = $voucher['kodevoucher'];
-                $poin = $voucher['poin'];
-                $dateRedeem = date('Y-m-d H:i:s');
-                $expired_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
-                $vouchergenerate = date('YmdHis') . $kodevoucher;
-                $this->vouchermember->insertVoucherNewMember($kodevoucher, $nomor, $poin, $dateRedeem, $expired_date, $vouchergenerate);
+
+            $this->db->insert('users', $member_data);
+            $user_id = $this->db->insert_id();
+
+            // Ambil semua reward untuk member baru
+            $new_member_rewards = $this->db->where('category', 'newmember')
+                                         ->get('rewards')
+                                         ->result_array();
+
+            // Generate dan assign voucher untuk setiap reward
+            foreach ($new_member_rewards as $reward) {
+                // Generate kode voucher
+                $name_part = strtoupper(substr(str_replace(' ', '', $member_data['name']), 0, 5));
+                $random_num = str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT);
+                $voucher_code = "NEW-{$name_part}-{$reward['id']}-{$random_num}";
+
+                // Generate QR Code URL
+                $date_code = date('Ymd');
+                $user_code = substr($member_data['phone_number'], -4);
+                $qr_image_name = 'vcreward-' . $user_code . '-' . $date_code . '-' . uniqid() . '.png';
+                $qr_url = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($voucher_code);
+
+                // Hitung tanggal expired berdasarkan total_days
+                $expires_at = date('Y-m-d H:i:s', strtotime("+{$reward['total_days']} days"));
+
+                // Insert ke redeem_voucher
+                $voucher_data = array(
+                    'user_id' => $user_id,
+                    'reward_id' => $reward['id'],
+                    'brand_id' => $reward['brand_id'],
+                    'points_used' => 0, // Karena gratis untuk member baru
+                    'redeem_date' => date('Y-m-d H:i:s'),
+                    'status' => 'Available',
+                    'qr_code_url' => $qr_url,
+                    'kode_voucher' => $voucher_code,
+                    'expires_at' => $expires_at
+                );
+
+                $this->db->insert('redeem_voucher', $voucher_data);
             }
+
+            $this->db->trans_complete();
+
+            if ($this->db->trans_status() === FALSE) {
+                throw new Exception('Gagal menambahkan member baru');
+            }
+
+            $this->session->set_flashdata('pesan', '<div class="alert alert-success">Member berhasil ditambahkan beserta voucher member baru</div>');
+            
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>');
         }
-            $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>');
-            redirect(base_url('member/indexKasir'));
-        }
+        
+        redirect('member/indexKasir');
     }
+}
     public function tambah_saveCabang()
 {
     $this->form_validation->set_rules("namamember", "Nama Member", "required|trim");
@@ -405,77 +450,86 @@ class Member extends CI_Controller {
                 
             }
         }
-        public function edit_memberKasir($nomor){
-            $nomor = encode_php_tags($nomor);
-            $this->form_validation->set_rules("namamember","Nama Member","required");
-            $this->form_validation->set_rules("nomor","Nomor","required");
-            $this->form_validation->set_rules("alamat","Alamat","required");
-            $this->form_validation->set_rules("email","Email","required");
-            $this->form_validation->set_rules("jeniskelamin","Jenis Kelamin","required");
-            $this->form_validation->set_rules("tanggallahir","Tanggal Lahir","required");
-            $this->form_validation->set_rules("tempatlahir","Tempat Lahir","required");
-            if($this->form_validation->run() == FALSE){
-                $data['title'] = "Edit User";
-                $data['member'] = $this->admin->get('member', ['nomor' => $nomor]);
-                $this->template->load('templates/kasir', 'member/editKasir', $data);
-            }else{
-                $config['upload_path'] = '../fotouser/';
-                $config['allowed_types'] = 'gif|jpg|png|PNG|jpeg|JPEG';
-                $config['max_size'] = 2048000;
-                $config['max_width'] = 10000;
-                $config['max_height'] = 10000;
-                $this->load->library('upload', $config);
-                if(!$this->upload->do_upload('foto')){
-                    $namamember = $this->input->post("namamember");
-                    $nomor = $this->input->post("nomor");
-                    $alamat = $this->input->post("alamat");
-                    $email = $this->input->post("email");
-                    $jeniskelamin = $this->input->post("jeniskelamin");
-                    $tanggallahir = $this->input->post("tanggallahir");
-                    $tempatlahir = $this->input->post("tempatlahir");
-                    $data = array(
-                        'namamember' => $namamember,
-                        'nomor' => $nomor,
-                        'alamat' => $alamat,
-                        'email' => $email,
-                        'jeniskelamin' => $jeniskelamin,
-                        'tanggallahir' => $tanggallahir,
-                        'tempatlahir' => $tempatlahir,
-                    );
-                    var_dump($data);
-                    $this->db->where('nomor',$nomor);
-                    $this->db->update('member',$data);
-                    $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Diupdate</div>');
-                    redirect('member/indexKasir');
-                }else{
-                    $foto = $this->upload->data();
-                    $foto = $foto['file_name'];
-                    $namamember = $this->input->post("namamember");
-                    $nomor = $this->input->post("nomor");
-                    $alamat = $this->input->post("alamat");
-                    $email = $this->input->post("email");
-                    $jeniskelamin = $this->input->post("jeniskelamin");
-                    $tanggallahir = $this->input->post("tanggallahir");
-                    $tempatlahir = $this->input->post("tempatlahir");
-                    $data = array(
-                        'namamember' => $namamember,
-                        'nomor' => $nomor,
-                        'alamat' => $alamat,
-                        'email' => $email,
-                        'jeniskelamin' => $jeniskelamin,
-                        'tanggallahir' => $tanggallahir,
-                        'tempatlahir' => $tempatlahir,
-                        'foto' => $foto
-                    );
-                    var_dump($data);
-                    $this->db->where('nomor',$nomor);
-                    $this->db->update('member',$data);
-                    $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Diupdate</div>');
-                    redirect('member/indexKasir');
+        public function edit_memberKasir($phone_number = null)
+{
+    if (!$phone_number) {
+        redirect('member/indexKasir');
+    }
+
+    // Get member data from users table
+    $data['title'] = "Edit Member";
+    $data['member'] = $this->db->select('id, name as namamember, phone_number as nomor, 
+                                       address as alamat, email, gender as jeniskelamin, 
+                                       birthdate as tanggallahir, city as tempatlahir, 
+                                       profile_pic as foto')
+                              ->where('phone_number', $phone_number)
+                              ->get('users')
+                              ->row_array();
+
+    if (!$data['member']) {
+        set_pesan('Data tidak ditemukan.', false);
+        redirect('member/indexKasir');
+    }
+
+    // Set validation rules
+    $this->form_validation->set_rules('namamember', 'Nama Member', 'required|trim');
+    $this->form_validation->set_rules('nomor', 'Nomor HP', 'required|trim');
+    $this->form_validation->set_rules('alamat', 'Alamat', 'required|trim');
+    $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email');
+    $this->form_validation->set_rules('jeniskelamin', 'Jenis Kelamin', 'required|trim');
+    $this->form_validation->set_rules('tanggallahir', 'Tanggal Lahir', 'required');
+    $this->form_validation->set_rules('tempatlahir', 'Kota', 'required|trim');
+
+    if ($this->form_validation->run() == false) {
+        $this->template->load('templates/kasir', 'member/editKasir', $data);
+    } else {
+        $input = $this->input->post(null, true);
+        
+        // Prepare update data
+        $data_update = [
+            'name' => $input['namamember'],
+            'phone_number' => $input['nomor'],
+            'address' => $input['alamat'],
+            'email' => $input['email'],
+            'gender' => ($input['jeniskelamin'] == 'L' ? 'male' : 'female'),
+            'birthdate' => $input['tanggallahir'],
+            'city' => $input['tempatlahir']
+        ];
+
+        // Handle optional photo upload
+        if (!empty($_FILES['foto']['name'])) {
+            $config['upload_path']   = '../ImageTerasJapan/ProfPic/';
+            $config['allowed_types'] = 'gif|jpg|jpeg|png';
+            $config['max_size']      = 2048;
+            $config['file_name']     = 'prof_' . time();
+
+            $this->load->library('upload', $config);
+
+            if ($this->upload->do_upload('foto')) {
+                // Delete old photo if not default
+                if ($data['member']['foto'] != 'profile.jpg' && 
+                    file_exists($config['upload_path'] . $data['member']['foto'])) {
+                    unlink($config['upload_path'] . $data['member']['foto']);
                 }
-                
+                $data_update['profile_pic'] = $this->upload->data('file_name');
+            } else {
+                set_pesan('Gagal mengupload foto: ' . $this->upload->display_errors(), false);
+                redirect('member/edit_memberKasir/' . $phone_number);
             }
         }
+
+        // Update user data
+        $updated = $this->db->where('phone_number', $phone_number)
+                           ->update('users', $data_update);
+
+        if ($updated) {
+            set_pesan('Data berhasil diubah.');
+        } else {
+            set_pesan('Gagal mengubah data.', false);
+        }
+        redirect('member/indexKasir');
+    }
+}
         public function edit_memberCabang($nomor){
             $nomor = encode_php_tags($nomor);
             $this->form_validation->set_rules("namamember","Nama Member","required");

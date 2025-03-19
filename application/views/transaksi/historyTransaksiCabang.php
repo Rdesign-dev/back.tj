@@ -19,7 +19,6 @@
                             <th>Kode Transaksi</th>
                             <th>Tanggal</th>
                             <th>Nama Member</th>
-                            <th>Jenis Transaksi</th>
                             <th>Jumlah</th>
                             <th>Metode Pembayaran</th>
                             <th>Bukti</th>
@@ -38,9 +37,19 @@
                                 <td><?= $t->transaction_codes; ?></td>
                                 <td><?= date('d-m-Y H:i', strtotime($t->created_at)); ?></td>
                                 <td><?= $t->member_name; ?></td>
-                                <td><?= $t->transaction_type; ?></td>
                                 <td>Rp <?= number_format($t->amount, 0, ',', '.'); ?></td>
-                                <td><?= $t->payment_method; ?></td>
+                                <td>
+                                    <?php 
+                                    if (!empty($t->payment_details)) {
+                                        $payments = explode(" & ", $t->payment_details);
+                                        foreach($payments as $payment) {
+                                            echo '<span class="badge badge-info mr-1">' . $payment . '</span>';
+                                        }
+                                    } else {
+                                        echo '-';
+                                    }
+                                    ?>
+                                </td>
                                 <td>
                                     <img width="50" src="<?= base_url('../ImageTerasJapan/transaction_proof/') . $t->transaction_evidence ?>" 
                                          alt="Bukti" class="img-thumbnail">
@@ -51,7 +60,7 @@
                             <?php endforeach;
                         else : ?>
                             <tr>
-                                <td colspan="10" class="text-center">Tidak ada transaksi</td>
+                                <td colspan="9" class="text-center">Tidak ada transaksi</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

@@ -61,138 +61,154 @@ class TransaksiKasir extends CI_Controller {
 
     public function convert_and_updateKasir() 
     {
-        // echo "<pre>";
-        // echo "POST Data:\n";
-        // var_dump($_POST);
-        // echo "\nFILES Data:\n";
-        // var_dump($_FILES);
-        // echo "</pre>";
-        // die();
-
         $login_session = $this->session->userdata('login_session');
         $member_data = $this->session->userdata('member_data');
 
-        // Form validation
-        if ($this->input->post('tukarVoucher')) {
-            $this->form_validation->set_rules('kodevouchertukar', 'Voucher', 'required');
-        } else {
-            $this->form_validation->set_rules('total', 'Total', 'required|numeric');
-            $this->form_validation->set_rules('payment_method', 'Metode Pembayaran', 'required');
-        }
+        try {
+            // Start transaction
+            $this->db->trans_start();
 
-        if ($this->form_validation->run() == FALSE) {
-            $data['title'] = "Transaksi Member";
-            $data['member'] = $member_data;
-            $this->template->load('templates/kasir', 'transaksi/transaksiMemberKasir', $data);
-        } else {
-            // Upload configuration and process
-            $config['upload_path'] = '../ImageTerasJapan/transaction_proof/';
+            // Handle file upload
+            $config['upload_path'] = '../ImageTerasJapan/transaction_proof/Payment';
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
             $config['max_size'] = 2048;
             $config['file_name'] = 'TRX_' . time();
 
             $this->load->library('upload', $config);
-
             if (!$this->upload->do_upload('fotobill')) {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">'.$this->upload->display_errors().'</div>');
-                redirect('transaksikasir/tambahTransaksiKasir');
-                return;
+                throw new Exception($this->upload->display_errors());
             }
 
             $upload_data = $this->upload->data();
-            $is_voucher = $this->input->post('tukarVoucher') === 'on'; // Will be true if checkbox is checked
-            $amount = $this->input->post('total');
-            $payment_method = $this->input->post('payment_method');
-
-            // Check balance if using BM payment method
-            if (!$is_voucher && $payment_method === 'BM') {
-                if ($member_data->balance < $amount) {
-                    $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Saldo member tidak mencukupi</div>');
-                    redirect('transaksikasir/tambahTransaksiKasir');
-                    return;
+            $is_voucher = $this->input->post('tukarVoucher') == 'on';
+            $total = $this->input->post('total');
+            $split_bill = $this->input->post('splitBill') == 'on';
+            
+            // Validate voucher if used
+            if ($is_voucher) {
+                $voucher_id = $this->input->post('kodevouchertukar');
+                $voucher = $this->db->where('redeem_id', $voucher_id)
+                                   ->where('user_id', $member_data->id)
+                                   ->where('status', 'Available')
+                                   ->get('redeem_voucher')
+                                   ->row();
+                
+                if (!$voucher) {
+                    throw new Exception('Voucher tidak valid atau sudah digunakan');
                 }
             }
 
             // Generate transaction code
             $sequence = $this->transaksi->getNextSequence();
             $transaction_code = "TX" . $login_session['branch_id'] . 
-                            $login_session['id'] . 
-                            ($is_voucher ? "RV" : "TJP") . 
-                            ($payment_method ?? "NULL") . 
-                            date('dmy') . 
-                            sprintf('%04d', $sequence);
+                              $login_session['id'] . 
+                              "TJP" . 
+                              date('dmy') . 
+                              sprintf('%04d', $sequence);
 
-            // Konversi kode payment method ke nilai enum yang sesuai
-            $payment_method_mapping = [
-                'CSH' => 'Cash',
-                'TFB' => 'Transfer Bank',
-                'BM' => 'Balance Member'
-            ];
-
-            // Prepare transaction data with fixed logic
-            $data = [
+            // Prepare transaction data
+            $transaction_data = [
                 'transaction_codes' => $transaction_code,
                 'user_id' => $member_data->id,
-                'transaction_type' => $is_voucher ? 'Redeem Voucher' : 'Teras Japan Payment', // Corrected typo
-                'amount' => $is_voucher ? null : $amount,
+                'transaction_type' => 'Teras Japan Payment',
+                'amount' => $total,
                 'branch_id' => $login_session['branch_id'],
                 'account_cashier_id' => $login_session['id'],
-                'payment_method' => $is_voucher ? null : $payment_method_mapping[$payment_method],
                 'transaction_evidence' => $upload_data['file_name'],
-                'voucher_id' => $is_voucher ? $this->input->post('kodevouchertukar') : null,
-                'created_at' => $this->input->post('tanggaltransaksi')
+                'voucher_id' => $is_voucher ? $voucher_id : null,
+                'created_at' => date('Y-m-d H:i:s')
             ];
 
-            // Add debug to verify
-            // echo "<pre>";
-            // echo "Data to be inserted:\n";
-            // var_dump($data);
-            // echo "</pre>";
-            // die();
+            // Insert transaction
+            $this->db->insert('transactions', $transaction_data);
+            $transaction_id = $this->db->insert_id();
 
-            // Begin transaction - Change from dbrc to db
-            $this->db->trans_start();
+            // Handle payments
+            if ($split_bill) {
+                // Primary payment
+                $primary_amount = $this->input->post('primary_amount');
+                $primary_method = $this->input->post('primary_payment_method');
+                
+                $this->db->insert('transaction_payments', [
+                    'transaction_id' => $transaction_id,
+                    'payment_method' => $primary_method,
+                    'amount' => $primary_amount
+                ]);
 
-            try {
-                // Insert transaction
-                $this->db->insert('transactions', $data);
+                // Secondary payment
+                $secondary_amount = $total - $primary_amount;
+                $secondary_method = $this->input->post('secondary_payment_method');
+                
+                $this->db->insert('transaction_payments', [
+                    'transaction_id' => $transaction_id,
+                    'payment_method' => $secondary_method,
+                    'amount' => $secondary_amount
+                ]);
 
-                // Award points for Teras Japan Payment
-                if (!$is_voucher && $data['transaction_type'] === 'Teras Japan Payment') {
-                    $points_earned = floor($amount / 10000);
-                    $new_points = $member_data->poin + $points_earned;
+                // Update balance if using Balance payment method
+                if ($primary_method == 'Balance' || $secondary_method == 'Balance') {
+                    $balance_amount = ($primary_method == 'Balance' ? $primary_amount : 0) +
+                                    ($secondary_method == 'Balance' ? $secondary_amount : 0);
+                    
+                    if ($member_data->balance < $balance_amount) {
+                        throw new Exception('Saldo tidak mencukupi');
+                    }
 
                     $this->db->where('id', $member_data->id)
-                             ->update('users', ['poin' => $new_points]);
+                             ->update('users', [
+                                 'balance' => $member_data->balance - $balance_amount
+                             ]);
                 }
+            } else {
+                // Single payment
+                $payment_method = $this->input->post('primary_payment_method');
+                
+                $this->db->insert('transaction_payments', [
+                    'transaction_id' => $transaction_id,
+                    'payment_method' => $payment_method,
+                    'amount' => $total
+                ]);
 
-                // Update balance if using balance payment
-                if (!$is_voucher && $payment_method === 'BM') {
-                    $new_balance = $member_data->balance - $amount;
+                // Update balance if using Balance
+                if ($payment_method == 'Balance') {
+                    if ($member_data->balance < $total) {
+                        throw new Exception('Saldo tidak mencukupi');
+                    }
+
                     $this->db->where('id', $member_data->id)
-                             ->update('users', ['balance' => $new_balance]);
+                             ->update('users', [
+                                 'balance' => $member_data->balance - $total
+                             ]);
                 }
-
-                // Update voucher status if redeeming
-                if ($is_voucher) {
-                    $this->db->where('redeem_id', $data['voucher_id'])
-                             ->update('redeem_voucher', ['status' => 'Used']);
-                }
-
-                $this->db->trans_complete();
-
-                if ($this->db->trans_status() === FALSE) {
-                    throw new Exception('Transaction failed');
-                }
-
-                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Transaksi berhasil</div>');
-                redirect('transaksikasir/tambahTransaksiKasir');
-
-            } catch (Exception $e) {
-                $this->db->trans_rollback();
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Transaksi gagal: ' . $e->getMessage() . '</div>');
-                redirect('transaksikasir/tambahTransaksiKasir');
             }
+
+            // Update voucher status if used
+            if ($is_voucher) {
+                $this->db->where('redeem_id', $voucher_id)
+                         ->update('redeem_voucher', ['status' => 'Used']);
+            }
+
+            // Calculate and update points
+            $points_earned = floor($total / 10000);
+            if ($points_earned > 0) {
+                $this->db->where('id', $member_data->id)
+                         ->set('poin', 'poin + ' . $points_earned, FALSE)
+                         ->update('users');
+            }
+
+            $this->db->trans_complete();
+
+            if ($this->db->trans_status() === FALSE) {
+                throw new Exception('Transaksi gagal');
+            }
+
+            $this->session->set_flashdata('pesan', '<div class="alert alert-success">Transaksi berhasil</div>');
+            redirect('transaksikasir/historyTransaksiKasir'); // Changed redirect
+
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>');
+            redirect('transaksikasir/tambahTransaksiKasir'); // Changed redirect
         }
     }
 

@@ -19,7 +19,6 @@
                             <th>Kode Transaksi</th>
                             <th>Tanggal</th>
                             <th>Nama Member</th>
-                            <th>Jenis Transaksi</th>
                             <th>Jumlah</th>
                             <th>Metode Pembayaran</th>
                             <th>Bukti</th>
@@ -36,12 +35,32 @@
                             <td><?= $t->transaction_codes; ?></td>
                             <td><?= date('d-m-Y H:i', strtotime($t->created_at)); ?></td>
                             <td><?= $t->member_name; ?></td>
-                            <td><?= $t->transaction_type; ?></td>
-                            <td><?= $t->amount ? 'Rp ' . number_format($t->amount, 0, ',', '.') : '-'; ?></td>
-                            <td><?= $t->payment_method ?? '-'; ?></td>
+                            <td>Rp <?= number_format($t->amount, 0, ',', '.'); ?></td>
+                            <td>
+                                <?php 
+                                if (!empty($t->payment_details)) {
+                                    $payments = explode(" & ", $t->payment_details);
+                                    foreach($payments as $payment) {
+                                        echo '<span class="badge badge-info mr-1">';
+                                        if (strpos($payment, 'cash') !== false) {
+                                            echo str_replace('cash', 'Cash', $payment);
+                                        } else if (strpos($payment, 'transferBank') !== false) {
+                                            echo str_replace('transferBank', 'Transfer', $payment);
+                                        } else if (strpos($payment, 'Balance') !== false) {
+                                            echo str_replace('Balance', 'Saldo', $payment);
+                                        }
+                                        echo '</span>';
+                                    }
+                                } else {
+                                    echo '-';
+                                }
+                                ?>
+                            </td>
                             <td>
                                 <?php if($t->transaction_evidence && $t->transaction_evidence != 'struk.png'): ?>
-                                    <img src="<?= base_url('../ImageTerasJapan/transaction_proof/' . $t->transaction_evidence); ?>" width="50">
+                                    <img src="<?= base_url('../ImageTerasJapan/transaction_proof/' . $t->transaction_evidence); ?>" 
+                                         width="50" class="img-thumbnail" alt="Bukti"
+                                         onclick="window.open(this.src)" style="cursor: pointer;">
                                 <?php else: ?>
                                     -
                                 <?php endif; ?>
@@ -59,6 +78,9 @@
 
 <script>
 $(document).ready(function() {
-    $('#dataTable').DataTable();
+    $('#dataTable').DataTable({
+        responsive: true,
+        order: [[2, 'desc']] // Order by date column descending
+    });
 });
 </script>

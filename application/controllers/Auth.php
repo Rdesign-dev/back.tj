@@ -74,6 +74,7 @@ class Auth extends CI_Controller
                             $branch_name = $this->auth->get_name_id($user_db['id']);
                             $userdata['idcabang'] = $branch_id;
                             $userdata['namacabang'] = $branch_name;
+                            $this->session->set_userdata('login_session', $userdata);
                             redirect('dashboard/cabang');
                         } else {
                             redirect('dashboard');
