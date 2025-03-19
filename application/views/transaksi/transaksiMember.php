@@ -80,6 +80,14 @@
                 </div>
 
                 <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="saldo">Saldo Member</label>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" id="saldo" 
+                               value="<?= isset($saldo) ? (int)$saldo : '0' ?>" readonly>
+                    </div>
+                </div>
+
+                <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="penukaranvoucher">Penukaran Voucher</label>
                     <div class="col-md-6">
                         <div class="d-flex align-items-center">
@@ -137,18 +145,17 @@
                     </div>
 
                     <!-- Payment Amount -->
-                    <div class="row form-group">
+                    <div class="row form-group" id="primary_amount_section" style="display: none;">
                         <label class="col-md-4 text-md-right" for="primary_amount">
-                            <span id="payment_amount_label">Jumlah Pembayaran</span>
+                            <span id="payment_amount_label">Jumlah Pembayaran Utama</span>
                         </label>
                         <div class="col-md-6">
-                            <input type="number" id="primary_amount" name="primary_amount" class="form-control" 
-                                placeholder="Masukkan jumlah pembayaran" min="0">
+                            <input type="number" id="primary_amount" name="primary_amount" class="form-control" placeholder="Masukkan jumlah" min="0">
                             <span class="text-danger small" id="primary_amount_error"></span>
                         </div>
                     </div>
 
-                    <!-- Secondary Payment Section (initially hidden) -->
+                    <!-- Secondary Payment Section -->
                     <div id="secondary_payment_section" style="display:none;">
                         <div class="row form-group">
                             <label class="col-md-4 text-md-right">Sisa yang Harus Dibayar</label>
@@ -215,29 +222,21 @@ document.addEventListener("DOMContentLoaded", function() {
     const secondaryPaymentMethod = document.getElementById('secondary_payment_method');
     const paymentMethodLabel = document.getElementById('payment_method_label');
     const paymentAmountLabel = document.getElementById('payment_amount_label');
+    const primaryAmountSection = document.getElementById('primary_amount_section');
 
     // Function to toggle voucher fields
     function toggleVoucherFields(isVoucherMode) {
         divKodevoucher.style.display = isVoucherMode ? 'block' : 'none';
-        nonVoucherFields.style.display = isVoucherMode ? 'none' : 'block';
-        
-        // Handle form validation requirements
-        totalInput.required = !isVoucherMode;
-        if (isVoucherMode) {
-            totalInput.value = '';
-            splitBillCheckbox.checked = false;
-            secondaryPaymentSection.style.display = 'none';
-        }
     }
 
     // Calculate remaining amount for split bill
     function calculateRemaining() {
-        const total = parseFloat(totalInput.value) || 0;
-        const primaryAmount = parseFloat(primaryAmountInput.value) || 0;
+        const total = parseInt(document.getElementById('total').value) || 0;
+        const primaryAmount = parseInt(document.getElementById('primary_amount').value) || 0;
         
         if (splitBillCheckbox.checked && total > 0) {
             const remaining = total - primaryAmount;
-            remainingAmountInput.value = remaining.toFixed(2);
+            remainingAmountInput.value = remaining > 0 ? remaining : 0; // Ensure no decimals
             
             // Validate primary amount
             if (primaryAmount >= total) {
@@ -261,6 +260,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         if (this.checked) {
             // Show secondary payment section immediately when split bill is checked
+            primaryAmountSection.style.display = 'block';
             secondaryPaymentSection.style.display = 'block';
             // Reset values
             primaryAmountInput.value = '';
@@ -269,6 +269,7 @@ document.addEventListener("DOMContentLoaded", function() {
             secondaryPaymentMethod.disabled = false;
             calculateRemaining();
         } else {
+            primaryAmountSection.style.display = 'none';
             secondaryPaymentSection.style.display = 'none';
             remainingAmountInput.value = '';
         }
@@ -291,30 +292,30 @@ document.addEventListener("DOMContentLoaded", function() {
     memberForm.addEventListener('submit', function(e) {
         let isValid = true;
 
-        if (!tukarVoucherCheckbox.checked) {
-            // Normal transaction validation
-            if (!totalInput.value.trim()) {
-                totalInput.classList.add('is-invalid');
-                isValid = false;
-            }
+        // Validate total for all transactions
+        if (!totalInput.value.trim()) {
+            totalInput.classList.add('is-invalid');
+            isValid = false;
+        }
 
-            if (splitBillCheckbox.checked) {
-                const total = parseFloat(totalInput.value) || 0;
-                const primaryAmount = parseFloat(primaryAmountInput.value) || 0;
-                
-                if (primaryAmount >= total || primaryAmount <= 0 || !secondaryPaymentMethod.value) {
-                    isValid = false;
-                    alert('Pastikan:\n- Jumlah pembayaran utama lebih kecil dari total\n- Metode pembayaran kedua sudah dipilih');
-                }
-            }
-        } else {
-            // Voucher mode validation
-            if (!document.getElementById('kodevouchertukar').value) {
-                document.getElementById('kodevouchertukar').classList.add('is-invalid');
+        // Validate voucher if selected
+        if (tukarVoucherCheckbox.checked && !document.getElementById('kodevouchertukar').value) {
+            document.getElementById('kodevouchertukar').classList.add('is-invalid');
+            isValid = false;
+        }
+
+        // Validate split bill if enabled
+        if (splitBillCheckbox.checked) {
+            const total = parseFloat(totalInput.value) || 0;
+            const primaryAmount = parseFloat(primaryAmountInput.value) || 0;
+            
+            if (primaryAmount >= total || primaryAmount <= 0 || !secondaryPaymentMethod.value) {
                 isValid = false;
+                alert('Pastikan:\n- Jumlah pembayaran utama lebih kecil dari total\n- Metode pembayaran kedua sudah dipilih');
             }
         }
 
+        // Validate foto bill
         if (!fotobillInput.value.trim()) {
             fotobillInput.classList.add('is-invalid');
             isValid = false;

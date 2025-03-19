@@ -77,6 +77,8 @@ class Transaksi extends CI_Controller {
         }
     public function convert_and_update() 
     {
+        log_message('debug', 'Starting convert_and_update method');
+        
         // Get login session data
         $login_session = $this->session->userdata('login_session');
         
@@ -84,156 +86,145 @@ class Transaksi extends CI_Controller {
         if (!$login_session) {
             $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Silahkan login terlebih dahulu</div>');
             redirect('auth');
-        return;
+            return;
         }
     
-        
-        // Id Admin
-        $account_id = $login_session['id'];
+        // Load required models
+        $this->load->model('Transaksi_model');
+        $this->load->model('Member_model');
     
         // Get user_id by phone number
         $phone_number = $this->input->post('nomor');
-        $user_id = $this->user->get_user_by_phone($phone_number);
+        $user = $this->db->get_where('users', ['phone_number' => $phone_number])->row();
     
-        $user_id = intval($user_id);
-        
-        // Form validation rules
-        $this->form_validation->set_rules('tanggaltransaksi', 'Tanggal Transaksi', 'required');
-        $this->form_validation->set_rules('nocabang', 'Nama Cabang', 'required');
-        $this->form_validation->set_rules('nomor', 'Nomor Member', 'required');
-        $this->form_validation->set_rules('nama', 'Nama Member', 'required');
-        $this->form_validation->set_rules('total', 'Total', 'required|numeric');
-        
-        // Additional validation for split bill
-        if ($this->input->post('splitBill')) {
-            $this->form_validation->set_rules('primary_payment_method', 'Metode Pembayaran Utama', 'required');
-            $this->form_validation->set_rules('primary_amount', 'Jumlah Pembayaran Utama', 'required|numeric|less_than['.$this->input->post('total').']');
-            $this->form_validation->set_rules('secondary_payment_method', 'Metode Pembayaran Kedua', 'required|differs[primary_payment_method]');
-        } else {
-            $this->form_validation->set_rules('payment_method', 'Metode Pembayaran', 'required');
+        if (!$user) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Member tidak ditemukan</div>');
+            redirect('transaksi/add');
+            return;
         }
     
-        if ($this->form_validation->run() == FALSE) {
-            $data['title'] = "Transaksi Member";
-            $data['cabang'] = $this->db->get('branches')->result_array();
-            $data['member'] = $this->session->userdata('member_data');
-            $this->template->load('templates/dashboard', 'transaksi/transaksiMember', $data);
-        } else {
-            // Process transaction
-            $config['upload_path'] = '../ImageTerasJapan/transaction_proof/';
-            $config['allowed_types'] = 'gif|jpg|png|jpeg';
-            $config['max_size'] = 2048;
-            $config['file_name'] = $this->generate_evidence_filename($this->input->post('nomor'));
+        // Start transaction
+        $this->db->trans_start();
     
+        try {
+            $total = $this->input->post('total');
+            $payment_method = $this->input->post('primary_payment_method');
+            $branch_id = $this->input->post('nocabang');
+            
+            // Check if using balance payment
+            if ($payment_method == 'Balance') {
+                if ($user->balance < $total) {
+                    throw new Exception('Saldo tidak mencukupi untuk melakukan transaksi');
+                }
+            }
+    
+            // Handle file upload
+            $config['upload_path'] = './uploads/struk/';
+            $config['allowed_types'] = 'jpg|jpeg|png';
+            $config['max_size'] = 2048; // 2MB
             $this->load->library('upload', $config);
     
-            if (!$this->upload->do_upload('fotobill')) {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">'.$this->upload->display_errors().'</div>');
-                redirect('transaksi/add');
-                return;
+            $transaction_evidence = 'struk.png'; // default value
+            if ($this->upload->do_upload('fotobill')) {
+                $uploaded_data = $this->upload->data();
+                $transaction_evidence = $uploaded_data['file_name'];
             }
     
-            $upload_data = $this->upload->data();
-            
-            $data = [
-                'transaction_codes' => $this->generate_transaction_code($account_id, $this->input->post('tukarVoucher') ? 'Redeem Voucher' : 'Teras Japan Payment'),
-                'user_id' => $user_id,
-                'transaction_type' => $this->input->post('tukarVoucher') ? 'Redeem Voucher' : 'Teras Japan Payment',
-                'amount' => $this->input->post('total'),
-                'branch_id' => $this->input->post('nocabang'),
-                'account_cashier_id' => $account_id,
-                'transaction_evidence' => $upload_data['file_name'],
+            // Prepare transaction data
+            $transaction_data = [
+                'transaction_codes' => $this->generate_transaction_code($login_session['id'], 'Teras Japan Payment'),
+                'user_id' => $user->id,
+                'transaction_type' => 'Teras Japan Payment',
+                'amount' => $total,
+                'branch_id' => $branch_id,
+                'account_cashier_id' => $login_session['id'],
+                'transaction_evidence' => $transaction_evidence,
                 'created_at' => $this->input->post('tanggaltransaksi')
             ];
-
-            try {
-                // Upload file handling remains the same
-                $upload_data = $this->upload->data();
+    
+            // Insert transaction
+            $this->db->insert('transactions', $transaction_data);
+            $transaction_id = $this->db->insert_id();
+    
+            // Handle payments
+            if ($this->input->post('splitBill')) {
+                // Split bill payment
+                $primary_amount = $this->input->post('primary_amount');
+                $secondary_amount = $total - $primary_amount;
                 
-                // Prepare transaction data - removed payment_method field
-                $transaction_data = [
-                    'transaction_codes' => $this->generate_transaction_code($account_id, $this->input->post('tukarVoucher') ? 'Redeem Voucher' : 'Teras Japan Payment'),
-                    'user_id' => $user_id,
-                    'transaction_type' => $this->input->post('tukarVoucher') ? 'Redeem Voucher' : 'Teras Japan Payment',
-                    'amount' => $this->input->post('total'),
-                    'branch_id' => $this->input->post('nocabang'),
-                    'account_cashier_id' => $account_id,
-                    'transaction_evidence' => $upload_data['file_name'],
-                    'created_at' => $this->input->post('tanggaltransaksi')
-                ];
-        
-                // Start transaction
-                $this->db->trans_start();
-        
-                // Insert main transaction
-                $this->db->insert('transactions', $transaction_data);
-                $transaction_id = $this->db->insert_id();
-        
-                // Handle payment records
-                if ($this->input->post('splitBill')) {
-                    // Insert primary payment
-                    $primary_payment = [
-                        'transaction_id' => $transaction_id,
-                        'payment_method' => $this->input->post('primary_payment_method'),
-                        'amount' => $this->input->post('primary_amount')
-                    ];
-                    $this->db->insert('transaction_payments', $primary_payment);
-        
-                    // Calculate and insert secondary payment
-                    $secondary_amount = $this->input->post('total') - $this->input->post('primary_amount');
-                    $secondary_payment = [
-                        'transaction_id' => $transaction_id,
-                        'payment_method' => $this->input->post('secondary_payment_method'),
-                        'amount' => $secondary_amount
-                    ];
-                    $this->db->insert('transaction_payments', $secondary_payment);
-                } else {
-                    // Single payment method
-                    $payment_data = [
-                        'transaction_id' => $transaction_id,
-                        'payment_method' => $this->input->post('payment_method'),
-                        'amount' => $this->input->post('total')
-                    ];
-                    $this->db->insert('transaction_payments', $payment_data);
+                // Validate amounts
+                if ($primary_amount <= 0 || $secondary_amount <= 0) {
+                    throw new Exception('Jumlah pembayaran tidak valid');
                 }
-        
-                // Handle voucher if needed
-                if ($this->input->post('tukarVoucher')) {
-                    $kode_voucher = $this->input->post('kodevouchertukar');
-                    $this->updateVoucherStatus($kode_voucher);
+    
+                // Check balance if using it
+                if ($payment_method == 'Balance' && $user->balance < $primary_amount) {
+                    throw new Exception('Saldo tidak mencukupi untuk pembayaran pertama');
                 }
-        
-                // Increment transaction count
-                $this->incrementBranchTransactionCount($this->input->post('nocabang'));
-        
-                $this->db->trans_complete();
-        
-                if ($this->db->trans_status() === FALSE) {
-                    throw new Exception('Gagal melakukan transaksi');
-                }
-        
-                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Transaksi berhasil disimpan</div>');
-                redirect('transaksi/historyTransaksi');
-        
-            } catch (Exception $e) {
-                $this->db->trans_rollback();
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>');
-                redirect('transaksi/add');
+    
+                // Insert primary payment
+                $this->db->insert('transaction_payments', [
+                    'transaction_id' => $transaction_id,
+                    'payment_method' => $payment_method,
+                    'amount' => $primary_amount
+                ]);
+    
+                // Insert secondary payment
+                $this->db->insert('transaction_payments', [
+                    'transaction_id' => $transaction_id,
+                    'payment_method' => $this->input->post('secondary_payment_method'),
+                    'amount' => $secondary_amount
+                ]);
+    
+            } else {
+                // Single payment
+                $this->db->insert('transaction_payments', [
+                    'transaction_id' => $transaction_id,
+                    'payment_method' => $payment_method,
+                    'amount' => $total
+                ]);
             }
+    
+            // Update balance if using it
+            if ($payment_method == 'Balance') {
+                $amount_to_deduct = $this->input->post('splitBill') ? $primary_amount : $total;
+                $this->db->set('balance', 'balance - ' . $amount_to_deduct, FALSE)
+                         ->where('id', $user->id)
+                         ->update('users');
+            }
+    
+            // Increment branch transaction count
+            $this->db->set('transaction_count', 'transaction_count + 1', FALSE)
+                     ->where('id', $branch_id)
+                     ->update('branch');
+    
+            $this->db->trans_complete();
+    
+            if ($this->db->trans_status() === FALSE) {
+                throw new Exception('Gagal menyimpan transaksi');
+            }
+    
+            $this->session->set_flashdata('pesan', '<div class="alert alert-success">Transaksi berhasil disimpan</div>');
+            redirect('transaksi/historyTransaksi');
+    
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>');
+            redirect('transaksi/add');
         }
     }
-        public function file_check($str)
-        {
-            // Check if a file is uploaded
-            if (empty($_FILES['bukti']['name'])) {
-                $this->form_validation->set_message('file_check', 'The {field} field is required.');
-                return false;
-            }
+        // public function file_check($str)
+        // {
+        //     // Check if a file is uploaded
+        //     if (empty($_FILES['bukti']['name'])) {
+        //         $this->form_validation->set_message('file_check', 'The {field} field is required.');
+        //         return false;
+        //     }
 
-            // Additional checks if needed (e.g., file type, size, etc.)
+        //     // Additional checks if needed (e.g., file type, size, etc.)
 
-            return true;
-        }
+        //     return true;
+        // }
         public function dataTopup()
 	    {
         $data['title'] = "Data TopUp Saldo Member";
@@ -505,7 +496,7 @@ public function add()
     $data['title'] = "Transaksi Member";
     // Update the branch query to match your database structure
     $data['cabang'] = $this->db->select('branch_id as id, branch_code, branch_name')
-                               ->from('branches')
+                               ->from('branch')
                                ->get()
                                ->result_array();
     $data['member'] = $this->session->userdata('member_data');
