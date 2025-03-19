@@ -110,11 +110,22 @@ class Transaksi extends CI_Controller {
             $total = $this->input->post('total');
             $payment_method = $this->input->post('primary_payment_method');
             $branch_id = $this->input->post('nocabang');
+            $is_redeem_voucher = $this->input->post('tukarVoucher') == '1';
+            $voucher_code = $this->input->post('kodevouchertukar');
             
-            // Check if using balance payment
-            if ($payment_method == 'Balance') {
-                if ($user->balance < $total) {
-                    throw new Exception('Saldo tidak mencukupi untuk melakukan transaksi');
+            // Validate voucher if used
+            if ($is_redeem_voucher && $voucher_code) {
+                // Check if voucher exists and belongs to user
+                $voucher = $this->db->select('rv.redeem_id, rv.user_id, rv.status')
+                                   ->from('redeem_voucher rv')
+                                   ->where('rv.kode_voucher', $voucher_code)
+                                   ->where('rv.user_id', $user->id)
+                                   ->where('rv.status', 'Available')
+                                   ->get()
+                                   ->row();
+    
+                if (!$voucher) {
+                    throw new Exception('Voucher tidak valid atau bukan milik member ini');
                 }
             }
     
@@ -130,7 +141,7 @@ class Transaksi extends CI_Controller {
                 $transaction_evidence = $uploaded_data['file_name'];
             }
     
-            // Prepare transaction data
+            // Prepare transaction data with current timestamp
             $transaction_data = [
                 'transaction_codes' => $this->generate_transaction_code($login_session['id'], 'Teras Japan Payment'),
                 'user_id' => $user->id,
@@ -139,7 +150,8 @@ class Transaksi extends CI_Controller {
                 'branch_id' => $branch_id,
                 'account_cashier_id' => $login_session['id'],
                 'transaction_evidence' => $transaction_evidence,
-                'created_at' => $this->input->post('tanggaltransaksi')
+                'created_at' => date('Y-m-d H:i:s'), // Menggunakan timestamp saat ini
+                'voucher_id' => $is_redeem_voucher && $voucher ? $voucher->redeem_id : null
             ];
     
             // Insert transaction
@@ -193,6 +205,12 @@ class Transaksi extends CI_Controller {
                          ->update('users');
             }
     
+            // Update voucher status if used
+            if ($is_redeem_voucher && $voucher) {
+                $this->db->where('redeem_id', $voucher->redeem_id)
+                         ->update('redeem_voucher', ['status' => 'Used']);
+            }
+    
             // Increment branch transaction count
             $this->db->set('transaction_count', 'transaction_count + 1', FALSE)
                      ->where('id', $branch_id)
@@ -233,7 +251,23 @@ class Transaksi extends CI_Controller {
 	    }
         public function historyTransaksi() {
     $data['title'] = "History Transaksi";
-    $data['trans'] = $this->transaksi->getHistoryTransaksiDetails();
+    
+    // Modify the query to include voucher information
+    $data['trans'] = $this->db->select('t.*, b.branch_name, u.name as member_name, 
+                    a.Name as cashier_name, rv.kode_voucher,
+                    GROUP_CONCAT(CONCAT(tp.payment_method, " (", tp.amount, ")") SEPARATOR " & ") as payment_details,
+                    SUM(tp.amount) as total_amount')
+             ->from('transactions t')
+             ->join('branch b', 'b.id = t.branch_id', 'left')
+             ->join('users u', 'u.id = t.user_id', 'left')
+             ->join('accounts a', 'a.id = t.account_cashier_id', 'left')
+             ->join('redeem_voucher rv', 'rv.redeem_id = t.voucher_id', 'left')
+             ->join('transaction_payments tp', 'tp.transaction_id = t.transaction_id', 'left')
+             ->group_by('t.transaction_id')
+             ->order_by('t.created_at', 'DESC')
+             ->get()
+             ->result();
+    
     $this->template->load('templates/dashboard', 'transaksi/historyTransaksi', $data);
 }
         public function historyTransaksiKasir()
@@ -289,19 +323,16 @@ public function cari_memberSaldo(){
         }
     }
 }
-public function convert_and_updateSaldoMember() {
+public function convert_and_updateSaldoMember() 
+{
     $login_session = $this->session->userdata('login_session');
     $account_id = $login_session['id'];
-    $branch_id = $login_session['branch_id'];
-
+    
     // Set validation rules
     $this->form_validation->set_rules('nominal', 'Nominal', 'required|numeric|greater_than_equal_to[10000]');
     $this->form_validation->set_rules('metode', 'Metode Pembayaran', 'required|in_list[cash,transferBank]');
-    if($this->input->post('metode') == 'transferBank') {
-        $this->form_validation->set_rules('bukti', 'Bukti Transfer', 'callback_file_check');
-    }
-
-    if($this->form_validation->run() == FALSE) {
+    
+    if ($this->form_validation->run() == FALSE) {
         $data['title'] = "Top Up Saldo";
         $data['member'] = $this->session->userdata('member_data');
         $this->template->load('templates/dashboard', 'transaksi/transaksiMemberSaldo', $data);
@@ -312,31 +343,30 @@ public function convert_and_updateSaldoMember() {
     $this->db->trans_start();
 
     try {
-        $nominal = str_replace(',', '', $this->input->post('nominal')); // Remove thousand separators
-        $nominal = floatval($nominal); // Convert to float for decimal handling
+        $nominal = str_replace(',', '', $this->input->post('nominal'));
         $phone_number = $this->input->post('nomor');
         
-        // Get current user data with precise balance
+        // Get user data
         $user = $this->db->select('id, balance')
                         ->where('phone_number', $phone_number)
                         ->get('users')
                         ->row();
 
-        if(!$user) {
+        if (!$user) {
             throw new Exception('Member tidak ditemukan');
         }
 
-        // Handle file upload if transfer
+        // Handle file upload for transfer
         $evidence_filename = 'struk.png';
-        if($this->input->post('metode') == 'transferBank') {
-            $config['upload_path'] = '../ImageTerasJapan/transaction_proof/';
-            $config['allowed_types'] = 'gif|jpg|png|jpeg';
+        if ($this->input->post('metode') == 'transferBank') {
+            $config['upload_path'] = '../ImageTerasJapan/transaction_proof/Topup';
+            $config['allowed_types'] = 'jpg|jpeg|png';
             $config['max_size'] = 10240; // 10MB
-            $config['file_name'] = 'TRXBT' . $phone_number . mt_rand(1000, 9999);
+            $config['file_name'] = $this->generate_evidence_filename($user->id);
 
             $this->load->library('upload', $config);
 
-            if(!$this->upload->do_upload('bukti')) {
+            if (!$this->upload->do_upload('bukti')) {
                 throw new Exception('Gagal upload bukti: ' . $this->upload->display_errors('',''));
             }
 
@@ -344,33 +374,23 @@ public function convert_and_updateSaldoMember() {
             $evidence_filename = $upload_data['file_name'];
         }
 
-        // Prepare transaction data with proper decimal handling
+        // Prepare transaction data
         $transaction_data = [
             'transaction_codes' => $this->generate_transaction_code($account_id, 'Balance Top-up'),
             'user_id' => $user->id,
             'transaction_type' => 'Balance Top-up',
             'amount' => $nominal,
-            'branch_id' => $branch_id,
+            'branch_id' => null, // Set null for admin pusat
             'account_cashier_id' => $account_id,
             'transaction_evidence' => $evidence_filename,
             'created_at' => date('Y-m-d H:i:s')
         ];
 
-                // Add debug output
-        // echo "<pre>";
-        // echo "Data to be inserted:\n";
-        // var_dump($transaction_data);
-        // echo "\nUser data:\n";
-        // var_dump($user);
-        // echo "\nSession data:\n";
-        // var_dump($login_session);
-        // die();
-
         // Insert transaction
         $this->db->insert('transactions', $transaction_data);
         $transaction_id = $this->db->insert_id();
 
-        // Insert into transaction_payments
+        // Insert payment detail
         $payment_data = [
             'transaction_id' => $transaction_id,
             'payment_method' => $this->input->post('metode'),
@@ -378,23 +398,10 @@ public function convert_and_updateSaldoMember() {
         ];
         $this->db->insert('transaction_payments', $payment_data);
 
-        // Calculate new balance with proper decimal handling
-        $current_balance = floatval($user->balance);
-        $new_balance = $current_balance + $nominal;
-
-        // // Debug output
-        // echo "<pre>";
-        // echo "Current balance: " . $current_balance . "\n";
-        // echo "Nominal: " . $nominal . "\n";
-        // echo "New balance: " . $new_balance . "\n";
-        // echo "</pre>";
-        // die();
-
-        // Update user balance using precise decimal
+        // Update user balance
+        $new_balance = $user->balance + $nominal;
         $this->db->where('id', $user->id)
-            ->update('users', [
-            'balance' => number_format($new_balance, 2, '.', '')
-            ]);
+                 ->update('users', ['balance' => $new_balance]);
 
         $this->db->trans_complete();
 

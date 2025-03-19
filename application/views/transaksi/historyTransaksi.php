@@ -77,11 +77,13 @@
                             ?>
                         </td>
                         <td class="column-voucher">
-                            <?php if($tran->transaction_type == 'Redeem Voucher'): ?>  <!-- Perbaiki penulisan 'Redeem' -->
-                                <span class="badge badge-info"><?= $tran->kode_voucher ?? 'No Code' ?></span>
-                            <?php else: ?>
-                                -
-                            <?php endif; ?>
+                            <?php 
+                            if ($tran->voucher_id): // Cek apakah transaksi menggunakan voucher
+                                echo '<span class="badge badge-info">' . ($tran->kode_voucher ?? 'No Code') . '</span>';
+                            else:
+                                echo '-';
+                            endif; 
+                            ?>
                         </td>
                         <td>
                             <?php if($tran->transaction_evidence && $tran->transaction_evidence != 'struk.png'): ?>

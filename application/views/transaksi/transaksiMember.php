@@ -28,6 +28,7 @@
                 <?= $this->session->flashdata('pesan'); ?>
                 <?php echo form_open_multipart('transaksi/convert_and_update', 'id="memberForm"'); ?>
 
+                <!-- Hapus atau comment bagian ini
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="tanggaltransaksi">Tanggal Transaksi</label>
                     <div class="col-md-6">
@@ -36,6 +37,7 @@
                         <span class="text-danger small"><?= form_error('tanggaltransaksi'); ?></span>
                     </div>
                 </div>
+                -->
 
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nocabang">Nama Cabang</label>
@@ -226,6 +228,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Function to toggle voucher fields
     function toggleVoucherFields(isVoucherMode) {
+        // Hanya toggle dropdown voucher, tidak mempengaruhi field lain
         divKodevoucher.style.display = isVoucherMode ? 'block' : 'none';
     }
 

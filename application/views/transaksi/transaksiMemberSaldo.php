@@ -47,7 +47,9 @@
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nominal">Nominal TopUp</label>
                     <div class="col-md-6">
-                        <input type="text" id="nominal" name="nominal" class="form-control" placeholder="Minimal Rp 10.000">
+                        <input type="number" id="nominal" name="nominal" class="form-control" 
+                               min="10000" step="1000" required 
+                               placeholder="Minimal Rp 10.000">
                         <?= form_error('nominal', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
@@ -55,19 +57,24 @@
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="metode">Metode Pembayaran</label>
                     <div class="col-md-6">
-                        <select name="metode" id="metode" class="form-control">
-                            <option value="">- Pilih Metode Pembayaran -</option>
+                        <select name="metode" id="metode" class="form-control" required>
+                            <option value="">Pilih Metode</option>
                             <option value="cash">Cash</option>
                             <option value="transferBank">Transfer Bank</option>
                         </select>
                         <?= form_error('metode', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="bukti">Bukti Pembayaran</label>
-                    <div class="col-md-6">
-                        <input type="file" id="bukti" name="bukti" class="form-control">
-                        <?= form_error('bukti', '<span class="text-danger small">', '</span>'); ?>
+
+                <div id="buktiTransfer" style="display:none;">
+                    <div class="row form-group">
+                        <label class="col-md-4 text-md-right" for="bukti">Bukti Transfer</label>
+                        <div class="col-md-6">
+                            <input type="file" id="bukti" name="bukti" class="form-control" 
+                                   accept="image/*" data-max-size="10485760">
+                            <small class="text-muted">Max size: 10MB. Format: JPG, JPEG, PNG</small>
+                            <?= form_error('bukti', '<span class="text-danger small">', '</span>'); ?>
+                        </div>
                     </div>
                 </div>
 
@@ -134,6 +141,14 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             namaInput.classList.remove("is-invalid");
         }
+    });
+
+    document.getElementById('metode').addEventListener('change', function() {
+        const buktiTransfer = document.getElementById('buktiTransfer');
+        buktiTransfer.style.display = this.value === 'transferBank' ? 'block' : 'none';
+        
+        const buktiInput = document.getElementById('bukti');
+        buktiInput.required = this.value === 'transferBank';
     });
 });
 </script>

@@ -134,7 +134,7 @@
                     <span>FAQ</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('bantuan'); ?>">
                     <i class="fas fa-tasks"></i>
                     <span>Pusat Bantuan</span>
@@ -145,7 +145,7 @@
                     <i class="fas fa-file-contract"></i>
                     <span>Konten PopUp</span>
                 </a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('laporan'); ?>">
                     <i class="fas fa-file-pdf"></i>
@@ -153,17 +153,23 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link pb-0" href="<?= base_url('feedback'); ?>">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Feedback Member</span>
+                </a>
+            </li>
+            <!-- <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('undian/inputPoinUndian'); ?>">
                     <i class="fas fa-gift"></i>
                     <span>Input Poin Undian</span>
                 </a>
-            </li>
-            <li class="nav-item">
+            </li> -->
+            <!-- <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('undian'); ?>">
                     <i class="fas fa-gift"></i>
                     <span>Data Undian</span>
                 </a>
-            </li>
+            </li> -->
 
             <?php endif; ?>
             <hr class="sidebar-divider d-none d-md-block">
