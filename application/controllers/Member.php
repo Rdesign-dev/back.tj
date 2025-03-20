@@ -131,36 +131,41 @@ class Member extends CI_Controller {
             $this->db->insert('users', $member_data);
             $user_id = $this->db->insert_id();
 
-            // Debug user insertion
-            echo "<pre>User Data:";
-            var_dump($member_data);
-            echo "User ID: " . $user_id . "</pre>";
-
             // Ambil semua reward untuk member baru
             $new_member_rewards = $this->db->where('category', 'newmember')
                                          ->get('rewards')
                                          ->result_array();
 
-            // Debug rewards data
-            echo "<pre>Rewards Data:";
-            var_dump($new_member_rewards);
-            echo "</pre>";
-
             // Generate dan assign voucher untuk setiap reward
             foreach ($new_member_rewards as $reward) {
                 // Generate kode voucher
                 $name_part = strtoupper(substr(str_replace(' ', '', $member_data['name']), 0, 5));
+				$three_name = substr($name_part, 0, 3);
                 $random_num = str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT);
+				$last_phone = substr($member_data['phone_number'], -4);
+				$random_char = substr(bin2hex(random_bytes(ceil(13 / 2))), 0, 13);
                 $voucher_code = "NEW-{$name_part}-{$reward['id']}-{$random_num}";
+                $expires_at = date('Y-m-d H:i:s', strtotime("+{$reward['total_days']} days"));
 
-                // Generate QR Code URL
-                $date_code = date('Ymd');
-                $user_code = substr($member_data['phone_number'], -4);
-                $qr_image_name = 'vcreward-' . $user_code . '-' . $date_code . '-' . uniqid() . '.png';
+                // Generate QR Code URL from API
+                $qr_image_name = 'vcreward-' . $three_name . '-' . $last_phone . '-' . $random_char . '.png';
                 $qr_url = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($voucher_code);
 
-                // Hitung tanggal expired berdasarkan total_days
-                $expires_at = date('Y-m-d H:i:s', strtotime("+{$reward['total_days']} days"));
+				// Get the QR Code image
+				$qr_image = file_get_contents($qr_url);
+
+				// Check if the QR Code image error
+				if ($qr_image === false) {
+					$this->db->trans_rollback();
+					$this->session->set_flashdata('pesan', '<div class="alert alert-danger">Terjadi kesalahan saat menghasilkan QR Code.</div>');
+					redirect('member/tambah_save_kasir');
+				}
+
+				// Directory to save QR Code
+				$save_directory = $_SERVER['DOCUMENT_ROOT'] . '/ImageTerasJapan/qrcode/'; 
+
+				// Save QR Code to directory
+				file_put_contents($save_directory . $qr_image_name, $qr_image);
 
                 // Prepare voucher data
                 $voucher_data = array(
@@ -170,23 +175,13 @@ class Member extends CI_Controller {
                     'points_used' => 0,
                     'redeem_date' => date('Y-m-d H:i:s'),
                     'status' => 'Available',
-                    'qr_code_url' => $qr_url,
+                    'qr_code_url' => $qr_image_name,
                     'kode_voucher' => $voucher_code,
                     'expires_at' => $expires_at
                 );
 
-                // Debug voucher data before insert
-                echo "<pre>Voucher Data for Reward {$reward['id']}:";
-                var_dump($voucher_data);
-                echo "</pre>";
-
-                // Try to insert and show result
-                $insert_result = $this->db->insert('redeem_voucher', $voucher_data);
-                echo "Insert Result for Reward {$reward['id']}: ";
-                var_dump($insert_result);
-                echo "<br>Last Query: " . $this->db->last_query();
-                echo "<br>DB Error: " . $this->db->error()['message'];
-                echo "<hr>";
+				// Insert voucher to database
+                $this->db->insert('redeem_voucher', $voucher_data);
             }
 
             $this->db->trans_complete();
@@ -196,14 +191,11 @@ class Member extends CI_Controller {
             }
 
             $this->session->set_flashdata('pesan', '<div class="alert alert-success">Member berhasil ditambahkan beserta voucher member baru</div>');
-            
+            redirect('member/indexKasir');
         } catch (Exception $e) {
             $this->db->trans_rollback();
             $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>');
         }
-        
-        // Comment out redirect temporarily to see debug output
-        // redirect('member/indexKasir');
     }
 }
     public function tambah_saveCabang()
