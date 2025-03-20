@@ -42,7 +42,7 @@
                             <tr>
                                 <td>Jenis Kelamin</td>
                                 <td>:</td>
-                                <td><?= ($member->gender == 'male' ? 'Laki-laki' : 'Perempuan') ?? '-' ?></td>
+                                <td><?= $member->gender ? ($member->gender == 'male' ? 'Laki-laki' : 'Perempuan') : '-' ?></td>
                             </tr>
                             <tr>
                                 <td>Tanggal Lahir</td>

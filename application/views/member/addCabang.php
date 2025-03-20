@@ -33,7 +33,7 @@
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nomor">Nomor Handphone</label>
                     <div class="col-md-6">
-                        <input value="<?= set_value('nomor'); ?>" type="text" id="nomor" name="nomor" class="form-control" placeholder="Masukkan Nomor Handphone">
+                        <input type="text" id="nomor" name="nomor" class="form-control" pattern="[0-9]+" title="Hanya boleh diisi oleh angka, dan diawali dengan 08" placeholder="Nomor Handphone Cth:08xxxxxxxxxx">
                         <?= form_error('nomor', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
@@ -43,8 +43,9 @@
                             <span class="icon"><i class="fa fa-save"></i></span>
                             <span class="text">Simpan</span>
                         </button>
-                        <button type="reset" class="btn btn-secondary">
-                            Reset
+                        <button type="reset" class="btn btn-secondary btn-icon-split">
+                            <span class="icon"><i class="fas fa-backspace"></i></span>
+                            <span class="text">Reset</span>
                         </button>
                     </div>
                 </div>
@@ -53,14 +54,43 @@
         </div>
     </div>
 </div>
+
+<!-- Add this script at the end of your HTML body or in the head section -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Ambil elemen input yang belum diisi
-        var emptyInput = document.querySelector('input[value=""]');
-        
-        if (emptyInput) {
-            // Fokuskan input yang belum diisi
-            emptyInput.focus();
+    $(document).ready(function () {
+        // Function to validate and add focus on empty input fields
+        function validateForm() {
+            let valid = true;
+
+            // Check each input field
+            $('input[type="text"]').each(function () {
+                if ($(this).val() === '') {
+                    valid = false;
+                    $(this).addClass('is-invalid'); // Add red border for empty fields
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            return valid;
         }
+
+        // Add event listener to form submission
+        $('form').submit(function (e) {
+            if (!validateForm()) {
+                e.preventDefault(); // Prevent form submission if validation fails
+            }
+        });
+
+        // Add event listener to input fields for real-time validation
+        $('input[type="text"]').on('input', function () {
+            if ($(this).val() === '') {
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
     });
 </script>
