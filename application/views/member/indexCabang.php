@@ -40,19 +40,26 @@
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
-                            <td><?= $member['namamember']; ?></td>
-                            <td><?= $member['nomor']; ?></td>
-                            <td><?= $member['poin']; ?></td>
-                            <td>Rp. <?= number_format($member['saldo'], 0, ',', '.') ?></td>
-                            <td><?= $member['tanggaldaftar']; ?></td>
-                            <td><a href="<?= base_url("member/detailCabang/{$member['nomor']}")?>" class="btn btn-primary"><i class="fas fa-info-circle"></i> Detail</a>
-                            <a href="<?= base_url('member/edit_memberCabang/') . $member['nomor'] ?>" class="btn btn-success"><i class="fas fa-user-cog"></i> Edit</a></a></td>
-                            
+                            <td><?= $member['namamember'] ?? '-'; ?></td>
+                            <td><?= $member['nomor'] ?? '-'; ?></td>
+                            <td><?= number_format($member['poin'] ?? 0, 0, ',', '.'); ?></td>
+                            <td>Rp <?= number_format($member['saldo'] ?? 0, 0, ',', '.'); ?></td>
+                            <td><?= $member['tanggaldaftar'] ? date('d-m-Y H:i', strtotime($member['tanggaldaftar'])) : '-'; ?></td>
+                            <td>
+                                <a href="<?= base_url('member/detailCabang/') . $member['nomor'] ?>" 
+                                   class="btn btn-circle btn-sm btn-info" title="Detail">
+                                    <i class="fas fa-info-circle"></i>
+                                </a>
+                                <a href="<?= base_url('member/edit_memberCabang/') . $member['nomor'] ?>" 
+                                   class="btn btn-circle btn-sm btn-warning" title="Edit">
+                                    <i class="fas fa-user-cog"></i>
+                                </a>
+                            </td>
                         </tr>
                     <?php endforeach;
                     else : ?>
                     <tr>
-                        <td colspan="8" class="text-center">Silahkan tambahkan user baru</td>
+                        <td colspan="7" class="text-center">Silahkan tambahkan user baru</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

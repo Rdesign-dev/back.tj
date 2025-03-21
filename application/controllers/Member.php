@@ -61,17 +61,40 @@ class Member extends CI_Controller {
 	}
     public function indexKasir()
 {
-    $this->_has_login();
     $data['title'] = "Member Management";
-    $data['members'] = $this->member->find_all();
+    $data['members'] = $this->db->select('
+        id,
+        name as namamember,
+        phone_number as nomor,
+        email,
+        balance as saldo,
+        poin,
+        profile_pic as foto,
+        registration_time as tanggaldaftar
+    ')
+    ->from('users')
+    ->get()
+    ->result_array();
+    
     $this->template->load('templates/kasir', 'member/indexKasir', $data);
 }
 	public function indexCabang()
-	{
-        $data['title'] = "Member Management";
-        $data['members'] = $this->member->find_all();
-		$this->template->load('templates/cabang', 'member/indexCabang', $data);
-	}
+{
+    $data['title'] = "Member Management";
+    $data['members'] = $this->db->select('
+        id,
+        name as namamember,
+        phone_number as nomor,
+        poin,
+        balance as saldo,
+        registration_time as tanggaldaftar
+    ')
+    ->from('users')
+    ->get()
+    ->result_array();
+    
+    $this->template->load('templates/cabang', 'member/indexCabang', $data);
+}
     public function tambah() {
         $this->_has_login();
         $data['title'] = "Tambah Member";

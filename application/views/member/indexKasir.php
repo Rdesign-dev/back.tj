@@ -24,35 +24,51 @@
             <thead>
                 <tr>
                     <th width="30">No.</th>
+                    <th>Foto</th>
                     <th>Nama Member</th>
                     <th>Nomor Handphone</th>
-                    <th>Poin</th>
+                    <th>Email</th>
                     <th>Saldo</th>
+                    <th>Poin</th>
                     <th>Tanggal Daftar</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                <?php
-                $no = 1;
-                if ($members) :
-                    foreach ($members as $member) :
-                        ?>
-                        <tr>
-                            <td><?= $no++; ?></td>
-                            <td><?= $member['namamember']; ?></td>
-                            <td><?= $member['nomor']; ?></td>
-                            <td><?= $member['poin']; ?></td>
-                            <td>Rp. <?= number_format($member['saldo'], 0, ',', '.') ?></td>
-                            <td><?= $member['tanggaldaftar']; ?></td>
-                            <td><a href="<?= base_url("member/detailKasir/{$member['nomor']}")?>" class="btn btn-primary"><i class="fas fa-info-circle"></i> Detail</a>
-                            <a href="<?= base_url('member/edit_memberKasir/') . $member['nomor'] ?>" class="btn btn-success"><i class="fas fa-user-cog"></i> Edit</a></a></td>
-                            
-                        </tr>
-                    <?php endforeach;
-                    else : ?>
+                <?php 
+                if ($members): 
+                    $no = 1;
+                    foreach ($members as $member): 
+                ?>
                     <tr>
-                        <td colspan="8" class="text-center">Silahkan tambahkan member baru</td>
+                        <td><?= $no++; ?></td>
+                        <td>
+                            <img src="<?= base_url('../ImageTerasJapan/ProfPic/' . ($member['foto'] ?? 'profile.jpg')) ?>" 
+                                 alt="Profile" class="rounded-circle" width="45" height="45">
+                        </td>
+                        <td><?= $member['namamember'] ?? '-'; ?></td>
+                        <td><?= $member['nomor'] ?? '-'; ?></td>
+                        <td><?= $member['email'] ?? '-'; ?></td>
+                        <td>Rp <?= number_format($member['saldo'] ?? 0, 0, ',', '.'); ?></td>
+                        <td><?= number_format($member['poin'] ?? 0, 0, ',', '.'); ?></td>
+                        <td><?= $member['tanggaldaftar'] ? date('d-m-Y H:i', strtotime($member['tanggaldaftar'])) : '-'; ?></td>
+                        <td>
+                            <a href="<?= base_url('member/detailKasir/') . $member['nomor'] ?>" 
+                               class="btn btn-circle btn-sm btn-info" title="Detail">
+                                <i class="fa fa-fw fa-eye"></i>
+                            </a>
+                            <a href="<?= base_url('member/edit_memberKasir/') . $member['nomor'] ?>" 
+                               class="btn btn-circle btn-sm btn-warning" title="Edit">
+                                <i class="fa fa-fw fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                <?php 
+                    endforeach; 
+                else: 
+                ?>
+                    <tr>
+                        <td colspan="9" class="text-center">Data Kosong</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
