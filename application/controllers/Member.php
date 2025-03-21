@@ -742,25 +742,20 @@ class Member extends CI_Controller {
         redirect('member/indexCabang');
     }
 }
-<<<<<<< HEAD
-}
-=======
-    
     public function toggle_status($id) 
-{
-    $this->_has_login();
-    
-    if ($this->member->toggle_status($id)) {
-        $this->session->set_flashdata('pesan', 
-            '<div class="alert alert-success">Status member berhasil diubah!</div>'
-        );
-    } else {
-        $this->session->set_flashdata('pesan', 
-            '<div class="alert alert-danger">Gagal mengubah status member!</div>'
-        );
-    }
-    
-    redirect('member');
+    {
+        $this->_has_login();
+        
+        if ($this->member->toggle_status($id)) {
+            $this->session->set_flashdata('pesan', 
+                '<div class="alert alert-success">Status member berhasil diubah!</div>'
+            );
+        } else {
+            $this->session->set_flashdata('pesan', 
+                '<div class="alert alert-danger">Gagal mengubah status member!</div>'
+            );
+        }
+        
+        redirect('member');
+    } 
 }
-}
->>>>>>> 5adaaab70ac0072598aac0bc785aa31eae6f6505

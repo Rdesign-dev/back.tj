@@ -85,7 +85,7 @@
                     <label class="col-md-4 text-md-right" for="saldo">Saldo Member</label>
                     <div class="col-md-6">
                         <input type="text" class="form-control" id="saldo" 
-                               value="<?= isset($saldo) ? (int)$saldo : '0' ?>" readonly>
+                               value="Rp <?= isset($member) && !empty($member) ? number_format(array_values($member)[0]['balance'], 0, ',', '.') : '0' ?>" readonly>
                     </div>
                 </div>
 
