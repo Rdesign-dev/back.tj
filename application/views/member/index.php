@@ -31,6 +31,7 @@
                     <th>Saldo</th>
                     <th>Poin</th>
                     <th>Tanggal Daftar</th>
+                    <th>Status</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -53,13 +54,21 @@
                             <td><?= number_format($member['poin'], 0, ',', '.'); ?></td>
                             <td><?= date('d-m-Y H:i', strtotime($member['registration_time'])); ?></td>
                             <td>
-                                <a href="<?= base_url('member/detail/') . $member['phone_number'] ?>" 
-                                   class="btn btn-circle btn-sm btn-info" title="Detail">
-                                    <i class="fa fa-fw fa-eye"></i>
-                                </a>
+                                <span class="badge badge-<?= $member['deleted'] == 0 ? 'success' : 'danger' ?>">
+                                    <?= $member['deleted'] == 0 ? 'Aktif' : 'Nonaktif' ?>
+                                </span>
+                            </td>
+                            <td>
                                 <a href="<?= base_url('member/edit/') . $member['id'] ?>" 
-                                   class="btn btn-circle btn-sm btn-warning" title="Edit">
+                                   class="btn btn-circle btn-sm btn-warning" 
+                                   title="Edit">
                                     <i class="fa fa-fw fa-edit"></i>
+                                </a>
+                                <a href="<?= base_url('member/toggle_status/') . $member['id'] ?>" 
+                                   class="btn btn-circle btn-sm <?= $member['deleted'] == 0 ? 'btn-danger' : 'btn-success' ?>" 
+                                   onclick="return confirm('<?= $member['deleted'] == 0 ? 'Nonaktifkan' : 'Aktifkan' ?> member ini?')"
+                                   title="<?= $member['deleted'] == 0 ? 'Nonaktifkan' : 'Aktifkan' ?>">
+                                    <i class="fa fa-fw fa-power-off"></i>
                                 </a>
                             </td>
                         </tr>

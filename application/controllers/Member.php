@@ -39,16 +39,23 @@ class Member extends CI_Controller {
 	{
 	    $this->_has_login();
         $data['title'] = "Data Member";
-        // Make sure we're selecting profile_pic field
-        $data['members'] = $this->db->select('id, name, phone_number, email, balance, poin, 
-                                        profile_pic, registration_time')
-                               ->from('users')
-                               ->order_by('name', 'ASC')
-                               ->get()
-                               ->result_array();
-    
-        // Debug to check if profile_pic is present in the data
-        // echo '<pre>'; print_r($data['members']); die;
+        
+        // Update query to include deleted field
+        $data['members'] = $this->db->select('
+            id, 
+            name, 
+            phone_number, 
+            email, 
+            balance, 
+            poin, 
+            profile_pic, 
+            registration_time,
+            deleted'  // Add this field
+        )
+        ->from('users')
+        ->order_by('name', 'ASC')
+        ->get()
+        ->result_array();
     
         $this->template->load('templates/dashboard', 'member/index', $data);
 	}
@@ -735,4 +742,25 @@ class Member extends CI_Controller {
         redirect('member/indexCabang');
     }
 }
+<<<<<<< HEAD
 }
+=======
+    
+    public function toggle_status($id) 
+{
+    $this->_has_login();
+    
+    if ($this->member->toggle_status($id)) {
+        $this->session->set_flashdata('pesan', 
+            '<div class="alert alert-success">Status member berhasil diubah!</div>'
+        );
+    } else {
+        $this->session->set_flashdata('pesan', 
+            '<div class="alert alert-danger">Gagal mengubah status member!</div>'
+        );
+    }
+    
+    redirect('member');
+}
+}
+>>>>>>> 5adaaab70ac0072598aac0bc785aa31eae6f6505
