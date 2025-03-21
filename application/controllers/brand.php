@@ -631,4 +631,35 @@ class Brand extends CI_Controller {
             }
         }
     }
+
+    public function delete($id) {
+        $brand = $this->brand->get_by_id($id);
+        
+        if ($brand) {
+            // Delete logo image if exists
+            if ($brand['image'] && file_exists('../ImageTerasJapan/logo/' . $brand['image'])) {
+                unlink('../ImageTerasJapan/logo/' . $brand['image']);
+            }
+            
+            // Delete banner image if exists
+            if ($brand['banner'] && file_exists('../ImageTerasJapan/banner/' . $brand['banner'])) {
+                unlink('../ImageTerasJapan/banner/' . $brand['banner']);
+            }
+            
+            // Delete related promos and vouchers
+            $this->db->delete('brand_promo', ['id_brand' => $id]);
+            $this->db->delete('rewards', ['brand_id' => $id]);
+            
+            // Delete brand
+            if ($this->db->delete('brands', ['id' => $id])) {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Brand berhasil dihapus!</div>');
+            } else {
+                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Brand gagal dihapus!</div>');
+            }
+        } else {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Brand tidak ditemukan!</div>');
+        }
+        
+        redirect('brand');
+    }
 }
