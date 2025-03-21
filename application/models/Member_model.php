@@ -13,15 +13,20 @@ class Member_model extends CI_Model{
         return $this->db->insert('users', $data);
     }
 
-    public function find_all(){
+    public function find_all() 
+    {
         return $this->db->select('
-            name as namamember, 
-            phone_number as nomor, 
+            id,
+            name,
+            phone_number,
+            email,
+            balance,
             poin,
-            balance as saldo, 
-            registration_time as tanggaldaftar
-        ')
-        ->from('users')
+            registration_time,
+            profile_pic,
+            deleted'  // Add this field
+        )
+        ->from($this->table)
         ->order_by('registration_time', 'DESC')
         ->get()
         ->result_array();
@@ -116,6 +121,16 @@ class Member_model extends CI_Model{
                  ->join('users u', 'u.id = l.id')
                  ->order_by('l.datetime', 'DESC');
         return $this->db->get()->result();
+    }
+
+    public function toggle_status($id) {
+        $member = $this->db->get_where('users', ['id' => $id])->row_array();
+        
+        if ($member) {
+            $new_status = ($member['deleted'] == 0) ? 1 : 0;
+            return $this->db->update('users', ['deleted' => $new_status], ['id' => $id]);
+        }
+        return false;
     }
 }
 
