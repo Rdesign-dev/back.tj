@@ -22,10 +22,10 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?php echo form_open_multipart('member/tambah_save', array('id' => 'memberForm')); ?>
+                <?php echo form_open_multipart('member/tambah_save'); ?>
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="namamember">Nama Member</label>
-                    <div class="col-md-6"> 
+                    <div class="col-md-6">
                         <input value="<?= set_value('namamember'); ?>" type="text" id="namamember" name="namamember" class="form-control" placeholder="Masukkan Nama Member">
                         <?= form_error('namamember', '<span class="text-danger small">', '</span>'); ?>
                     </div>
@@ -33,9 +33,8 @@
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nomor">Nomor Handphone</label>
                     <div class="col-md-6">
-                        <input value="<?= set_value('nomor'); ?>" type="text" id="nomor" name="nomor" class="form-control" pattern="[0-9]+" title="Hanya boleh diisi oleh angka, dan diawali dengan 08" placeholder="Nomor Handphone Cth:08xxx">
+                        <input type="text" id="nomor" name="nomor" class="form-control" pattern="[0-9]+" title="Hanya boleh diisi oleh angka, dan diawali dengan 08" placeholder="Nomor Handphone Cth:08xxxxxxxxxx">
                         <?= form_error('nomor', '<span class="text-danger small">', '</span>'); ?>
-
                     </div>
                 </div>
                 <div class="row form-group justify-content-end">
@@ -50,32 +49,39 @@
                         </button>
                     </div>
                 </div>
-                <?php echo form_close(); ?>
-                
+                <?= form_close(); ?>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var memberForm = document.getElementById('memberForm');
+    $(document).ready(function () {
+        function validateForm() {
+            let valid = true;
+            $('input[type="text"]').each(function () {
+                if ($(this).val() === '') {
+                    valid = false;
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+            return valid;
+        }
 
-        memberForm.addEventListener("submit", function (event) {
-            var namamemberInput = document.getElementById('namamember');
-            var nomorInput = document.getElementById('nomor');
-
-            if (!namamemberInput.value.trim()) {
-                event.preventDefault();
-                namamemberInput.classList.add("is-invalid");
-            } else {
-                namamemberInput.classList.remove("is-invalid");
+        $('form').submit(function (e) {
+            if (!validateForm()) {
+                e.preventDefault();
             }
+        });
 
-            if (!nomorInput.value.trim()) {
-                event.preventDefault();
-                nomorInput.classList.add("is-invalid");
+        $('input[type="text"]').on('input', function () {
+            if ($(this).val() === '') {
+                $(this).addClass('is-invalid');
             } else {
-                nomorInput.classList.remove("is-invalid");
+                $(this).removeClass('is-invalid');
             }
         });
     });

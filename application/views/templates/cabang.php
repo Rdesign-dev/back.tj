@@ -52,7 +52,7 @@
                 <div class="sidebar-brand-icon">
                     <img src="<?= base_url() ?>assets/img/terasjapan.png" alt="Admin Logo" style="width: 24px; height: 24px; object-fit: cover;" class="mr-2">
                     <div class="sidebar-brand-text mx-2">
-                        Admin Cabang <?= userdata('namacabang'); ?>
+                        Admin Cabang 
                     </div>
                 </div>
             </a>

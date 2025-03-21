@@ -79,31 +79,101 @@ class Member extends CI_Controller {
         $data['title'] = "Tambah Member";
         $this->template->load('templates/cabang', 'member/addCabang', $data);
     }
-    public function tambah_save() {
-        $this->form_validation->set_rules('namamember', 'Nama Member', 'required|trim');
-        $this->form_validation->set_rules('nomor', 'Nomor Handphone', 'required|trim|is_unique[users.phone_number]');
+    public function tambah_save() 
+{
+    $this->_has_login();
     
-        if ($this->form_validation->run() == false) {
-            $data['title'] = "Tambah Member";
-            $this->template->load('templates/dashboard', 'member/add', $data);
-        } else {
-            $data = [
-                'name' => $this->input->post('namamember', true),
-                'phone_number' => $this->input->post('nomor', true),
-                'balance' => 0,
+    $this->form_validation->set_rules("namamember", "Nama Member", "required|trim");
+    $this->form_validation->set_rules("nomor", "Nomor", "required|trim|callback_check_unique_number|min_length[11]");
+    
+    if ($this->form_validation->run() == false) {
+        $data['title'] = "Tambah Member";
+        $this->template->load('templates/dashboard', 'member/add', $data);
+    } else {
+        try {
+            $this->db->trans_start();
+
+            // Insert member baru
+            $member_data = array(
+                'name' => $this->input->post("namamember", true),
+                'phone_number' => $this->input->post("nomor", true),
                 'poin' => 0,
+                'balance' => 0,
+                'profile_pic' => 'profile.jpg',
                 'registration_time' => date('Y-m-d H:i:s')
-            ];
-    
-            if ($this->member->insert($data)) {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Data Member berhasil ditambahkan!</div>');
-                redirect('member');
-            } else {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Data Member gagal ditambahkan!</div>');
-                redirect('member/add');
+            );
+
+            $this->db->insert('users', $member_data);
+            $user_id = $this->db->insert_id();
+
+            // Ambil semua reward untuk member baru
+            $new_member_rewards = $this->db->where('category', 'newmember')
+                                         ->get('rewards')
+                                         ->result_array();
+
+            // Generate dan assign voucher untuk setiap reward
+            foreach ($new_member_rewards as $reward) {
+                // Generate kode voucher
+                $name_part = strtoupper(substr(str_replace(' ', '', $member_data['name']), 0, 5));
+                $three_name = substr($name_part, 0, 3);
+                $random_num = str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT);
+                $last_phone = substr($member_data['phone_number'], -4);
+                $random_char = substr(bin2hex(random_bytes(ceil(13 / 2))), 0, 13);
+                $voucher_code = "NEW-{$name_part}-{$reward['id']}-{$random_num}";
+                $expires_at = date('Y-m-d H:i:s', strtotime("+{$reward['total_days']} days"));
+
+                // Generate QR Code URL from API
+                $qr_image_name = 'vcreward-' . $three_name . '-' . $last_phone . '-' . $random_char . '.png';
+                $qr_url = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($voucher_code);
+
+                // Get the QR Code image
+                $qr_image = file_get_contents($qr_url);
+
+                // Check if the QR Code image error
+                if ($qr_image === false) {
+                    $this->db->trans_rollback();
+                    $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Terjadi kesalahan saat menghasilkan QR Code.</div>');
+                    redirect('member/tambah_save');
+                }
+
+                // Directory to save QR Code
+                $save_directory = $_SERVER['DOCUMENT_ROOT'] . '/ImageTerasJapan/qrcode/';
+
+                // Save QR Code to directory
+                file_put_contents($save_directory . $qr_image_name, $qr_image);
+
+                // Prepare voucher data
+                $voucher_data = array(
+                    'user_id' => $user_id,
+                    'reward_id' => $reward['id'],
+                    'brand_id' => $reward['brand_id'],
+                    'points_used' => 0,
+                    'redeem_date' => date('Y-m-d H:i:s'),
+                    'status' => 'Available',
+                    'qr_code_url' => $qr_image_name,
+                    'kode_voucher' => $voucher_code,
+                    'expires_at' => $expires_at
+                );
+
+                // Insert voucher to database
+                $this->db->insert('redeem_voucher', $voucher_data);
             }
+
+            $this->db->trans_complete();
+
+            if ($this->db->trans_status() === FALSE) {
+                throw new Exception('Gagal menambahkan member baru');
+            }
+
+            $this->session->set_flashdata('pesan', '<div class="alert alert-success">Member berhasil ditambahkan beserta voucher member baru</div>');
+            redirect('member');
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>');
+            redirect('member');
         }
     }
+}
     public function tambah_save_kasir()
 {
     $this->_has_login();
@@ -225,8 +295,8 @@ class Member extends CI_Controller {
 
             // Ambil semua reward untuk member baru
             $new_member_rewards = $this->db->where('category', 'newmember')
-                                         ->get('rewards')
-                                         ->result_array();
+                                        ->get('rewards')
+                                        ->result_array();
 
             // Generate dan assign voucher untuk setiap reward
             foreach ($new_member_rewards as $reward) {
@@ -312,14 +382,15 @@ class Member extends CI_Controller {
         }
     }
 
-    public function detail(){
-        $this->_has_login();
-        $data['title'] = "Detail Member";
-        $nomor = $this->uri->segment('3');
-        $data['member'] = $this->member->cari_detail_id($nomor);
-        $data['trans'] = $this->transaksi->getTransaksiDetails($nomor);
-		$this->template->load('templates/dashboard', 'member/detail', $data);
-    }
+    public function detail()
+{
+    $this->_has_login();
+    $data['title'] = "Detail Member";
+    $nomor = $this->uri->segment('3');
+    $data['member'] = $this->member->cari_detail_id($nomor);
+    $data['trans'] = $this->transaksi->getTransaksiDetails($nomor);
+    $this->template->load('templates/dashboard', 'member/detail', $data);
+}
     public function detailKasir(){
         $data['title'] = "Detail Member";
         $nomor = $this->uri->segment('3');
@@ -664,6 +735,4 @@ class Member extends CI_Controller {
         redirect('member/indexCabang');
     }
 }
-    
-    
 }
