@@ -156,7 +156,7 @@
                             <span class="text-danger small" id="primary_amount_error"></span>
                         </div>
                     </div>
-
+<!-- atos sami bal tapi nahe benten hasilna -->
                     <!-- Secondary Payment Section -->
                     <div id="secondary_payment_section" style="display:none;">
                         <div class="row form-group">
@@ -263,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         if (this.checked) {
             // Show secondary payment section immediately when split bill is checked
-            primaryAmountSection.style.display = 'block';
+            primaryAmountSection.style.display = 'flex';
             secondaryPaymentSection.style.display = 'block';
             // Reset values
             primaryAmountInput.value = '';

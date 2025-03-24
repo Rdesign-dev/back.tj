@@ -41,7 +41,7 @@ class TransaksiCabang extends CI_Controller {
                                ->where('status', 'Available')
                                ->where('expires_at >', date('Y-m-d H:i:s'))
                                ->get()
-                               ->result();
+                               ->result_array();
 
             $data['title'] = "Transaksi Member";
             $data['member'] = $member_data;

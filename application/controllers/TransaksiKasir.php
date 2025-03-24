@@ -42,8 +42,9 @@ class TransaksiKasir extends CI_Controller {
                                 ->where('expires_at >', date('Y-m-d H:i:s'))
                                 ->where('user_id', $member_data->id)
                                 ->get()
-                                ->result();
+                                ->result_array();
 
+            // Save member data to session
             $this->session->set_userdata('member_data', $member_data);
 
             $data['title'] = "Transaksi Member";
@@ -51,6 +52,7 @@ class TransaksiKasir extends CI_Controller {
             $data['unused_vouchers'] = $unused_vouchers;
 
             $this->template->load('templates/kasir', 'transaksi/transaksiMemberKasir', $data);
+            // $this->load->view('transaksi/transaksiMemberKasir', $data);
         }
     }
 
