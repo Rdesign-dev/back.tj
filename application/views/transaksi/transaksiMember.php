@@ -63,7 +63,7 @@
                             <input type="checkbox" class="custom-control-input" id="tukarVoucher" name="tukarVoucher">
                             <label class="custom-control-label" for="tukarVoucher">Ya, gunakan voucher</label>
                         </div>
-                        <select name="kodevouchertukar" id="kodevouchertukar" class="form-control" style="display:none;">
+                        <select name="kode_voucher" id="kode_voucher" class="form-control" style="display:none;">
                             <option value="">Pilih Voucher</option>
                             <?php foreach ($unused_vouchers as $voucher): ?>
                             <option value="<?= $voucher['kode_voucher'] ?>">
@@ -171,7 +171,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const splitBillCheckbox = document.getElementById('splitBill');
     const tukarVoucherCheckbox = document.getElementById('tukarVoucher');
-    const voucherSelect = document.getElementById('kodevouchertukar');
+    const voucherSelect = document.getElementById('kode_voucher');
     const primaryAmountInput = document.getElementById('primary_amount');
     const secondaryAmountInput = document.getElementById('secondary_amount');
     const totalInput = document.getElementById('total');

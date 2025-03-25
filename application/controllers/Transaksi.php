@@ -110,23 +110,27 @@ class Transaksi extends CI_Controller {
             $total = $this->input->post('total');
             $payment_method = $this->input->post('primary_payment_method');
             $branch_id = $this->input->post('nocabang');
-            $is_redeem_voucher = $this->input->post('tukarVoucher') == '1';
-            $voucher_code = $this->input->post('kodevouchertukar');
+            $is_redeem_voucher = $this->input->post('tukarVoucher') === 'on'; // Changed from '1' to 'on'
+            $voucher_code = $this->input->post('kode_voucher'); // Changed from 'kodevouchertukar' to 'kode_voucher'
             
             // Validate voucher if used
             if ($is_redeem_voucher && $voucher_code) {
                 // Check if voucher exists and belongs to user
                 $voucher = $this->db->select('rv.redeem_id, rv.user_id, rv.status')
-                                   ->from('redeem_voucher rv')
-                                   ->where('rv.kode_voucher', $voucher_code)
-                                   ->where('rv.user_id', $user->id)
-                                   ->where('rv.status', 'Available')
-                                   ->get()
-                                   ->row();
+                                ->from('redeem_voucher rv')
+                                ->where('rv.kode_voucher', $voucher_code) // Changed from 'kodevouchertukar' to 'kode_voucher'
+                                ->where('rv.user_id', $user->id)
+                                ->where('rv.status', 'Available')
+                                ->get()
+                                ->row();
     
                 if (!$voucher) {
                     throw new Exception('Voucher tidak valid atau bukan milik member ini');
                 }
+
+                // Debug voucher query
+                log_message('debug', 'Voucher query: ' . $this->db->last_query());
+                log_message('debug', 'Voucher data: ' . print_r($voucher, true));
             }
     
             // Handle file upload
@@ -144,7 +148,7 @@ class Transaksi extends CI_Controller {
     
             // Prepare transaction data with current timestamp
             $transaction_data = [
-                'transaction_codes' => $this->generate_transaction_code($login_session['id'], 'Teras Japan Payment'),
+                'transaction_codes' => $this->generate_transaction_code('Teras Japan Payment'),
                 'user_id' => $user->id,
                 'transaction_type' => 'Teras Japan Payment',
                 'amount' => $total,
@@ -152,8 +156,20 @@ class Transaksi extends CI_Controller {
                 'account_cashier_id' => $login_session['id'],
                 'transaction_evidence' => $transaction_evidence,
                 'created_at' => date('Y-m-d H:i:s'), // Menggunakan timestamp saat ini
-                'voucher_id' => $is_redeem_voucher && $voucher ? $voucher->redeem_id : null
+                'voucher_id' => $is_redeem_voucher && isset($voucher->redeem_id) ? $voucher->redeem_id : null
             ];
+
+            // Debug: Print POST data
+            // echo "<pre>POST Data:";
+            // var_dump($_POST);
+            
+            // echo "\nVoucher Query:";
+            // echo $this->db->last_query();
+            
+            // echo "\nTransaction Data to Insert:";
+            // var_dump($transaction_data);
+    
+            // die('Debug output - stopping here'); // Stop execution to see the debug output
     
             // Insert transaction
             $this->db->insert('transactions', $transaction_data);
@@ -161,34 +177,38 @@ class Transaksi extends CI_Controller {
     
             // Handle payments
             if ($this->input->post('splitBill')) {
-                // Split bill payment
-                $primary_amount = $this->input->post('primary_amount');
-                $secondary_amount = $total - $primary_amount;
+                // Get amounts from the correct POST fields
+                $primary_amount = (int)preg_replace('/[^\d]/', '', $this->input->post('primary_amount_display'));
+                $secondary_amount = (int)preg_replace('/[^\d]/', '', $this->input->post('secondary_amount_display'));
+                
+                // Debug payment amounts
+                log_message('debug', 'Primary amount: ' . $primary_amount);
+                log_message('debug', 'Secondary amount: ' . $secondary_amount);
+                log_message('debug', 'Total amount: ' . $total);
                 
                 // Validate amounts
                 if ($primary_amount <= 0 || $secondary_amount <= 0) {
                     throw new Exception('Jumlah pembayaran tidak valid');
                 }
-    
+            
                 // Check balance if using it
                 if ($payment_method == 'Balance' && $user->balance < $primary_amount) {
                     throw new Exception('Saldo tidak mencukupi untuk pembayaran pertama');
                 }
-    
+            
                 // Insert primary payment
                 $this->db->insert('transaction_payments', [
                     'transaction_id' => $transaction_id,
                     'payment_method' => $payment_method,
                     'amount' => $primary_amount
                 ]);
-    
+            
                 // Insert secondary payment
                 $this->db->insert('transaction_payments', [
                     'transaction_id' => $transaction_id,
                     'payment_method' => $this->input->post('secondary_payment_method'),
                     'amount' => $secondary_amount
                 ]);
-    
             } else {
                 // Single payment
                 $this->db->insert('transaction_payments', [
@@ -197,6 +217,18 @@ class Transaksi extends CI_Controller {
                     'amount' => $total
                 ]);
             }
+            
+            // Add debugging before the payment processing
+            // echo "<pre>Payment Data:";
+            // var_dump([
+            //     'splitBill' => $this->input->post('splitBill'),
+            //     'primary_amount_display' => $this->input->post('primary_amount_display'),
+            //     'secondary_amount_display' => $this->input->post('secondary_amount_display'),
+            //     'primary_payment_method' => $payment_method,
+            //     'secondary_payment_method' => $this->input->post('secondary_payment_method'),
+            //     'total' => $total
+            // ]);
+            // die();
     
             // Update balance if using it
             if ($payment_method == 'Balance') {
@@ -378,7 +410,7 @@ public function convert_and_updateSaldoMember()
 
         // Prepare transaction data
         $transaction_data = [
-            'transaction_codes' => $this->generate_transaction_code($account_id, 'Balance Top-up'),
+            'transaction_codes' => $this->generate_transaction_code('Balance Top-up'),
             'user_id' => $user->id,
             'transaction_type' => 'Balance Top-up',
             'amount' => $nominal,
