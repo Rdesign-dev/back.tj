@@ -174,6 +174,20 @@ class Transaksi extends CI_Controller {
             // Insert transaction
             $this->db->insert('transactions', $transaction_data);
             $transaction_id = $this->db->insert_id();
+
+            // Calculate and update points
+            $amount = (int)$total;
+            $points_to_add = floor($amount / 10000); // Every Rp 10.000 gets 1 point
+
+            if ($points_to_add > 0) {
+                // Update user points
+                $this->db->set('poin', "poin + {$points_to_add}", FALSE)
+                         ->where('id', $user->id)
+                         ->update('users');
+                         
+                // Log points addition (optional)
+                log_message('debug', "Added {$points_to_add} points to user {$user->id} for transaction {$transaction_id}");
+            }
     
             // Handle payments
             if ($this->input->post('splitBill')) {
@@ -220,14 +234,14 @@ class Transaksi extends CI_Controller {
                 // Update balance for each Balance payment
                 if ($primary_payment_method == 'Balance') {
                     $this->db->set('balance', "balance - {$primary_amount}", FALSE)
-                             ->where('id', $user->id)
-                             ->update('users');
+                            ->where('id', $user->id)
+                            ->update('users');
                 }
                 
                 if ($secondary_payment_method == 'Balance') {
                     $this->db->set('balance', "balance - {$secondary_amount}", FALSE)
-                             ->where('id', $user->id)
-                             ->update('users');
+                            ->where('id', $user->id)
+                            ->update('users');
                 }
             } else {
                 // Single payment
@@ -243,8 +257,8 @@ class Transaksi extends CI_Controller {
                         throw new Exception('Saldo tidak mencukupi');
                     }
                     $this->db->set('balance', "balance - {$total}", FALSE)
-                             ->where('id', $user->id)
-                             ->update('users');
+                            ->where('id', $user->id)
+                            ->update('users');
                 }
             }
             

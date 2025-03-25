@@ -64,53 +64,86 @@ class TransaksiKasir extends CI_Controller {
     public function convert_and_updateKasir() 
     {
         try {
-            // Start transaction
             $this->db->trans_start();
             
             // Get member data
             $nomor = $this->input->post('nomor');
             $member_data = $this->db->get_where('users', ['phone_number' => $nomor])->row();
             
-            // Get payment data - important to parse the amount correctly
+            // Get payment amounts
             $primary_amount = (int)preg_replace('/[^0-9]/', '', $this->input->post('primary_amount_display'));
             $secondary_amount = (int)preg_replace('/[^0-9]/', '', $this->input->post('secondary_amount_display'));
-            $total = $primary_amount;
-            
-            if ($this->input->post('splitBill')) {
-                $total = $primary_amount + $secondary_amount;
+            $total = $this->input->post('splitBill') ? ($primary_amount + $secondary_amount) : $primary_amount;
+
+            // Voucher handling
+            $voucher_id = null;
+            if ($this->input->post('tukarVoucher') === 'on') {
+                $voucher_code = $this->input->post('kodevouchertukar');
+                
+                // Get and validate voucher
+                $voucher = $this->db->select('redeem_id, user_id, status')
+                                   ->from('redeem_voucher')
+                                   ->where('kode_voucher', $voucher_code)
+                                   ->where('user_id', $member_data->id)
+                                   ->where('status', 'Available')
+                                   ->where('expires_at >', date('Y-m-d H:i:s'))
+                                   ->get()
+                                   ->row();
+
+                if (!$voucher) {
+                    throw new Exception('Voucher tidak valid atau sudah digunakan');
+                }
+
+                $voucher_id = $voucher->redeem_id;
+
+                // Update voucher status to Used
+                $this->db->where('redeem_id', $voucher_id)
+                         ->update('redeem_voucher', ['status' => 'Used']);
             }
 
-            // Insert transaction
+            // Handle file upload
+            $transaction_evidence = 'struk.png';
+            if ($_FILES['fotobill']['size'] > 0) {
+                $config['upload_path'] = '../ImageTerasJapan/transaction_proof/Payment/';
+                $config['allowed_types'] = 'jpg|jpeg|png';
+                $config['max_size'] = 2048;
+                $config['file_name'] = $this->generate_struk_filename();
+                
+                $this->load->library('upload', $config);
+                if ($this->upload->do_upload('fotobill')) {
+                    $uploaded_data = $this->upload->data();
+                    $transaction_evidence = $uploaded_data['file_name'];
+                }
+            }
+
+            // Prepare transaction data
             $transaction_data = [
                 'transaction_codes' => $this->generate_transaction_code('Teras Japan Payment'),
                 'user_id' => $member_data->id,
                 'transaction_type' => 'Teras Japan Payment',
                 'amount' => $total,
-                'branch_id' => $this->session->userdata('login_session')['branch_id'], // Use branch_id instead of idcabang
+                'branch_id' => $this->session->userdata('login_session')['branch_id'],
                 'account_cashier_id' => $this->session->userdata('login_session')['id'],
-                'created_at' => date('Y-m-d H:i:s')
+                'transaction_evidence' => $transaction_evidence,
+                'created_at' => date('Y-m-d H:i:s'),
+                'voucher_id' => $voucher_id  // Add voucher_id here
             ];
 
+            // Insert transaction
             $this->db->insert('transactions', $transaction_data);
             $transaction_id = $this->db->insert_id();
 
-            // Handle file upload
-            $config['upload_path'] = '../ImageTerasJapan/transaction_proof/Payment/';
-            $config['allowed_types'] = 'jpg|jpeg|png';
-            $config['max_size'] = 2048;
-            $config['file_name'] = $this->generate_struk_filename();
-            
-            $this->load->library('upload', $config);
-            
-            if ($this->upload->do_upload('fotobill')) {
-                $uploaded_data = $this->upload->data();
+            // Calculate and add points (Rp 10.000 = 1 point)
+            $points_to_add = floor($total / 10000);
+            if ($points_to_add > 0) {
+                $this->db->set('poin', "poin + {$points_to_add}", FALSE)
+                         ->where('id', $member_data->id)
+                         ->update('users');
                 
-                // Update transaction with image
-                $this->db->where('transaction_id', $transaction_id)
-                         ->update('transactions', ['transaction_evidence' => $uploaded_data['file_name']]);
+                log_message('debug', "Added {$points_to_add} points to user {$member_data->id}");
             }
 
-            // Insert payment(s)
+            // Handle payments
             if ($this->input->post('splitBill')) {
                 // Primary payment
                 $this->db->insert('transaction_payments', [

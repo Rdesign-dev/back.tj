@@ -79,7 +79,33 @@ class TransaksiCabang extends CI_Controller {
                 $total = $primary_amount + $secondary_amount;
             }
 
-            // Insert transaction
+            // Voucher handling
+            $voucher_id = null;
+            if ($this->input->post('tukarVoucher') === 'on') {
+                $voucher_code = $this->input->post('kodevouchertukar');
+                
+                // Get voucher details and validate
+                $voucher = $this->db->select('redeem_id, user_id, status')
+                                   ->from('redeem_voucher')
+                                   ->where('kode_voucher', $voucher_code)
+                                   ->where('user_id', $member_data->id)
+                                   ->where('status', 'Available')
+                                   ->where('expires_at >', date('Y-m-d H:i:s'))
+                                   ->get()
+                                   ->row();
+
+                if (!$voucher) {
+                    throw new Exception('Voucher tidak valid atau sudah digunakan');
+                }
+
+                $voucher_id = $voucher->redeem_id;
+
+                // Update voucher status to Used
+                $this->db->where('redeem_id', $voucher_id)
+                         ->update('redeem_voucher', ['status' => 'Used']);
+            }
+
+            // Insert transaction with voucher_id
             $transaction_data = [
                 'transaction_codes' => $this->generate_transaction_code('Teras Japan Payment'),
                 'user_id' => $member_data->id,
@@ -87,11 +113,31 @@ class TransaksiCabang extends CI_Controller {
                 'amount' => $total,
                 'branch_id' => $this->session->userdata('login_session')['branch_id'],
                 'account_cashier_id' => $this->session->userdata('login_session')['id'],
-                'created_at' => date('Y-m-d H:i:s')
+                'created_at' => date('Y-m-d H:i:s'),
+                'voucher_id' => $voucher_id  // Add voucher_id here
             ];
 
+            // Debug data
+            log_message('debug', 'Transaction Data: ' . print_r($transaction_data, true));
+            log_message('debug', 'POST Data: ' . print_r($_POST, true));
+
+            // Insert transaction
             $this->db->insert('transactions', $transaction_data);
             $transaction_id = $this->db->insert_id();
+
+            // Calculate and add points based on transaction amount
+            $amount = (int)$total;
+            $points_to_add = floor($amount / 10000); // Every Rp 10.000 gets 1 point
+
+            if ($points_to_add > 0) {
+                // Update user points
+                $this->db->set('poin', "poin + {$points_to_add}", FALSE)
+                        ->where('id', $member_data->id)
+                        ->update('users');
+                        
+                // Log points addition (optional)
+                log_message('debug', "Added {$points_to_add} points to user {$member_data->id} for transaction {$transaction_id}");
+            }
 
             // Handle file upload
             $config['upload_path'] = '../ImageTerasJapan/transaction_proof/Payment/';
@@ -106,7 +152,7 @@ class TransaksiCabang extends CI_Controller {
                 
                 // Update transaction with image
                 $this->db->where('transaction_id', $transaction_id)
-                         ->update('transactions', ['transaction_evidence' => $uploaded_data['file_name']]);
+                        ->update('transactions', ['transaction_evidence' => $uploaded_data['file_name']]);
             }
 
             // Insert payment(s)
@@ -140,7 +186,7 @@ class TransaksiCabang extends CI_Controller {
                 }
                 $new_balance = $member_data->balance - $primary_amount;
                 $this->db->where('id', $member_data->id)
-                         ->update('users', ['balance' => $new_balance]);
+                        ->update('users', ['balance' => $new_balance]);
             }
 
             // If split bill and second payment is balance
@@ -150,7 +196,7 @@ class TransaksiCabang extends CI_Controller {
                 }
                 $new_balance = $member_data->balance - $secondary_amount;
                 $this->db->where('id', $member_data->id)
-                         ->update('users', ['balance' => $new_balance]);
+                        ->update('users', ['balance' => $new_balance]);
             }
 
             $this->db->trans_complete();
