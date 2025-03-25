@@ -130,9 +130,10 @@ class Transaksi extends CI_Controller {
             }
     
             // Handle file upload
-            $config['upload_path'] = './uploads/struk/';
+            $config['upload_path'] = '../ImageTerasJapan/transaction_proof/Payment/';
             $config['allowed_types'] = 'jpg|jpeg|png';
-            $config['max_size'] = 2048; // 2MB
+            $config['max_size'] = 5048;
+            $config['file_name'] = $this->generate_struk_filename();
             $this->load->library('upload', $config);
     
             $transaction_evidence = 'struk.png'; // default value
@@ -462,35 +463,27 @@ public function getHistorysaldo() {
     $this->template->load('templates/dashboard', 'topup/index', $data);
 }
 
-private function generate_transaction_code($account_id, $transaction_type) {
-    $date = date('dmy');
-    
-    // Get payment method - handle both regular and split bill scenarios
-    $payment_method = $this->input->post('splitBill') 
-        ? $this->input->post('primary_payment_method')
-        : $this->input->post('payment_method');
-        
-    $payment_code = ($payment_method == 'cash') ? 'CSH' : 
-                   ($payment_method == 'Balance' ? 'BAL' : 'TF');
-    
-    // Add transaction type code
+// Add this function to each controller (Transaksi, TransaksiKasir, TransaksiCabang)
+private function generate_transaction_code($transaction_type) {
+    // Get type code based on transaction type
     $type_code = '';
     switch($transaction_type) {
         case 'Balance Top-up':
-            $type_code = 'BT';
+            $type_code = 'BTU';
             break;
         case 'Teras Japan Payment':
             $type_code = 'TJP';
             break;
-        case 'Redeem Voucher':
-            $type_code = 'RV';
-            break;
-        default:
-            $type_code = 'TJP'; // Default to Teras Japan Payment
     }
     
-    $random = mt_rand(1000, 9999);
-    return "TRXSU{$type_code}{$account_id}{$random}";
+    // Generate timestamp YYYYMMDDHHMISS
+    $timestamp = date('YmdHis');
+    
+    // Generate 6 random characters
+    $random = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"), 0, 6);
+    
+    // Format: TRX{type_code}{timestamp}{random}
+    return "TRX{$type_code}{$timestamp}{$random}";
 }
 
 private function generate_evidence_filename($user_id) {
@@ -502,8 +495,8 @@ private function generate_evidence_filename($user_id) {
 public function add()
 {
     $data['title'] = "Transaksi Member";
-    // Update the branch query to match your database structure
-    $data['cabang'] = $this->db->select('branch_id as id, branch_code, branch_name')
+    // Fix the query to use correct column name 'id' instead of 'branch_id'
+    $data['cabang'] = $this->db->select('id, branch_code, branch_name')
                                ->from('branch')
                                ->get()
                                ->result_array();
@@ -561,5 +554,11 @@ public function getHistorytopupKasir()
     
     $this->template->load('templates/kasir', 'topup/dataKasir', $data);
     }
+
+    private function generate_struk_filename() {
+        $timestamp = date('YmdHis'); // Format: 20240324153000 (tahun bulan tanggal jam menit detik)
+        $random = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"), 0, 6); // 6 karakter random
+        return "TRX{$timestamp}{$random}";
+}
 
 }

@@ -67,12 +67,15 @@ class Auth extends CI_Controller
                             $branch_id = $this->auth->get_branch_id($user_db['id']);
                             $branch_name = $this->auth->get_name_id($user_db['id']);
                             $userdata['idcabang'] = $branch_id;
+                            $userdata['branch_id'] = $branch_id; // Add this line
                             $userdata['namacabang'] = $branch_name;
+                            $this->session->set_userdata('login_session', $userdata); // Move this here
                             redirect('dashboard/kasir'); // Sesuaikan dengan URL dashboard kasir Anda
                         } else if($user_db['account_type'] == 'branch_admin') {
                             $branch_id = $this->auth->get_branch_id($user_db['id']);
                             $branch_name = $this->auth->get_name_id($user_db['id']);
                             $userdata['idcabang'] = $branch_id;
+                            $userdata['branch_id'] = $branch_id; // Add this line
                             $userdata['namacabang'] = $branch_name;
                             $this->session->set_userdata('login_session', $userdata);
                             redirect('dashboard/cabang');
