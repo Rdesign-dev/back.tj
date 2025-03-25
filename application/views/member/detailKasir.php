@@ -88,6 +88,7 @@
                             <th>Nama Kasir</th>
                             <th>Total</th>
                             <th>Metode Pembayaran</th>
+                            <th>Kode Voucher</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -122,6 +123,7 @@
                                     }
                                     ?>
                                 </td>
+                                <td><?= $tran->kodevoucher ?? '-' ?></td>
                             </tr>
                         <?php } ?>
                     </tbody>

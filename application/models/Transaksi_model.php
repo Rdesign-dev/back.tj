@@ -188,12 +188,14 @@ class Transaksi_model extends CI_Model {
                                 t.amount as total,
                                 b.branch_name as namacabang,
                                 a.Name as nama,
+                                rv.kode_voucher as kodevoucher,
                                 GROUP_CONCAT(CONCAT(tp.payment_method, " (Rp ", FORMAT(tp.amount, 0), ")") SEPARATOR " & ") as metodebayar')
                         ->from('transactions t')
                         ->join('users u', 'u.id = t.user_id')
                         ->join('branch b', 'b.id = t.branch_id')
                         ->join('accounts a', 'a.id = t.account_cashier_id')
                         ->join('transaction_payments tp', 'tp.transaction_id = t.transaction_id', 'left')
+                        ->join('redeem_voucher rv', 'rv.redeem_id = t.voucher_id', 'left') // Added this join
                         ->where('u.phone_number', $phone_number)
                         ->where('t.transaction_type', 'Teras Japan Payment')
                         ->group_by('t.transaction_id')
