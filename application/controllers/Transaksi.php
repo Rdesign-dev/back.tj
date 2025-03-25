@@ -181,34 +181,54 @@ class Transaksi extends CI_Controller {
                 $primary_amount = (int)preg_replace('/[^\d]/', '', $this->input->post('primary_amount_display'));
                 $secondary_amount = (int)preg_replace('/[^\d]/', '', $this->input->post('secondary_amount_display'));
                 
-                // Debug payment amounts
-                log_message('debug', 'Primary amount: ' . $primary_amount);
-                log_message('debug', 'Secondary amount: ' . $secondary_amount);
-                log_message('debug', 'Total amount: ' . $total);
+                // Get payment methods
+                $primary_payment_method = $this->input->post('primary_payment_method');
+                $secondary_payment_method = $this->input->post('secondary_payment_method');
                 
                 // Validate amounts
                 if ($primary_amount <= 0 || $secondary_amount <= 0) {
                     throw new Exception('Jumlah pembayaran tidak valid');
                 }
             
-                // Check balance if using it
-                if ($payment_method == 'Balance' && $user->balance < $primary_amount) {
-                    throw new Exception('Saldo tidak mencukupi untuk pembayaran pertama');
+                // Check balance if either payment uses Balance
+                if ($primary_payment_method == 'Balance') {
+                    if ($user->balance < $primary_amount) {
+                        throw new Exception('Saldo tidak mencukupi untuk pembayaran pertama');
+                    }
+                }
+                
+                if ($secondary_payment_method == 'Balance') {
+                    if ($user->balance < $secondary_amount) {
+                        throw new Exception('Saldo tidak mencukupi untuk pembayaran kedua');
+                    }
                 }
             
                 // Insert primary payment
                 $this->db->insert('transaction_payments', [
                     'transaction_id' => $transaction_id,
-                    'payment_method' => $payment_method,
+                    'payment_method' => $primary_payment_method,
                     'amount' => $primary_amount
                 ]);
             
                 // Insert secondary payment
                 $this->db->insert('transaction_payments', [
                     'transaction_id' => $transaction_id,
-                    'payment_method' => $this->input->post('secondary_payment_method'),
+                    'payment_method' => $secondary_payment_method,
                     'amount' => $secondary_amount
                 ]);
+            
+                // Update balance for each Balance payment
+                if ($primary_payment_method == 'Balance') {
+                    $this->db->set('balance', "balance - {$primary_amount}", FALSE)
+                             ->where('id', $user->id)
+                             ->update('users');
+                }
+                
+                if ($secondary_payment_method == 'Balance') {
+                    $this->db->set('balance', "balance - {$secondary_amount}", FALSE)
+                             ->where('id', $user->id)
+                             ->update('users');
+                }
             } else {
                 // Single payment
                 $this->db->insert('transaction_payments', [
@@ -216,6 +236,16 @@ class Transaksi extends CI_Controller {
                     'payment_method' => $payment_method,
                     'amount' => $total
                 ]);
+            
+                // Update balance if using Balance
+                if ($payment_method == 'Balance') {
+                    if ($user->balance < $total) {
+                        throw new Exception('Saldo tidak mencukupi');
+                    }
+                    $this->db->set('balance', "balance - {$total}", FALSE)
+                             ->where('id', $user->id)
+                             ->update('users');
+                }
             }
             
             // Add debugging before the payment processing
