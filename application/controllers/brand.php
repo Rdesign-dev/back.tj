@@ -245,7 +245,6 @@ class Brand extends CI_Controller {
 
     public function addpromo($brand_id = null)
     {
-        // Validate brand exists
         $brand = $this->brand->get_by_id($brand_id);
         if (!$brand) {
             set_pesan('Brand ID tidak ditemukan', false);
@@ -254,34 +253,28 @@ class Brand extends CI_Controller {
 
         if ($this->input->post()) {
             $this->_validasi_promo();
-            
+
             if ($this->form_validation->run() == false) {
                 $data['title'] = "Tambah Promo";
                 $data['brand_id'] = $brand_id;
                 $data['brand'] = $brand;
-                $this->template->load('templates/dashboard', 'brand/add_promo', $data);
+                $this->template->load('templates/dashboard', 'brand/addpromo', $data);
             } else {
                 $input = $this->input->post(null, true);
                 $input['id_brand'] = $brand_id;
 
                 // Handle image upload
-                $config['upload_path']   = '../ImageTerasJapan/promo/';
-                $config['allowed_types'] = 'jpg|jpeg|png';
-                $config['max_size']      = 2048;
-                $config['file_name']     = 'promo_' . time();
-
-                $this->load->library('upload', $config);
-
                 if (!empty($_FILES['promo_image']['name'])) {
-                    if ($this->upload->do_upload('promo_image')) {
-                        $input['promo_image'] = $this->upload->data('file_name');
+                    $upload = $this->_do_upload('promo_image');
+                    if ($upload) {
+                        $input['promo_image'] = $upload;
                     } else {
-                        set_pesan($this->upload->display_errors(), false);
+                        set_pesan('Gagal mengunggah gambar promo', false);
                         redirect('brand/addpromo/' . $brand_id);
                     }
                 }
 
-                // Set status based on dates
+                // Determine promo status
                 date_default_timezone_set('Asia/Jakarta');
                 $now = strtotime('now');
                 $available_from = strtotime($input['available_from']);
@@ -289,7 +282,7 @@ class Brand extends CI_Controller {
 
                 if ($available_from > $now) {
                     $input['status'] = 'Coming';
-                } else if ($valid_until < $now) {
+                } elseif ($valid_until < $now) {
                     $input['status'] = 'Expired';
                 } else {
                     $input['status'] = 'Available';
@@ -307,7 +300,7 @@ class Brand extends CI_Controller {
             $data['title'] = "Tambah Promo";
             $data['brand_id'] = $brand_id;
             $data['brand'] = $brand;
-            $this->template->load('templates/dashboard', 'brand/add_promo', $data);
+            $this->template->load('templates/dashboard', 'brand/addpromo', $data);
         }
     }
 
@@ -318,7 +311,6 @@ class Brand extends CI_Controller {
             redirect('brand');
         }
 
-        // Get promo data
         $promo = $this->brand->get_promo_by_id($id);
         if (!$promo) {
             set_pesan('Data promo tidak ditemukan', false);
@@ -327,36 +319,27 @@ class Brand extends CI_Controller {
 
         if ($this->input->post()) {
             $this->_validasi_promo();
-            
+
             if ($this->form_validation->run() == false) {
                 $data['title'] = "Edit Promo";
                 $data['promo'] = $promo;
                 $this->template->load('templates/dashboard', 'brand/edit_promo', $data);
             } else {
                 $input = $this->input->post(null, true);
-                
-                // Handle image upload if new image is provided
+                $input['promo_image'] = $promo['promo_image'];
+
+                // Handle image upload
                 if (!empty($_FILES['promo_image']['name'])) {
-                    $config['upload_path']   = '../ImageTerasJapan/promo/';
-                    $config['allowed_types'] = 'jpg|jpeg|png';
-                    $config['max_size']      = 2048;
-                    $config['file_name']     = 'promo_' . time();
-
-                    $this->load->library('upload', $config);
-
-                    if ($this->upload->do_upload('promo_image')) {
-                        // Delete old image if exists
-                        if ($promo['promo_image'] && file_exists($config['upload_path'] . $promo['promo_image'])) {
-                            unlink($config['upload_path'] . $promo['promo_image']);
-                        }
-                        $input['promo_image'] = $this->upload->data('file_name');
+                    $upload = $this->_do_upload('promo_image');
+                    if ($upload) {
+                        $input['promo_image'] = $upload;
                     } else {
-                        set_pesan($this->upload->display_errors(), false);
+                        set_pesan('Gagal mengunggah gambar promo', false);
                         redirect('brand/editpromo/' . $id);
                     }
                 }
 
-                // Set timezone and determine status
+                // Determine promo status
                 date_default_timezone_set('Asia/Jakarta');
                 $now = strtotime('now');
                 $available_from = strtotime($input['available_from']);
@@ -364,19 +347,16 @@ class Brand extends CI_Controller {
 
                 if ($available_from > $now) {
                     $input['status'] = 'Coming';
-                } else if ($valid_until < $now) {
+                } elseif ($valid_until < $now) {
                     $input['status'] = 'Expired';
                 } else {
                     $input['status'] = 'Available';
                 }
 
-                if ($this->brand->save_edit_promo($id, $input)) {
-                    set_pesan('Promo berhasil diupdate');
-                    redirect('brand');
-                } else {
-                    set_pesan('Gagal mengupdate promo', false);
-                    redirect('brand/editpromo/' . $id);
-                }
+                unset($input['id']);
+                $this->brand->update_promo($id, $input);
+                set_pesan('Perubahan berhasil disimpan');
+                redirect('brand');
             }
         } else {
             $data['title'] = "Edit Promo";
@@ -388,7 +368,7 @@ class Brand extends CI_Controller {
     private function _validasi_promo()
     {
         $this->form_validation->set_rules('promo_name', 'Nama Promo', 'required|trim');
-        $this->form_validation->set_rules('promo_desc', 'Deskripsi', 'required|trim');
+        $this->form_validation->set_rules('promo_desc', 'Deskripsi Promo', 'required|trim');
         $this->form_validation->set_rules('available_from', 'Tersedia Sejak', 'required');
         $this->form_validation->set_rules('valid_until', 'Masa Berlaku', 'required');
         
@@ -661,5 +641,21 @@ class Brand extends CI_Controller {
         }
         
         redirect('brand');
+    }
+
+    private function _do_upload($field_name)
+    {
+        $config['upload_path'] = '../ImageTerasJapan/promo/';
+        $config['allowed_types'] = 'jpg|jpeg|png';
+        $config['max_size'] = 2048; // 2MB
+        $config['file_name'] = 'promo_' . time();
+
+        $this->load->library('upload', $config);
+
+        if (!$this->upload->do_upload($field_name)) {
+            return false; // Return false if upload fails
+        }
+
+        return $this->upload->data('file_name'); // Return the uploaded file name
     }
 }

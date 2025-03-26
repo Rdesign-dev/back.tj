@@ -9,8 +9,11 @@ class Voucher_model extends CI_Model {
         parent::__construct();
     }
 
-    public function find_all(){
-        return $this->db->get($this->table)->result_array();
+    public function find_all() {
+        $this->db->select('rewards.*, brands.name as brand_name');
+        $this->db->from('rewards');
+        $this->db->join('brands', 'brands.id = rewards.brand_id', 'left');
+        return $this->db->get()->result_array();
     }
 
     public function insert($data) {
@@ -29,5 +32,12 @@ class Voucher_model extends CI_Model {
     public function get_by_id($id){
         $this->db->where('id', $id);
         return $this->db->get($this->table)->row_array(); // Ubah ke row_array() agar konsisten dengan format data
+    }
+
+    public function get_all_brands() {
+        return $this->db->select('id, name')
+                        ->from('brands')
+                        ->get()
+                        ->result_array();
     }
 }

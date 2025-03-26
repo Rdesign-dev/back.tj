@@ -26,12 +26,13 @@ class User extends CI_Controller
         // Get current user's ID from session
         $current_user_id = $this->session->userdata('login_session')['id'];
         
-        // Change 'user' to 'users' to match the view
-        $data['users'] = $this->db->select('*')
-                                ->from('accounts')
-                                ->where('id !=', $current_user_id)
-                                ->get()
-                                ->result_array();
+        // Update query to join with the branch table
+        $data['users'] = $this->db->select('accounts.*, branch.branch_name')
+                                  ->from('accounts')
+                                  ->join('branch', 'accounts.branch_id = branch.id', 'left') // Join with branch table
+                                  ->where('accounts.id !=', $current_user_id) // Exclude current user
+                                  ->get()
+                                  ->result_array();
         
         $this->template->load('templates/dashboard', 'user/data', $data);
     }

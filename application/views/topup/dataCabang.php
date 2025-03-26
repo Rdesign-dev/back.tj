@@ -10,14 +10,14 @@
                         </h4>
                     </div>
                     <div class="col-auto">
-                        <a href="<?= base_url('transaksicabang/saldoCabang') ?>" class="btn btn-sm btn-primary btn-icon-split">
+                        <!-- <a href="<?= base_url('transaksicabang/saldoCabang') ?>" class="btn btn-sm btn-primary btn-icon-split">
                             <span class="icon">
                                 <i class="fa fa-plus"></i>
                             </span>
                             <span class="text">
                                 Tambah Top Up
                             </span>
-                        </a>
+                        </a> -->
                     </div>
                 </div>
             </div>
@@ -31,12 +31,13 @@
                             <th>Nama Member</th>
                             <th>Nominal</th>
                             <th>Kasir</th>
+                            <th>Bukti Transaksi</th> <!-- New column -->
                         </tr>
                     </thead>
                     <tbody>
                         <?php 
                         $no = 1;
-                        if($trans): foreach($trans as $t): ?>
+                        if ($trans): foreach ($trans as $t): ?>
                         <tr>
                             <td><?= $no++; ?></td>
                             <td><?= $t->transaction_codes; ?></td>
@@ -44,10 +45,17 @@
                             <td><?= $t->member_name; ?></td>
                             <td>Rp <?= number_format($t->amount ?? 0, 0, ',', '.'); ?></td>
                             <td><?= $t->cashier_name; ?></td>
+                            <td>
+                                <?php if (!empty($t->transaction_evidence)): ?>
+                                    <img src="<?= base_url('ImageTerasJapan/transaction_proof/Topup/' . $t->transaction_evidence); ?>" alt="Bukti Transaksi" class="img-fluid" style="max-width: 150px; max-height: 150px;">
+                                <?php else: ?>
+                                    <span class="text-danger">Tidak Ada Bukti</span>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                         <?php endforeach; else: ?>
                         <tr>
-                            <td colspan="6" class="text-center">Belum ada data top up</td>
+                            <td colspan="7" class="text-center">Belum ada data top up</td>
                         </tr>
                         <?php endif; ?>
                     </tbody>
@@ -58,7 +66,7 @@
 </div>
 
 <script>
-$(document).ready(function() {
+$(document).ready(function() {  
     $('#dataTable').DataTable();
 });
 </script>

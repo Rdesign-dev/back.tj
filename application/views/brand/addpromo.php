@@ -22,45 +22,45 @@
             </div>
             <div class="card-body pb-2">
                 <?= $this->session->flashdata('pesan'); ?>
-                <?= form_open_multipart('brand/save', array('id' => 'brandForm')); ?>
-                
+                <?= form_open_multipart('brand/addpromo/' . $brand_id); ?>
+
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="name">Nama Promo </label>
+                    <label class="col-md-4 text-md-right" for="promo_name">Nama Promo</label>
                     <div class="col-md-6">
-                        <input value="<?= set_value('name'); ?>" type="text" id="name" name="name" class="form-control" placeholder="Masukkan Nama Brand">
-                        <?= form_error('name', '<div class="text-danger small">', '</div>'); ?>
+                        <input value="<?= set_value('promo_name'); ?>" type="text" id="promo_name" name="promo_name" class="form-control" placeholder="Masukkan Nama Promo" required>
+                        <?= form_error('promo_name', '<div class="text-danger small">', '</div>'); ?>
                     </div>
                 </div>
 
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="desc">Deskripsi</label>
+                    <label class="col-md-4 text-md-right" for="promo_desc">Deskripsi Promo</label>
                     <div class="col-md-6">
-                        <textarea id="desc" name="desc" class="form-control" placeholder="Masukkan Deskripsi Brand"><?= set_value('desc'); ?></textarea>
-                        <?= form_error('desc', '<div class="text-danger small">', '</div>'); ?>
+                        <textarea id="promo_desc" name="promo_desc" class="form-control" placeholder="Masukkan Deskripsi Promo" rows="4"><?= set_value('promo_desc'); ?></textarea>
+                        <?= form_error('promo_desc', '<div class="text-danger small">', '</div>'); ?>
                     </div>
                 </div>
 
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="desc">Status</label>
+                    <label class="col-md-4 text-md-right" for="available_from">Tersedia Sejak</label>
                     <div class="col-md-6">
-                        <textarea id="desc" name="desc" class="form-control" placeholder="Masukkan Deskripsi Brand"><?= set_value('desc'); ?></textarea>
-                        <?= form_error('desc', '<div class="text-danger small">', '</div>'); ?>
+                        <input type="datetime-local" id="available_from" name="available_from" class="form-control" value="<?= set_value('available_from'); ?>" required>
+                        <?= form_error('available_from', '<div class="text-danger small">', '</div>'); ?>
                     </div>
                 </div>
 
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="desc">Batas Waktu</label>
+                    <label class="col-md-4 text-md-right" for="valid_until">Masa Berlaku</label>
                     <div class="col-md-6">
-                        <textarea id="desc" name="desc" class="form-control" placeholder="Masukkan Deskripsi Brand"><?= set_value('desc'); ?></textarea>
-                        <?= form_error('desc', '<div class="text-danger small">', '</div>'); ?>
+                        <input type="datetime-local" id="valid_until" name="valid_until" class="form-control" value="<?= set_value('valid_until'); ?>" required>
+                        <?= form_error('valid_until', '<div class="text-danger small">', '</div>'); ?>
                     </div>
                 </div>
 
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="image">Gambar</label>
+                    <label class="col-md-4 text-md-right" for="promo_image">Gambar Promo</label>
                     <div class="col-md-6">
-                        <input type="file" id="image" name="image" class="form-control" accept="image/*">
-                        <?= form_error('image', '<div class="text-danger small">', '</div>'); ?>
+                        <input type="file" id="promo_image" name="promo_image" class="form-control" accept="image/*">
+                        <?= form_error('promo_image', '<div class="text-danger small">', '</div>'); ?>
                     </div>
                 </div>
 
@@ -82,7 +82,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById('brandForm');
-    const requiredFields = ['name', 'desc', 'image', 'banner'];
+    const requiredFields = ['promo_name', 'promo_desc', 'promo_image', 'available_from', 'valid_until'];
     
     form.addEventListener('submit', function(e) {
         let isValid = true;

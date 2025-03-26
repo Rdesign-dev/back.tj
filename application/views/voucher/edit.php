@@ -65,6 +65,21 @@
                 </div>
 
                 <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="brand_id">Brand</label>
+                    <div class="col-md-6">
+                        <select id="brand_id" name="brand_id" class="form-control" required>
+                            <option value="" selected disabled>-- Pilih Brand --</option>
+                            <?php foreach ($brands as $brand): ?>
+                                <option value="<?= $brand['id']; ?>" <?= $voucher['brand_id'] == $brand['id'] ? 'selected' : ''; ?>>
+                                    <?= $brand['name']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?= form_error('brand_id', '<span class="text-danger small">', '</span>'); ?>
+                    </div>
+                </div>
+
+                <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="image_name">Foto</label>
                     <div class="col-md-6">
                         <div class="row">

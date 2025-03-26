@@ -43,22 +43,6 @@
                 </div>
 
                 <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="points_required">Points Required</label>
-                    <div class="col-md-6">
-                        <input value="<?= set_value('points_required', $promo['points_required']); ?>" type="number" id="points_required" name="points_required" class="form-control" min="0" required>
-                        <?= form_error('points_required', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-
-                <div class="row form-group">
-                    <label class="col-md-4 text-md-right" for="qty">Quantity</label>
-                    <div class="col-md-6">
-                        <input value="<?= set_value('qty', $promo['qty']); ?>" type="number" id="qty" name="qty" class="form-control" min="0">
-                        <?= form_error('qty', '<span class="text-danger small">', '</span>'); ?>
-                    </div>
-                </div>
-
-                <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="available_from">Tersedia Sejak</label>
                     <div class="col-md-6">
                         <input type="datetime-local" id="available_from" name="available_from" class="form-control" value="<?= date('Y-m-d\TH:i', strtotime($promo['available_from'])); ?>" required>

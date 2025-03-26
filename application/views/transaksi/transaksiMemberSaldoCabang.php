@@ -62,7 +62,7 @@
                     </div>
                 </div>
 
-                <div class="row form-group" id="buktiDiv" style="display:none;">
+                <div class="row form-group" id="buktiDiv">
                     <label class="col-md-4 text-md-right" for="bukti">Bukti Pembayaran</label>
                     <div class="col-md-6">
                         <input type="file" id="bukti" name="bukti" class="form-control">
@@ -91,15 +91,8 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const metodeSelect = document.getElementById('metode');
-    const buktiDiv = document.getElementById('buktiDiv');
     const nominalInput = document.getElementById('nominal');
     const form = document.querySelector('form');
-
-    // Show/hide bukti upload based on payment method
-    metodeSelect.addEventListener('change', function() {
-        buktiDiv.style.display = this.value === 'transferBank' ? 'flex' : 'none';
-    });
 
     // Format nominal with thousand separator
     nominalInput.addEventListener('input', function(e) {

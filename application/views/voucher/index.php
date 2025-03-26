@@ -32,6 +32,7 @@
                     <th>Berlaku Sampai</th>
                     <th>Total Hari Aktif</th>
                     <th>Qty</th>
+                    <th>Brand</th> <!-- New column -->
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -56,23 +57,12 @@
                                 <?php endif; ?>
                             </td>
                             <td><?= $voucher['points_required']; ?></td>
-                            <td>
-                                <?php
-                                if ($voucher['category'] == 'oldmember') {
-                                    echo "Member Biasa";
-                                } elseif ($voucher['category'] == 'newmember') {
-                                    echo "Member Baru";
-                                } elseif($voucher['category'] == 'code'){
-                                    echo "Kode Referal";
-                                } else {
-                                    echo "Undefined";
-                                }
-                                ?>
-                            </td>
+                            <td><?= ucfirst($voucher['category']); ?></td>
                             <td><?= $voucher['description']; ?></td>
                             <td><?= date('d-m-Y', strtotime($voucher['valid_until'])); ?></td>
                             <td><?= $voucher['total_days']; ?></td>
                             <td><?= $voucher['qty']; ?></td>
+                            <td><?= $voucher['brand_name']; ?></td> <!-- Display brand name -->
                             <td>
                                 <a href="<?= base_url('voucher/edit_voucher/') . $voucher['id'] ?>" class="btn btn-circle btn-sm btn-warning"><i class="fa fa-fw fa-edit"></i></a>
                                 <a onclick="return confirm('Yakin ingin menghapus data?')" href="<?= base_url('voucher/delete/') . $voucher['id'] ?>" class="btn btn-circle btn-sm btn-danger"><i class="fa fa-fw fa-trash"></i></a>
@@ -81,7 +71,7 @@
                     <?php endforeach;
                     else : ?>
                     <tr>
-                        <td colspan="10" class="text-center">Silahkan tambahkan Voucher Penukaran Poin</td>
+                        <td colspan="11" class="text-center">Silahkan tambahkan Voucher Penukaran Poin</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

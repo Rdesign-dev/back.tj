@@ -73,6 +73,7 @@ class Topup_model extends CI_Model {
                                  u.name as member_name,
                                  t.amount, 
                                  a.Name as cashier_name,
+                                 t.transaction_evidence,  -- Include transaction evidence
                                  GROUP_CONCAT(CONCAT(tp.payment_method, " (", tp.amount, ")") SEPARATOR " & ") as payment_details')
                 ->from('transactions t')
                 ->join('users u', 'u.id = t.user_id')

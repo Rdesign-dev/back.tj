@@ -367,11 +367,6 @@ document.addEventListener('DOMContentLoaded', function() {
                            class="btn btn-circle btn-sm btn-warning">
                             <i class="fa fa-fw fa-edit"></i>
                         </a>
-                        <a onclick="return confirm('Yakin ingin menghapus data?')" 
-                           href="${BASE_URL}brand/delete_voucher/${voucher.id}" 
-                           class="btn btn-circle btn-sm btn-danger">
-                            <i class="fa fa-fw fa-trash"></i>
-                        </a>
                     </td>
                 </tr>`;
         });
