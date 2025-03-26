@@ -139,13 +139,13 @@
                     <i class="fas fa-tasks"></i>
                     <span>Pusat Bantuan</span>
                 </a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('content'); ?>">
                     <i class="fas fa-file-contract"></i>
                     <span>Konten PopUp</span>
                 </a>
-            </li> -->
+            </li>
             <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('laporan'); ?>">
                     <i class="fas fa-file-pdf"></i>

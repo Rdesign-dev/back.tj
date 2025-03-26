@@ -482,7 +482,10 @@ class Member extends CI_Controller {
             $config['upload_path'] = '../ImageTerasJapan/ProfPic/';
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
             $config['max_size'] = 2048;
-            $config['file_name'] = uniqid('prof_');
+            
+            // New format: PicM-membername-timestamp
+            $member_name = strtolower(str_replace(' ', '-', $this->input->post('nama', true)));
+            $config['file_name'] = 'PicM-' . $member_name . '-' . time();
 
             $this->load->library('upload', $config);
 
@@ -656,7 +659,10 @@ class Member extends CI_Controller {
             $config['upload_path']   = '../ImageTerasJapan/ProfPic/';
             $config['allowed_types'] = 'gif|jpg|jpeg|png';
             $config['max_size']      = 2048;
-            $config['file_name']     = 'prof_' . time();
+            
+            // New format: PicM-membername-timestamp
+            $member_name = strtolower(str_replace(' ', '-', $input['namamember']));
+            $config['file_name']     = 'PicM-' . $member_name . '-' . time();
 
             $this->load->library('upload', $config);
 
@@ -736,7 +742,10 @@ class Member extends CI_Controller {
             $config['upload_path']   = '../ImageTerasJapan/ProfPic/';
             $config['allowed_types'] = 'gif|jpg|jpeg|png';
             $config['max_size']      = 2048;
-            $config['file_name']     = 'prof_' . time();
+            
+            // New format: PicM-membername-timestamp
+            $member_name = strtolower(str_replace(' ', '-', $input['namamember']));
+            $config['file_name']     = 'PicM-' . $member_name . '-' . time();
 
             $this->load->library('upload', $config);
 

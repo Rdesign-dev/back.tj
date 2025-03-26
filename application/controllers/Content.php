@@ -107,9 +107,11 @@ class Content extends CI_Controller {
         }
     }
 
-    private function _validasi() {
+    private function _validasi() 
+    {
         $this->form_validation->set_rules('name', 'Name', 'required|trim');
-        $this->form_validation->set_rules('link', 'Link', 'required|trim');
+        // Remove or comment out link validation since it's optional
+        // $this->form_validation->set_rules('link', 'Link', 'required|trim');
     }
 
     public function toggle($getId) {
@@ -120,6 +122,41 @@ class Content extends CI_Controller {
         } else {
             set_pesan('Gagal mengubah status.', false);
         }
+        redirect('content');
+    }
+
+    public function delete($getId)
+    {
+        if (!$getId) {
+            redirect('content');
+        }
+        
+        $id = encode_php_tags($getId);
+        
+        // Get content details first to get image filename
+        $content = $this->content->get_content_by_id($id);
+        
+        if ($content) {
+            // Delete image file if exists
+            if ($content['Image'] !== null) {
+                $file_path = '../ImageTerasJapan/contentpopup/' . $content['Image'];
+                if (file_exists($file_path)) {
+                    unlink($file_path);
+                }
+            }
+
+            // Delete database record
+            $delete = $this->content->delete_content($id);
+            
+            if ($delete) {
+                set_pesan('Content berhasil dihapus.');
+            } else {
+                set_pesan('Gagal menghapus content.', false);
+            }
+        } else {
+            set_pesan('Content tidak ditemukan.', false);
+        }
+        
         redirect('content');
     }
 }

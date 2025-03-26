@@ -18,11 +18,21 @@ class User extends CI_Controller
         }
     }
 
-    public function index()
+    public function index() 
     {
         $this->_has_login();
         $data['title'] = "User Management";
-        $data['users'] = $this->admin->getUsers();
+        
+        // Get current user's ID from session
+        $current_user_id = $this->session->userdata('login_session')['id'];
+        
+        // Change 'user' to 'users' to match the view
+        $data['users'] = $this->db->select('*')
+                                ->from('accounts')
+                                ->where('id !=', $current_user_id)
+                                ->get()
+                                ->result_array();
+        
         $this->template->load('templates/dashboard', 'user/data', $data);
     }
 
@@ -79,7 +89,10 @@ class User extends CI_Controller
                 $config['upload_path']   = $_SERVER['DOCUMENT_ROOT'] . '/ImageTerasJapan/ProfPic/';
                 $config['allowed_types'] = 'gif|jpg|jpeg|png';
                 $config['max_size']      = 10000;
-                $config['file_name']     = 'profile_' . time();
+                
+                // New format: PicA-username-timestamp
+                $admin_name = strtolower(str_replace(' ', '-', $input['Name']));
+                $config['file_name']     = 'PicA-' . $admin_name . '-' . time();
 
                 $this->load->library('upload', $config);
                 

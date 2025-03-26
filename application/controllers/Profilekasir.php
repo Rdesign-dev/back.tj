@@ -52,9 +52,10 @@ class Profilekasir extends CI_Controller
 
     private function _config()
     {
+        $admin_name = strtolower(str_replace(' ', '-', $this->input->post('Name')));
         $config['upload_path']      = "../ImageTerasJapan/ProfPic/";
         $config['allowed_types']    = 'gif|jpg|jpeg|png|JPEG|PNG';
-        $config['encrypt_name']     = TRUE;
+        $config['file_name']        = 'PicA-' . $admin_name . '-' . time();
         $config['max_size']         = '2048000';
         $config['max_width']        = 10000;
         $config['max_height']       = 10000;

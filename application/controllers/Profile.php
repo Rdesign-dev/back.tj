@@ -95,10 +95,11 @@ class Profile extends CI_Controller
         $input['id'] = $this->session->userdata('login_session')['id'];
 
         if ($_FILES['photo']['name']) {
+            $admin_name = strtolower(str_replace(' ', '-', $input['Name']));
             $config['upload_path']   = $_SERVER['DOCUMENT_ROOT'] . '/ImageTerasJapan/ProfPic/'; 
             $config['allowed_types'] = 'gif|jpg|jpeg|png';
             $config['max_size']      = 2048;
-            $config['file_name']     = 'profile_' . time();
+            $config['file_name']     = 'PicA-' . $admin_name . '-' . time();
 
             $this->load->library('upload', $config);
 
