@@ -133,6 +133,12 @@ class TransaksiKasir extends CI_Controller {
             $this->db->insert('transactions', $transaction_data);
             $transaction_id = $this->db->insert_id();
 
+            // Increment transaction_count in branch table
+            $branch_id = $this->session->userdata('login_session')['branch_id'];
+            $this->db->set('transaction_count', 'transaction_count + 1', FALSE)
+                     ->where('id', $branch_id)
+                     ->update('branch');
+
             // Calculate and add points (Rp 10.000 = 1 point)
             $points_to_add = floor($total / 10000);
             if ($points_to_add > 0) {

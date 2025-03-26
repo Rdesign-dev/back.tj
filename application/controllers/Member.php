@@ -454,13 +454,9 @@ class Member extends CI_Controller {
         redirect('member');
     }
 
+    // Only name and phone number are required
     $this->form_validation->set_rules('nama', 'Nama Member', 'required|trim');
     $this->form_validation->set_rules('phone', 'Nomor Handphone', 'required|trim');
-    $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email');
-    $this->form_validation->set_rules('alamat', 'Alamat', 'required|trim');
-    $this->form_validation->set_rules('gender', 'Jenis Kelamin', 'required');
-    $this->form_validation->set_rules('birthdate', 'Tanggal Lahir', 'required');
-    $this->form_validation->set_rules('city', 'Kota', 'required|trim');
 
     if ($this->form_validation->run() == false) {
         $data['title'] = "Edit Member";
@@ -470,40 +466,33 @@ class Member extends CI_Controller {
         $data = [
             'name' => $this->input->post('nama', true),
             'phone_number' => $this->input->post('phone', true),
-            'email' => $this->input->post('email', true),
-            'address' => $this->input->post('alamat', true),
-            'gender' => $this->input->post('gender', true),
-            'birthdate' => $this->input->post('birthdate', true),
-            'city' => $this->input->post('city', true)
+            'email' => $this->input->post('email') ? $this->input->post('email', true) : null,
+            'address' => $this->input->post('alamat') ? $this->input->post('alamat', true) : null,
+            'gender' => $this->input->post('gender') ? $this->input->post('gender', true) : null,
+            'birthdate' => $this->input->post('birthdate') ? $this->input->post('birthdate', true) : null,
+            'city' => $this->input->post('city') ? $this->input->post('city', true) : null
         ];
 
-        // Handle file upload
+        // Handle file upload if exists
         if (!empty($_FILES['foto']['name'])) {
             $config['upload_path'] = '../ImageTerasJapan/ProfPic/';
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
             $config['max_size'] = 2048;
             
-            // New format: PicM-membername-timestamp
             $member_name = strtolower(str_replace(' ', '-', $this->input->post('nama', true)));
             $config['file_name'] = 'PicM-' . $member_name . '-' . time();
 
             $this->load->library('upload', $config);
 
             if ($this->upload->do_upload('foto')) {
-                // Delete old image
                 $old_image = $this->input->post('old_image');
                 if ($old_image != 'default.png' && file_exists($config['upload_path'] . $old_image)) {
                     unlink($config['upload_path'] . $old_image);
                 }
-                
                 $data['profile_pic'] = $this->upload->data('file_name');
-            } else {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">' . $this->upload->display_errors() . '</div>');
-                redirect('member/edit/' . $getId);
             }
         }
 
-        // Update data
         $update = $this->db->update('users', $data, ['id' => $getId]);
 
         if ($update) {
@@ -541,11 +530,11 @@ class Member extends CI_Controller {
             $nomor = encode_php_tags($nomor);
             $this->form_validation->set_rules("namamember","Nama Member","required");
             $this->form_validation->set_rules("nomor","Nomor","required");
-            $this->form_validation->set_rules("alamat","Alamat","required");
-            $this->form_validation->set_rules("email","Email","required");
-            $this->form_validation->set_rules("jeniskelamin","Jenis Kelamin","required");
-            $this->form_validation->set_rules("tanggallahir","Tanggal Lahir","required");
-            $this->form_validation->set_rules("tempatlahir","Tempat Lahir","required");
+            // $this->form_validation->set_rules("alamat","Alamat","required");
+            // $this->form_validation->set_rules("email","Email","required");
+            // $this->form_validation->set_rules("jeniskelamin","Jenis Kelamin","required");
+            // $this->form_validation->set_rules("tanggallahir","Tanggal Lahir","required");
+            // $this->form_validation->set_rules("tempatlahir","Tempat Lahir","required");
             if($this->form_validation->run() == FALSE){
                 $data['title'] = "Edit User";
                 $data['member'] = $this->admin->get('member', ['nomor' => $nomor]);
@@ -614,7 +603,6 @@ class Member extends CI_Controller {
         redirect('member/indexKasir');
     }
 
-    // Get member data from users table
     $data['title'] = "Edit Member";
     $data['member'] = $this->db->select('id, name as namamember, phone_number as nomor, 
                                        address as alamat, email, gender as jeniskelamin, 
@@ -629,57 +617,45 @@ class Member extends CI_Controller {
         redirect('member/indexKasir');
     }
 
-    // Set validation rules
+    // Only name and phone number are required
     $this->form_validation->set_rules('namamember', 'Nama Member', 'required|trim');
     $this->form_validation->set_rules('nomor', 'Nomor HP', 'required|trim');
-    $this->form_validation->set_rules('alamat', 'Alamat', 'required|trim');
-    $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email');
-    $this->form_validation->set_rules('jeniskelamin', 'Jenis Kelamin', 'required|trim');
-    $this->form_validation->set_rules('tanggallahir', 'Tanggal Lahir', 'required');
-    $this->form_validation->set_rules('tempatlahir', 'Kota', 'required|trim');
 
     if ($this->form_validation->run() == false) {
         $this->template->load('templates/kasir', 'member/editKasir', $data);
     } else {
         $input = $this->input->post(null, true);
         
-        // Prepare update data
         $data_update = [
             'name' => $input['namamember'],
             'phone_number' => $input['nomor'],
-            'address' => $input['alamat'],
-            'email' => $input['email'],
-            'gender' => ($input['jeniskelamin'] == 'L' ? 'male' : 'female'),
-            'birthdate' => $input['tanggallahir'],
-            'city' => $input['tempatlahir']
+            'address' => $input['alamat'] ? $input['alamat'] : null,
+            'email' => $input['email'] ? $input['email'] : null,
+            'gender' => $input['jeniskelamin'] ? ($input['jeniskelamin'] == 'L' ? 'male' : 'female') : null,
+            'birthdate' => $input['tanggallahir'] ? $input['tanggallahir'] : null,
+            'city' => $input['tempatlahir'] ? $input['tempatlahir'] : null
         ];
 
-        // Handle optional photo upload
+        // Handle photo upload if exists
         if (!empty($_FILES['foto']['name'])) {
             $config['upload_path']   = '../ImageTerasJapan/ProfPic/';
             $config['allowed_types'] = 'gif|jpg|jpeg|png';
             $config['max_size']      = 2048;
             
-            // New format: PicM-membername-timestamp
             $member_name = strtolower(str_replace(' ', '-', $input['namamember']));
             $config['file_name']     = 'PicM-' . $member_name . '-' . time();
 
             $this->load->library('upload', $config);
 
             if ($this->upload->do_upload('foto')) {
-                // Delete old photo if not default
                 if ($data['member']['foto'] != 'profile.jpg' && 
                     file_exists($config['upload_path'] . $data['member']['foto'])) {
                     unlink($config['upload_path'] . $data['member']['foto']);
                 }
                 $data_update['profile_pic'] = $this->upload->data('file_name');
-            } else {
-                set_pesan('Gagal mengupload foto: ' . $this->upload->display_errors(), false);
-                redirect('member/edit_memberKasir/' . $phone_number);
             }
         }
 
-        // Update user data
         $updated = $this->db->where('phone_number', $phone_number)
                            ->update('users', $data_update);
 
@@ -697,72 +673,59 @@ class Member extends CI_Controller {
         redirect('member/indexCabang');
     }
 
-    // Get member data from users table
     $data['title'] = "Edit Member";
     $data['member'] = $this->db->select('id, name as namamember, phone_number as nomor, 
-                                       address as alamat, email, gender as jeniskelamin, 
-                                       birthdate as tanggallahir, city as tempatlahir, 
-                                       profile_pic as foto')
-                              ->where('phone_number', $phone_number)
-                              ->get('users')
-                              ->row_array();
+                                    address as alamat, email, gender as jeniskelamin, 
+                                    birthdate as tanggallahir, city as tempatlahir, 
+                                    profile_pic as foto')
+                            ->where('phone_number', $phone_number)
+                            ->get('users')
+                            ->row_array();
 
     if (!$data['member']) {
         set_pesan('Data tidak ditemukan.', false);
         redirect('member/indexCabang');
     }
 
-    // Set validation rules
+    // Only name and phone number are required
     $this->form_validation->set_rules('namamember', 'Nama Member', 'required|trim');
     $this->form_validation->set_rules('nomor', 'Nomor HP', 'required|trim');
-    $this->form_validation->set_rules('alamat', 'Alamat', 'required|trim');
-    $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email');
-    $this->form_validation->set_rules('jeniskelamin', 'Jenis Kelamin', 'required|trim');
-    $this->form_validation->set_rules('tanggallahir', 'Tanggal Lahir', 'required');
-    $this->form_validation->set_rules('tempatlahir', 'Kota', 'required|trim');
 
     if ($this->form_validation->run() == false) {
         $this->template->load('templates/cabang', 'member/editCabang', $data);
     } else {
         $input = $this->input->post(null, true);
         
-        // Prepare update data
         $data_update = [
             'name' => $input['namamember'],
             'phone_number' => $input['nomor'],
-            'address' => $input['alamat'],
-            'email' => $input['email'],
-            'gender' => ($input['jeniskelamin'] == 'L' ? 'male' : 'female'),
-            'birthdate' => $input['tanggallahir'],
-            'city' => $input['tempatlahir']
+            'address' => $input['alamat'] ? $input['alamat'] : null,
+            'email' => $input['email'] ? $input['email'] : null,
+            'gender' => $input['jeniskelamin'] ? ($input['jeniskelamin'] == 'L' ? 'male' : 'female') : null,
+            'birthdate' => $input['tanggallahir'] ? $input['tanggallahir'] : null,
+            'city' => $input['tempatlahir'] ? $input['tempatlahir'] : null
         ];
 
-        // Handle optional photo upload
+        // Handle photo upload if exists
         if (!empty($_FILES['foto']['name'])) {
             $config['upload_path']   = '../ImageTerasJapan/ProfPic/';
             $config['allowed_types'] = 'gif|jpg|jpeg|png';
             $config['max_size']      = 2048;
             
-            // New format: PicM-membername-timestamp
             $member_name = strtolower(str_replace(' ', '-', $input['namamember']));
             $config['file_name']     = 'PicM-' . $member_name . '-' . time();
 
             $this->load->library('upload', $config);
 
             if ($this->upload->do_upload('foto')) {
-                // Delete old photo if not default
                 if ($data['member']['foto'] != 'profile.jpg' && 
                     file_exists($config['upload_path'] . $data['member']['foto'])) {
                     unlink($config['upload_path'] . $data['member']['foto']);
                 }
                 $data_update['profile_pic'] = $this->upload->data('file_name');
-            } else {
-                set_pesan('Gagal mengupload foto: ' . $this->upload->display_errors(), false);
-                redirect('member/edit_memberCabang/' . $phone_number);
             }
         }
 
-        // Update user data
         $updated = $this->db->where('phone_number', $phone_number)
                            ->update('users', $data_update);
 

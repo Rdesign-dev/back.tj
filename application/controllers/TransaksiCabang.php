@@ -117,13 +117,15 @@ class TransaksiCabang extends CI_Controller {
                 'voucher_id' => $voucher_id  // Add voucher_id here
             ];
 
-            // Debug data
-            log_message('debug', 'Transaction Data: ' . print_r($transaction_data, true));
-            log_message('debug', 'POST Data: ' . print_r($_POST, true));
-
             // Insert transaction
             $this->db->insert('transactions', $transaction_data);
             $transaction_id = $this->db->insert_id();
+
+            // Increment transaction_count in branch table
+            $branch_id = $this->session->userdata('login_session')['branch_id'];
+            $this->db->set('transaction_count', 'transaction_count + 1', FALSE)
+                    ->where('id', $branch_id)
+                    ->update('branch');
 
             // Calculate and add points based on transaction amount
             $amount = (int)$total;
@@ -134,9 +136,6 @@ class TransaksiCabang extends CI_Controller {
                 $this->db->set('poin', "poin + {$points_to_add}", FALSE)
                         ->where('id', $member_data->id)
                         ->update('users');
-                        
-                // Log points addition (optional)
-                log_message('debug', "Added {$points_to_add} points to user {$member_data->id} for transaction {$transaction_id}");
             }
 
             // Handle file upload
