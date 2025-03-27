@@ -255,7 +255,7 @@
                                     <?= userdata('name'); // Menggunakan 'name' bukan 'nama' ?>
                                 </span>
                                 <img class="img-profile rounded-circle ml-2"
-                                    src="http://localhost/ImageTerasJapan/ProfPic/<?php echo userdata('photo'); ?>"
+                                    src="<?= base_url('../ImageTerasJapan/ProfPic/' . userdata('photo')); ?>"
                                     alt="Foto Profil">
                             </a>
                             <!-- Dropdown - User Information -->
