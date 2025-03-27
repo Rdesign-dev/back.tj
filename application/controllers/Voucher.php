@@ -96,6 +96,8 @@ class Voucher extends CI_Controller {
         $data['title'] = "Edit Voucher";
         // Mengambil data voucher berdasarkan ID dari tabel rewards
         $data['voucher'] = $this->voucher->get_by_id($id);
+        // Tambahkan data brands
+        $data['brands'] = $this->voucher->get_all_brands();
         
         if (!$data['voucher']) {
             $this->session->set_flashdata('pesan', '<div class="alert alert-danger" role="alert">Data tidak ditemukan!</div>');
