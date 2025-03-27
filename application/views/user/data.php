@@ -63,11 +63,11 @@
                                    class="btn btn-circle btn-sm btn-warning">
                                     <i class="fa fa-fw fa-edit"></i>
                                 </a>
-                                <a onclick="return confirm('Yakin ingin menghapus data?')" 
+                                <!-- <a onclick="return confirm('Yakin ingin menghapus data?')" 
                                    href="<?= base_url('user/delete/') . $user['id'] ?>" 
                                    class="btn btn-circle btn-sm btn-danger">
                                     <i class="fa fa-fw fa-trash"></i>
-                                </a>
+                                </a> -->
                             </td>
                         </tr>
                     <?php endforeach;

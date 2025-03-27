@@ -7,7 +7,6 @@ class Voucher extends CI_Controller {
         parent::__construct();
         cek_login();
         $this->load->model('Voucher_model','voucher');
-        $this->load->model('admin_model','admin');
     }
 
     public function tambahs() {
@@ -29,27 +28,41 @@ class Voucher extends CI_Controller {
         $this->form_validation->set_rules('category', 'Kategori', 'required');
         $this->form_validation->set_rules('description', 'Deskripsi', 'required');
         $this->form_validation->set_rules('brand_id', 'Brand', 'required');
+        $this->form_validation->set_rules('points_required', 'Points Required', 'required|numeric');
+        $this->form_validation->set_rules('valid_until', 'Valid Until', 'required');
+        $this->form_validation->set_rules('total_days', 'Total Days', 'required|numeric');
+        $this->form_validation->set_rules('qty', 'Quantity', 'required|numeric');
 
         if ($this->form_validation->run() == FALSE) {
             $data['title'] = "Tambah Voucher";
-            $data['brands'] = $this->admin->get_all_brands(); // Fetch all brands
+            $data['brands'] = $this->voucher->get_all_brands();
+            $data['validation_errors'] = validation_errors();
             $this->template->load('templates/dashboard', 'voucher/add', $data);
         } else {
-            $kode_cabang = $this->input->post('brand_id'); // Assuming brand_id is used as kode_cabang
-            $file_name = $this->generate_file_name($kode_cabang);
+            try {
+                $brand_id = $this->input->post('brand_id');
+                
+                // Validate brand
+                $brand = $this->voucher->get_brand_by_id($brand_id);
+                if (!$brand) {
+                    throw new Exception('Brand tidak ditemukan!');
+                }
 
-            $config['upload_path'] = '../ImageTerasJapan/reward';
-            $config['allowed_types'] = 'gif|jpg|png|jpeg';
-            $config['max_size'] = 5120; // 5 MB
-            $config['file_name'] = $file_name;
+                // Generate voucher code
+                $voucher_code = $this->generate_file_name($brand_id);
 
-            $this->load->library('upload', $config);
+                // Upload configuration
+                $config['upload_path'] = '../ImageTerasJapan/reward';
+                $config['allowed_types'] = 'gif|jpg|png|jpeg';
+                $config['max_size'] = 5120;
+                $config['file_name'] = $voucher_code;
 
-            if (!$this->upload->do_upload('image_name')) {
-                $error = $this->upload->display_errors();
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger" role="alert">' . $error . '</div>');
-                redirect(base_url('voucher/tambahs'));
-            } else {
+                $this->load->library('upload', $config);
+
+                if (!$this->upload->do_upload('image_name')) {
+                    throw new Exception($this->upload->display_errors());
+                }
+
                 $foto = $this->upload->data('file_name');
                 $data = array(
                     'title' => $this->input->post('title'),
@@ -60,11 +73,22 @@ class Voucher extends CI_Controller {
                     'valid_until' => $this->input->post('valid_until'),
                     'total_days' => $this->input->post('total_days'),
                     'qty' => $this->input->post('qty'),
-                    'brand_id' => $this->input->post('brand_id') // Save brand_id
+                    'brand_id' => $brand_id
                 );
-                $this->db->insert('rewards', $data);
-                $this->session->set_flashdata('pesan', '<div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>');
-                redirect(base_url('voucher'));
+
+                // Insert data using model
+                if ($this->voucher->insert($data)) {
+                    $this->session->set_flashdata('pesan', 
+                        '<div class="alert alert-success" role="alert">Data Berhasil Ditambahkan dengan kode: ' . $voucher_code . '</div>');
+                    redirect(base_url('voucher'));
+                } else {
+                    throw new Exception('Gagal menyimpan data voucher');
+                }
+
+            } catch (Exception $e) {
+                $this->session->set_flashdata('pesan', 
+                    '<div class="alert alert-danger" role="alert">Error: ' . $e->getMessage() . '</div>');
+                redirect(base_url('voucher/tambahs'));
             }
         }
     }
@@ -123,9 +147,14 @@ class Voucher extends CI_Controller {
         redirect('voucher');
     }
 
-    private function generate_file_name($kode_cabang) {
-        $timestamp = time(); // Current timestamp
-        $random_number = str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT); // 3 random digits
-        return "VC{$kode_cabang}{$timestamp}{$random_number}";
+    private function generate_file_name($brand_id) {
+        // Get brand name from database
+        $brand = $this->voucher->get_brand_by_id($brand_id);
+        $brand_name = $brand ? preg_replace('/[^A-Za-z0-9]/', '', $brand->name) : 'UNKNOWN';
+        
+        $timestamp = time();
+        $random_number = str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT);
+        
+        return "VC{$brand_name}{$timestamp}{$random_number}";
     }
 }

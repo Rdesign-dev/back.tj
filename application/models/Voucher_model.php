@@ -40,4 +40,7 @@ class Voucher_model extends CI_Model {
                         ->get()
                         ->result_array();
     }
+    public function get_brand_by_id($brand_id) {
+        return $this->db->get_where('brands', ['id' => $brand_id])->row();
+    }
 }
