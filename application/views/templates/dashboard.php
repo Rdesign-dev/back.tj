@@ -158,6 +158,11 @@
                     <span>Feedback Member</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link pb-0" href="<?= base_url('member/check'); ?>">
+                    <i class="fas fa-history"></i>
+                    <span>CheckIn Poin Member</span>
+                </a>
             <!-- <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('undian/inputPoinUndian'); ?>">
                     <i class="fas fa-gift"></i>
