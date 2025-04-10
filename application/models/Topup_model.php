@@ -9,15 +9,15 @@ class Topup_model extends CI_Model {
 
     public function getAllTopup() {
         $this->db->select('t.transaction_codes, t.created_at, t.amount, 
-                         GROUP_CONCAT(CONCAT(tp.payment_method, " (", tp.amount, ")") SEPARATOR " & ") as payment_details,
-                         t.transaction_evidence, u.name as member_name, a.Name as cashier_name')
-                 ->from('transactions t')
-                 ->join('users u', 'u.id = t.user_id')
-                 ->join('accounts a', 'a.id = t.account_cashier_id')
-                 ->join('transaction_payments tp', 'tp.transaction_id = t.transaction_id')
-                 ->where('t.transaction_type', 'Balance Top-up')
-                 ->group_by('t.transaction_id')
-                 ->order_by('t.created_at', 'DESC');
+                        GROUP_CONCAT(CONCAT(tp.payment_method, " (", tp.amount, ")") SEPARATOR " & ") as payment_details,
+                        t.transaction_evidence, u.name as member_name, a.Name as cashier_name')
+                ->from('transactions t')
+                ->join('users u', 'u.id = t.user_id')
+                ->join('accounts a', 'a.id = t.account_cashier_id')
+                ->join('transaction_payments tp', 'tp.transaction_id = t.transaction_id')
+                ->where('t.transaction_type', 'Balance Top-up')
+                ->group_by('t.transaction_id')
+                ->order_by('t.created_at', 'DESC');
         return $this->db->get()->result();
     }
 
@@ -59,9 +59,9 @@ class Topup_model extends CI_Model {
         
         // Update balance user
         $this->db->set('balance', 'balance + ' . $data['amount'], FALSE)
-                 ->where('id', $data['user_id'])
-                 ->update('users');
-                 
+                ->where('id', $data['user_id'])
+                ->update('users');
+                
         $this->db->trans_complete();
         return $this->db->trans_status();
     }
@@ -69,12 +69,12 @@ class Topup_model extends CI_Model {
     public function getTopupByIdCabang($branch_id)
     {
         return $this->db->select('t.transaction_codes, 
-                                 t.created_at, 
-                                 u.name as member_name,
-                                 t.amount, 
-                                 a.Name as cashier_name,
-                                 t.transaction_evidence,  -- Include transaction evidence
-                                 GROUP_CONCAT(CONCAT(tp.payment_method, " (", tp.amount, ")") SEPARATOR " & ") as payment_details')
+                                t.created_at, 
+                                u.name as member_name,
+                                t.amount, 
+                                a.Name as cashier_name,
+                                t.transaction_evidence,  -- Include transaction evidence
+                                GROUP_CONCAT(CONCAT(tp.payment_method, " (", tp.amount, ")") SEPARATOR " & ") as payment_details')
                 ->from('transactions t')
                 ->join('users u', 'u.id = t.user_id')
                 ->join('accounts a', 'a.id = t.account_cashier_id')

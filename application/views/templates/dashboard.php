@@ -159,7 +159,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('member/check'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('loginstreak'); ?>">
                     <i class="fas fa-history"></i>
                     <span>CheckIn Poin Member</span>
                 </a>
