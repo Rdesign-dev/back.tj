@@ -45,10 +45,11 @@
                     <td><?= $top->metode; ?></td>
                     <td>
                         <?php if($top->bukti != null): ?>
-                        <img src="http://localhost/ImageTerasJapan/transaction_proof/<?php echo $top->bukti; ?>"
-                            alt="Bukti Transfer" width="100px" height="100px">
+                        <img src="<?= base_url('../ImageTerasJapan/transaction_proof/kon/' . $top->bukti); ?>"
+                            alt="Bukti Transfer" width="100px" height="100px" onclick="window.open(this.src)"
+                            style="cursor: pointer;">
                         <?php else: ?>
-                        <img src="http://localhost/ImageTerasJapan/transaction_proof/struk.png" alt="Bukti Transfer"
+                        <img src="<?= base_url('../ImageTerasJapan/transaction_proof/struk.png'); ?>" alt="Bukti Transfer"
                             width="100px" height="100px">
                         <?php endif; ?>
                     </td>
