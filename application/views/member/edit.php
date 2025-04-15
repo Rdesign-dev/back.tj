@@ -16,7 +16,7 @@
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="foto">Foto</label>
                     <div class="col-md-6">
-                        <img src="<?= base_url('../ImageTerasJapan/ProfPic/' . ($member['profile_pic'] ?? 'default.png')) ?>" 
+                        <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/ProfPic/' . ($member['profile_pic'] ?? 'default.png')) ?>" 
                              alt="Profile Picture" width="100" class="mb-3">
                         <input type="file" name="foto" id="foto" class="form-control">
                     </div>

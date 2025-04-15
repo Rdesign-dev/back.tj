@@ -44,7 +44,7 @@
                         <tr>
                             <td><?= $no++; ?></td>
                             <td>
-                                <img src="<?= base_url('../ImageTerasJapan/ProfPic/' . ($member['profile_pic'] ?? 'profile.jpg')) ?>" 
+                                <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/ProfPic/' . ($member['profile_pic'] ?? 'profile.jpg')) ?>" 
                                      alt="Profile" class="rounded-circle" width="45" height="45">
                             </td>
                             <td><?= $member['name']; ?></td>

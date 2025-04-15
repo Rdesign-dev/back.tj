@@ -25,7 +25,7 @@
                         <div class="col-md-6">
                             <div class="row">
                                 <div class="col-12">
-                                    <img src="<?= base_url('../ImageTerasJapan/ProfPic/' . $member['foto']) ?>" alt="User" class="rounded-circle shadow-sm img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                                    <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/ProfPic/' . $member['foto']) ?>" alt="User" class="rounded-circle shadow-sm img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
                                 </div>
                                 <div class="col-12 mt-2">
                                     <input type="file" name="foto" id="foto" class="form-control">

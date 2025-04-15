@@ -7,7 +7,7 @@
     <div class="card-body">
         <div class="row">
             <div class="col-md-2 mb-4 mb-md-0">
-                <img src="<?= base_url('../ImageTerasJapan/ProfPic/') . ($user['photo'] ?? 'profile_default.png'); ?>" 
+                <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/ProfPic/') . ($user['photo'] ?? 'profile_default.png'); ?>" 
                      alt="<?= $user['Name'] ?? 'Profile Picture'; ?>" 
                      class="img-thumbnail rounded mb-2">
                 <a href="<?= base_url('profilecabang/settingCabang'); ?>" 

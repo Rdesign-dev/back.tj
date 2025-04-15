@@ -19,7 +19,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4 text-center">
-                        <img src="<?= base_url('../ImageTerasJapan/ProfPic/' . ($member->profile_pic ?? 'profile.jpg')) ?>" 
+                        <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/ProfPic/' . ($member->profile_pic ?? 'profile.jpg')) ?>" 
                              alt="Profile Picture" class="img-thumbnail mb-3" 
                              width="150" height="150">
                     </div>

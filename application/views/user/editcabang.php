@@ -91,7 +91,7 @@
                 <div class="row form-group">
                     <label class="col-md-3 text-md-right">Foto Saat Ini</label>
                     <div class="col-md-9">
-                        <img src="<?= base_url('../ImageTerasJapan/Profpic/') . $user['photo'] ?>" alt="<?= $user['Name']; ?>" class="img-thumbnail mb-2" style="height: 100px">
+                        <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/Profpic/') . $user['photo'] ?>" alt="<?= $user['Name']; ?>" class="img-thumbnail mb-2" style="height: 100px">
                     </div>
                 </div>
                 <div class="row form-group">

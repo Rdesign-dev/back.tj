@@ -61,7 +61,7 @@
                     <div class="col-md-6">
                         <div class="row">
                             <div class="col-sm-3">
-                                <img src="<?= base_url('../ImageTerasJapan/logo/' . $brand['image']) ?>" class="img-thumbnail">
+                                <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/logo/' . $brand['image']) ?>" class="img-thumbnail">
                             </div>
                             <div class="col">
                                 <input type="file" id="image" name="image" class="form-control" accept="image/*">

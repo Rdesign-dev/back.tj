@@ -43,7 +43,7 @@
                         <tr>
                             <td><?= $no++; ?></td>
                             <td>
-                                <img width="30" src="<?= base_url() ?>../ImageTerasJapan/ProfPic/<?= $user['photo'] ?>" 
+                                <img width="30" src="<?= base_url() ?>https://terasjapan.com/ImageTerasJapan/ProfPic/<?= $user['photo'] ?>" 
                                      alt="<?= $user['Name']; ?>" class="img-thumbnail rounded-circle">
                             </td>
                             <td><?= $user['Name']; ?></td>

@@ -42,7 +42,7 @@
                     <div class="col-md-6">
                         <div class="row">
                             <div class="col-6">
-                                <img src="<?= base_url('../ImageTerasJapan/banner/' . $banner['image']) ?>" alt="Banner Image" class="img-thumbnail">
+                                <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/banner/' . $banner['image']) ?>" alt="Banner Image" class="img-thumbnail">
                             </div>
                             <div class="col-6">
                                 <input type="file" name="image" id="image" class="form-control" accept="image/*">

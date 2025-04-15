@@ -47,7 +47,7 @@
                             <td><?= $voucher['title']; ?></td>
                             <td>
                                 <?php if(!empty($voucher['image_name'])): ?>
-                                    <img src="<?= base_url('../ImageTerasJapan/reward/' . $voucher['image_name']) ?>" 
+                                    <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/reward/' . $voucher['image_name']) ?>" 
                                          alt="Voucher Image" 
                                          width="150px" 
                                          height="100px"

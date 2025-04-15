@@ -47,7 +47,7 @@
                             <td><?= $t->cashier_name; ?></td>
                             <td>
                                 <?php if (!empty($t->transaction_evidence)): ?>
-                                    <img src="<?= base_url('../ImageTerasJapan/transaction_proof/Topup/' . $t->transaction_evidence); ?>" 
+                                    <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/transaction_proof/Topup/' . $t->transaction_evidence); ?>" 
                                          alt="Bukti Transaksi" 
                                          class="img-fluid" 
                                          style="max-width: 150px; max-height: 150px; cursor: pointer;"

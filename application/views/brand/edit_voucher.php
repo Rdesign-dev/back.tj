@@ -81,7 +81,7 @@
                     <div class="col-md-6">
                         <?php if($voucher['image_name']): ?>
                             <div class="mb-2">
-                                <img src="<?= base_url('../ImageTerasJapan/reward/' . $voucher['image_name']); ?>" 
+                                <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/reward/' . $voucher['image_name']); ?>" 
                                      alt="Current Image" class="img-thumbnail" style="max-height: 150px">
                             </div>
                         <?php endif; ?>

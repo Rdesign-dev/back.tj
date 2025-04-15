@@ -15,7 +15,7 @@
                     <div class="col-md-9">
                         <div class="row">
                             <div class="col-3">
-                                <img src="<?= base_url('../ImageTerasJapan/ProfPic/') . $user['photo']; ?>" alt="<?= $user['Name']; ?>" class="rounded-circle shadow-sm img-thumbnail">
+                                <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/ProfPic/') . $user['photo']; ?>" alt="<?= $user['Name']; ?>" class="rounded-circle shadow-sm img-thumbnail">
                             </div>
                             <div class="col-9">
                                 <input type="file" name="photo" id="photo">
