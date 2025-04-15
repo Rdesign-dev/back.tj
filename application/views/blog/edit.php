@@ -28,7 +28,7 @@
                     <div class="col-md-6">
                         <div class="row">
                             <div class="col-6">
-                                <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/news_event/') . $blog['image'] ?>" 
+                                <img src="https://terasjapan.com/ImageTerasJapan/news_event/<?= $blog['image'] ?>"
                                      alt="News Image" class="img-thumbnail" style="max-width: 150px;">
                             </div>
                             <div class="col-6">

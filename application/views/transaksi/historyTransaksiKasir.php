@@ -58,7 +58,7 @@
                             </td>
                             <td>
                                 <?php if($t->transaction_evidence && $t->transaction_evidence != 'struk.png'): ?>
-                                    <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/transaction_proof/Payment/' . $t->transaction_evidence); ?>" 
+                                    <img src="https://terasjapan.com/ImageTerasJapan/transaction_proof/Payment/<?= $t->transaction_evidence ?>" 
                                          width="50" class="img-thumbnail" alt="Bukti"
                                          onclick="window.open(this.src)" style="cursor: pointer;">
                                 <?php else: ?>

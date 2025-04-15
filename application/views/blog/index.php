@@ -41,7 +41,7 @@
                     <tr>
                         <td><?= $no++; ?></td>
                         <td>
-                            <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/news_event/') . $blog['image'] ?>" 
+                            <img src="https://terasjapan.com/ImageTerasJapan/news_event/<?= $blog['image'] ?>"
                                  alt="News Image" 
                                  class="img-thumbnail"
                                  style="max-width: 150px; height: auto;">

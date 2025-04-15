@@ -46,7 +46,7 @@
                     </td>
                     <td>
                         <?php if(isset($iklan['image']) && !empty($iklan['image'])): ?>
-                            <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/banner/' . $iklan['image']) ?>" 
+                            <img src="https://terasjapan.com/ImageTerasJapan/banner/<?= $iklan['image'] ?>" 
                                  alt="Banner Image" 
                                  class="img-thumbnail"
                                  style="max-height: 100px;">

@@ -5,7 +5,7 @@
             <?php if ($brands) :
                 foreach ($brands as $brand) : ?>
                     <div class="col-md-1 col-2 mb-1" style="cursor: pointer;">
-                        <img src="<?= base_url('../ImageTerasJapan/logo/' . $brand['image']) ?>" 
+                        <img src="https://terasjapan.com/ImageTerasJapan/logo/<?= $brand['image'] ?>" 
                              class="img-fluid brand-image" 
                              alt="<?= $brand['name'] ?>" 
                              data-id="<?= $brand['id'] ?>"
@@ -265,12 +265,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const row = `
             <tr>
                 <td>
-                    <img src="${BASE_URL}https://terasjapan.com/ImageTerasJapan/logo/${brand.image}" 
+                    <img src="https://terasjapan.com/ImageTerasJapan/logo/${brand.image}" 
                          alt="${brand.name}" 
                          style="width: 50px; height: 50px; object-fit: contain;">
                 </td>
                 <td>
-                    <img src="${BASE_URL}https://terasjapan.com/ImageTerasJapan/banner/${brand.banner}" 
+                    <img src="https://terasjapan.com/ImageTerasJapan/banner/${brand.banner}" 
                          alt="${brand.name} banner" 
                          style="width: 100px; height: 50px; object-fit: cover;">
                 </td>
@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         minute: '2-digit'
                     }) : '-'}</td>
                     <td>
-                        <img src="${BASE_URL}https://terasjapan.com/ImageTerasJapan/promo/${promo.promo_image}" 
+                        <img src="https://terasjapan.com/ImageTerasJapan/promo/${promo.promo_image}" 
                              alt="${promo.promo_name}" 
                              style="width: 100px; height: 50px; object-fit: cover;">
                     </td>
@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${voucher.title}</td>
                     <td>
                         ${voucher.image_name ? 
-                            `<img src="${BASE_URL}https://terasjapan.com/ImageTerasJapan/reward/${voucher.image_name}" 
+                            `<img src="https://terasjapan.com/ImageTerasJapan/reward/${voucher.image_name}" 
                                   alt="Voucher Image" 
                                   width="150px" 
                                   height="100px"

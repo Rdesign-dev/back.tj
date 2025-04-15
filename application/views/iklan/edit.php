@@ -42,7 +42,9 @@
                     <div class="col-md-6">
                         <div class="row">
                             <div class="col-6">
-                                <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/promo/' . $iklan['image_name']) ?>" alt="Promo Image" class="img-thumbnail">
+                                <img src="https://terasjapan.com/ImageTerasJapan/promo/<?= $iklan['image_name'] ?>" 
+                                     alt="Promo Image" 
+                                     class="img-thumbnail">
                             </div>
                             <div class="col-6">
                                 <input type="file" name="foto" id="foto" class="form-control" accept="image/*">

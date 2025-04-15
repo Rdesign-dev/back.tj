@@ -45,8 +45,10 @@
                         <?= $iklan['description']; ?>
                     </td>
                     <td class="text-center">
-                        <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/promo/') . $iklan['image_name'] ?>" alt="Promo Image"
-                            class="img-fluid" style="max-width: 150px; height: auto;">
+                        <img src="https://terasjapan.com/ImageTerasJapan/promo/<?= $iklan['image_name'] ?>" 
+                             alt="Promo Image"
+                             class="img-fluid" 
+                             style="max-width: 150px; height: auto;">
                     </td>
                     <td class="text-nowrap text-center d-flex justify-content-center gap-2 flex-wrap">
                         <!-- Edit Button -->

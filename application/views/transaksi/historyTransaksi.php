@@ -70,7 +70,7 @@
                         </td>
                         <td>
                             <?php if($tran->transaction_evidence && $tran->transaction_evidence != 'struk.png'): ?>
-                                <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/transaction_proof/Payment/' . $tran->transaction_evidence) ?>" 
+                                <img src="https://terasjapan.com/ImageTerasJapan/transaction_proof/Payment/<?= $tran->transaction_evidence ?>" 
                                      alt="Bill" width="150px" height="100px">
                             <?php else: ?>
                                 <span class="text-muted">No Image</span>

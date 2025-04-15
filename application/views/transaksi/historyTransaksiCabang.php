@@ -51,7 +51,7 @@
                                     ?>
                                 </td>
                                 <td>
-                                    <img width="50" src="<?= base_url('../ImageTerasJapan/transaction_proof/Payment') . $t->transaction_evidence ?>" 
+                                    <img width="50" src="https://terasjapan.com/ImageTerasJapan/transaction_proof/Payment/<?= $t->transaction_evidence ?>" 
                                          alt="Bukti" class="img-thumbnail">
                                 </td>
                                 <td><?= $t->kode_voucher ?? '-'; ?></td>

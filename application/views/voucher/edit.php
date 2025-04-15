@@ -84,7 +84,9 @@
                     <div class="col-md-6">
                         <div class="row">
                             <div class="col-6">
-                                <img src="https://terasjapan.com/fotovoucher/<?= $voucher['image_name'] ?>" alt="Voucher Image" class="img-thumbnail">
+                                <img src="https://terasjapan.com/ImageTerasJapan/reward/<?= $voucher['image_name'] ?>" 
+                                     alt="Voucher Image" 
+                                     class="img-thumbnail">
                             </div>
                             <div class="col-6">
                                 <input type="file" name="image_name" id="image_name">

@@ -13,11 +13,11 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4 text-center">
-                        <img src="<?= base_url('https://terasjapan.com/ImageTerasJapan/ProfPic/' . ($member->profile_pic ?? 'profile_default.png')) ?>" 
+                        <img src="https://terasjapan.com/ImageTerasJapan/ProfPic/<?= $member->profile_pic ?? 'profile_default.png' ?>" 
                              alt="Profile Picture" class="img-thumbnail mb-3" 
                              width="150" height="150">
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-8"></div></div>
                         <table class="table table-borderless">
                             <tr>
                                 <td>Nama Member</td>

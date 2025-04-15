@@ -16,7 +16,8 @@
                         <div class="row">
                             <div class="col-3">
                                 <img src="https://terasjapan.com/ImageTerasJapan/ProfPic/<?= $user['photo']; ?>"
-                                    alt="<?= $user['Name']; ?>" class="rounded-circle shadow-sm img-thumbnail">
+                                     alt="<?= $user['Name']; ?>" 
+                                     class="rounded-circle shadow-sm img-thumbnail">
                             </div>
                             <div class="col-9">
                                 <input type="file" name="photo" id="photo">

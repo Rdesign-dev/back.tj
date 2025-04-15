@@ -38,11 +38,11 @@
                     <td><?= $tran->payment_method ?></td>
                     <td>
                         <?php if($tran->transaction_evidence != null): ?>
-                        <img src='<?= base_url('https://terasjapan.com/ImageTerasJapan/transaction_proof/Topup/') . $tran->transaction_evidence ?>'
+                        <img src="https://terasjapan.com/ImageTerasJapan/transaction_proof/Topup/<?= $tran->transaction_evidence ?>"
                             alt="Transfer Evidence" width="150" height="100">
                         <?php else: ?>
-                        <img src='<?= base_url('https://terasjapan.com/ImageTerasJapan/transaction_proof/struk.png') ?>' alt="Transfer Evidence"
-                            width="150" height="100">
+                        <img src="https://terasjapan.com/ImageTerasJapan/transaction_proof/struk.png" 
+                            alt="Transfer Evidence" width="150" height="100">
                         <?php endif; ?>
                     </td>
                 </tr>
