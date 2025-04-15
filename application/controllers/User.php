@@ -87,7 +87,7 @@ class User extends CI_Controller
 
             // Handle photo upload
             if (!empty($_FILES['photo']['name'])) {
-                $config['upload_path']   = $_SERVER['DOCUMENT_ROOT'] . '/ImageTerasJapan/ProfPic/';
+                $config['upload_path']   = FCPATH . 'ImageTerasJapan/ProfPic/';
                 $config['allowed_types'] = 'gif|jpg|jpeg|png';
                 $config['max_size']      = 10000;
                 
@@ -106,7 +106,6 @@ class User extends CI_Controller
             } else {
                 $input['photo'] = 'default.jpg';
             }
-            
             // If not cashier or branch_admin, set branch_id to null
             if (!in_array($input['account_type'], ['cashier', 'branch_admin'])) {
                 $input['branch_id'] = null;

@@ -30,7 +30,7 @@ class Content extends CI_Controller {
             // Create filename from name field and timestamp
             $filename = url_title($input['name'], 'dash', true) . '_' . time() . '.' . $file_ext;
             
-            $config['upload_path']      = '../ImageTerasJapan/contentpopup/';
+            $config['upload_path']      = FCPATH . '/ImageTerasJapan/contentpopup/';
             $config['allowed_types']    = 'gif|jpg|jpeg|png|JPEG|PNG';
             $config['file_name']        = $filename; // Set custom filename
             $config['max_size']         = '2048';
@@ -75,7 +75,7 @@ class Content extends CI_Controller {
                 // Create filename from name field and timestamp
                 $filename = url_title($input['name'], 'dash', true) . '_' . time() . '.' . $file_ext;
                 
-                $config['upload_path']      = '../ImageTerasJapan/contentpopup/';
+                $config['upload_path']      = FCPATH . '/ImageTerasJapan/contentpopup/';
                 $config['allowed_types']    = 'gif|jpg|jpeg|png|JPEG|PNG';
                 $config['file_name']        = $filename; // Set custom filename
                 $config['max_size']         = '2048';

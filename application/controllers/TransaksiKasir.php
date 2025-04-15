@@ -104,7 +104,7 @@ class TransaksiKasir extends CI_Controller {
             // Handle file upload
             $transaction_evidence = 'struk.png';
             if ($_FILES['fotobill']['size'] > 0) {
-                $config['upload_path'] = '../ImageTerasJapan/transaction_proof/Payment/';
+                $config['upload_path'] = FCPATH . '/ImageTerasJapan/transaction_proof/Payment/';
                 $config['allowed_types'] = 'jpg|jpeg|png';
                 $config['max_size'] = 2048;
                 $config['file_name'] = $this->generate_struk_filename();

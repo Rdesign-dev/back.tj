@@ -71,15 +71,15 @@ class Brand extends CI_Controller {
             $brand = $this->brand->get_by_id($brand_id);
             
             if ($brand) {
-                $this->output
-                    ->set_status_header(200)
-                    ->set_content_type('application/json')
-                    ->set_output(json_encode($brand));
+                    $this->output
+                        ->set_status_header(200)
+                        ->set_content_type('application/json')
+                        ->set_output(json_encode($brand));
             } else {
-                $this->output
-                    ->set_status_header(404)
-                    ->set_content_type('application/json')
-                    ->set_output(json_encode(['error' => 'Brand not found']));
+                    $this->output
+                        ->set_status_header(404)
+                        ->set_content_type('application/json')
+                        ->set_output(json_encode(['error' => 'Brand not found']));
             }
         } catch (Exception $e) {
             log_message('error', 'Brand details error: ' . $e->getMessage());
@@ -133,7 +133,7 @@ class Brand extends CI_Controller {
 
             // Handle logo upload
             if (!empty($_FILES['image']['name'])) {
-                $config['upload_path'] = '../ImageTerasJapan/logo/';
+                $config['upload_path'] = FCPATH .'/ImageTerasJapan/logo/';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
                 $config['max_size'] = 10000;
                 $config['file_name'] = 'logo-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
@@ -152,7 +152,7 @@ class Brand extends CI_Controller {
 
             // Handle banner upload
             if (!empty($_FILES['banner']['name'])) {
-                $config['upload_path'] = '../ImageTerasJapan/banner/';
+                $config['upload_path'] = FCPATH . '/ImageTerasJapan/banner/';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
                 $config['max_size'] = 10000;
                 $config['file_name'] = 'banner-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
@@ -202,7 +202,7 @@ class Brand extends CI_Controller {
 
             // Handle logo upload
             if (!empty($_FILES['image']['name'])) {
-                $config['upload_path'] = '../ImageTerasJapan/logo/';
+                $config['upload_path'] = FCPATH . '/ImageTerasJapan/logo/';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
                 $config['max_size'] = 10000;
                 $config['file_name'] = 'logo-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
@@ -219,7 +219,7 @@ class Brand extends CI_Controller {
 
             // Handle banner upload
             if (!empty($_FILES['banner']['name'])) {
-                $config['upload_path'] = '../ImageTerasJapan/banner/';
+                $config['upload_path'] = FCPATH . '/ImageTerasJapan/banner/';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
                 $config['max_size'] = 10000;
                 $config['file_name'] = 'banner-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
@@ -440,7 +440,7 @@ class Brand extends CI_Controller {
             
             // Handle image upload if new image is provided
             if (!empty($_FILES['image']['name'])) {
-                $config['upload_path'] = '../ImageTerasJapan/reward/';
+                $config['upload_path'] = FCPATH . '/ImageTerasJapan/reward/';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
                 $config['max_size'] = 2048;
                 $config['file_name'] = 'voucher-' . date('ymd') . '-' . substr(md5(rand()), 0, 10);
@@ -545,7 +545,7 @@ class Brand extends CI_Controller {
                 // Handle image upload with new voucher code format
                 if (!empty($_FILES['image']['name'])) {
                     $file_ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-                    $config['upload_path'] = '../ImageTerasJapan/reward/';
+                    $config['upload_path'] = FCPATH . '/ImageTerasJapan/reward/';
                     $config['allowed_types'] = 'gif|jpg|png|jpeg';
                     $config['max_size'] = 5120; // 5MB
                     $config['file_name'] = $voucher_code;  // Use the new format
@@ -616,7 +616,7 @@ class Brand extends CI_Controller {
                 // Handle image upload with new voucher code format
                 if (!empty($_FILES['image']['name'])) {
                     $file_ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-                    $config['upload_path'] = '../ImageTerasJapan/reward/';
+                    $config['upload_path'] = FCPATH . '/ImageTerasJapan/reward/';
                     $config['allowed_types'] = 'gif|jpg|png|jpeg';
                     $config['max_size'] = 5120;
                     $config['file_name'] = $voucher_code;  // Use the new format
@@ -682,7 +682,7 @@ class Brand extends CI_Controller {
 
     private function _do_upload($field_name)
     {
-        $config['upload_path'] = '../ImageTerasJapan/promo/';
+        $config['upload_path'] = FCPATH . '/ImageTerasJapan/promo/';
         $config['allowed_types'] = 'jpg|jpeg|png';
         $config['max_size'] = 2048; // 2MB
         $config['file_name'] = 'promo_' . time();
