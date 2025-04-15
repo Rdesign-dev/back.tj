@@ -14,9 +14,11 @@ class Loginstreak extends CI_Controller
         $data['title'] = 'Daily Login Rewards Settings';
         $data['rewards'] = $this->Streak_model->getDailyRewards();
         
-        // $this->load->view('templates/header', $data);
-        $this->load->view('member/streak', $data);
-        // $this->load->view('templates/footer');
+        // Load the streak view into a variable
+        $data['contents'] = $this->load->view('member/streak', $data, true);
+        
+        // Load the dashboard template with all data
+        $this->load->view('templates/dashboard', $data);
     }
 
     public function update()
@@ -25,7 +27,7 @@ class Loginstreak extends CI_Controller
         $points = $this->input->post('points');
         
         $this->Streak_model->updateReward($id, $points);
-        $this->session->set_flashdata('pesan', 'Points updated successfully!');
+        $this->session->set_flashdata('pesan', '<div class="alert alert-success" role="alert">Point berhasil di ubah!</div>');
         redirect('loginstreak');
     }
 }
