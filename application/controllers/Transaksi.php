@@ -134,7 +134,7 @@ class Transaksi extends CI_Controller {
             }
     
             // Handle file upload
-            $config['upload_path'] = FCPATH . '/ImageTerasJapan/transaction_proof/Payment/';
+            $config['upload_path'] = FCPATH . '../ImageTerasJapan/transaction_proof/Payment/';
             $config['allowed_types'] = 'jpg|jpeg|png';
             $config['max_size'] = 5048;
             $config['file_name'] = $this->generate_struk_filename();
@@ -437,7 +437,7 @@ public function convert_and_updateSaldoMember()
         // Handle file upload for transfer
         $evidence_filename = 'struk.png';
         if ($this->input->post('metode') == 'transferBank') {
-            $config['upload_path'] = FCPATH . 'ImageTerasJapan/transaction_proof/Topup';
+            $config['upload_path'] = FCPATH . '../ImageTerasJapan/transaction_proof/Topup';
             $config['allowed_types'] = 'jpg|jpeg|png';
             $config['max_size'] = 10240; // 10MB
             $config['file_name'] = $this->generate_evidence_filename($user->id);

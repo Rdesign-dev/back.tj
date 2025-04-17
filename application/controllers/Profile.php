@@ -42,7 +42,7 @@ class Profile extends CI_Controller
 
             if ($_FILES['photo']['name']) {
                 $admin_name = strtolower(str_replace(' ', '-', $input['Name']));
-                $config['upload_path']   = FCPATH . 'ImageTerasJapan/ProfPic/'; 
+                $config['upload_path']   = FCPATH . '../ImageTerasJapan/ProfPic/'; 
                 $config['allowed_types'] = 'gif|jpg|jpeg|png';
                 $config['max_size']      = 2048;
                 $config['file_name']     = 'PicA-' . $admin_name . '-' . time();
@@ -57,7 +57,7 @@ class Profile extends CI_Controller
                 if ($this->upload->do_upload('photo')) {
                     $old_image = $this->user['photo'];
                     if ($old_image != 'default.jpg') {
-                        $old_image_path = FCPATH . 'ImageTerasJapan/ProfPic/' . $old_image;
+                        $old_image_path = FCPATH . '../ImageTerasJapan/ProfPic/' . $old_image;
                         if (file_exists($old_image_path)) {
                             unlink($old_image_path);
                         }

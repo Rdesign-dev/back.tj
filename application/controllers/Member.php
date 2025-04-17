@@ -475,7 +475,7 @@ class Member extends CI_Controller {
 
         // Handle file upload if exists
         if (!empty($_FILES['foto']['name'])) {
-            $config['upload_path'] = FCPATH . '/ImageTerasJapan/ProfPic/';
+            $config['upload_path'] = FCPATH . '../ImageTerasJapan/ProfPic/';
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
             $config['max_size'] = 2048;
             
@@ -540,7 +540,7 @@ class Member extends CI_Controller {
                 $data['member'] = $this->admin->get('member', ['nomor' => $nomor]);
                 $this->template->load('templates/dashboard', 'member/edit', $data);
             }else{
-                $config['upload_path'] = FCPATH . 'ImageTerasJapan/ProfPic/';
+                $config['upload_path'] = FCPATH . '../ImageTerasJapan/ProfPic/';
                 $config['allowed_types'] = 'gif|jpg|png|PNG|jpeg|JPEG';
                 $config['max_size'] = 2048000;
                 $config['max_width'] = 10000;
@@ -638,7 +638,7 @@ class Member extends CI_Controller {
 
         // Handle photo upload if exists
         if (!empty($_FILES['foto']['name'])) {
-            $config['upload_path']   = FCPATH . '/ImageTerasJapan/ProfPic/';
+            $config['upload_path']   = FCPATH . '../ImageTerasJapan/ProfPic/';
             $config['allowed_types'] = 'gif|jpg|jpeg|png';
             $config['max_size']      = 2048;
             
@@ -708,7 +708,7 @@ class Member extends CI_Controller {
 
         // Handle photo upload if exists
         if (!empty($_FILES['foto']['name'])) {
-            $config['upload_path']   = FCPATH . '/ImageTerasJapan/ProfPic/';
+            $config['upload_path']   = FCPATH . '../ImageTerasJapan/ProfPic/';
             $config['allowed_types'] = 'gif|jpg|jpeg|png';
             $config['max_size']      = 2048;
             

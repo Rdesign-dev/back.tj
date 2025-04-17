@@ -63,7 +63,7 @@ class Profilecabang extends CI_Controller
     private function _config()
     {
         $admin_name = strtolower(str_replace(' ', '-', $this->input->post('Name')));
-        $config['upload_path']      = FCPATH . '/ImageTerasJapan/Profpic';
+        $config['upload_path']      = FCPATH . '../ImageTerasJapan/Profpic';
         $config['allowed_types']    = 'gif|jpg|jpeg|png';
         $config['file_name']        = 'PicA-' . $admin_name . '-' . time();
         $config['max_size']         = '2048000';

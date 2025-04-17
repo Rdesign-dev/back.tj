@@ -66,7 +66,7 @@ class Usercabang extends CI_Controller
             $filename = 'Prof-' . str_replace(' ', '_', $input['Name']) . '-' . $random_number;
 
             // Upload configuration
-            $config['upload_path']   = FCPATH . 'ImageTerasJapan/Profpic';
+            $config['upload_path']   = FCPATH . '../ImageTerasJapan/Profpic';
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
             $config['max_size']      = 2048;
             $config['file_name']     = $filename;

@@ -139,7 +139,7 @@ class TransaksiCabang extends CI_Controller {
             }
 
             // Handle file upload
-            $config['upload_path'] = FCPATH . 'ImageTerasJapan/transaction_proof/Payment/';
+            $config['upload_path'] = FCPATH . '../ImageTerasJapan/transaction_proof/Payment/';
             $config['allowed_types'] = 'jpg|jpeg|png';
             $config['max_size'] = 2048;
             $config['file_name'] = $this->generate_struk_filename();
@@ -260,7 +260,7 @@ class TransaksiCabang extends CI_Controller {
         // Handle file upload for all payment methods
         $evidence_filename = 'struk.png';
         if (!empty($_FILES['bukti']['name'])) {
-            $config['upload_path'] = FCPATH . 'ImageTerasJapan/transaction_proof/Topup';
+            $config['upload_path'] = FCPATH . '../ImageTerasJapan/transaction_proof/Topup';
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
             $config['max_size'] = 10240; // 10MB
             $config['file_name'] = 'TRXBT_' . time();
@@ -389,7 +389,7 @@ class TransaksiCabang extends CI_Controller {
         // Handle file upload for all payment methods
         $evidence_filename = 'struk.png';
         if (!empty($_FILES['bukti']['name'])) {
-            $config['upload_path'] = FCPATH . 'ImageTerasJapan/transaction_proof/Topup/';
+            $config['upload_path'] = FCPATH . '../ImageTerasJapan/transaction_proof/Topup/';
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
             $config['max_size'] = 10240; // 10MB
             $config['file_name'] = 'TRXBT' . $phone_number . mt_rand(1000, 9999);

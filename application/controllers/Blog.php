@@ -32,7 +32,7 @@ class Blog extends CI_Controller {
         if ($this->form_validation->run() == FALSE) {
             $this->template->load('templates/dashboard', 'blog/add', $data);
         } else {
-            $config['upload_path'] = FCPATH . 'ImageTerasJapan/news_event/';
+            $config['upload_path'] = FCPATH . '../ImageTerasJapan/news_event/';
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
             $config['max_size'] = 2048; // 2MB
             $config['encrypt_name'] = TRUE;
@@ -87,7 +87,7 @@ class Blog extends CI_Controller {
 
             // Cek jika ada gambar yang akan diupload
             if ($_FILES['image']['name']) {
-                $config['upload_path']   = FCPATH . 'ImageTerasJapan/news_event/';
+                $config['upload_path']   = FCPATH . '../ImageTerasJapan/news_event/';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
                 $config['max_size']      = 2048;
                 $config['encrypt_name']  = TRUE;
@@ -131,7 +131,7 @@ class Blog extends CI_Controller {
         
         // Hapus file gambar
         if ($image != 'default.png') {
-            $file_path = FCPATH . 'ImageTerasJapan/news_event/' . $image;
+            $file_path = FCPATH . '../ImageTerasJapan/news_event/' . $image;
             if (file_exists($file_path)) {
                 unlink($file_path);
             }

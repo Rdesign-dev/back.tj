@@ -52,7 +52,7 @@ class Voucher extends CI_Controller {
                 $voucher_code = $this->generate_file_name($brand_id);
 
                 // Upload configuration
-                $config['upload_path'] = FCPATH . 'ImageTerasJapan/reward';
+                $config['upload_path'] = FCPATH . '../ImageTerasJapan/reward';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
                 $config['max_size'] = 5120;
                 $config['file_name'] = $voucher_code;
@@ -130,7 +130,7 @@ class Voucher extends CI_Controller {
         );
 
         if (!empty($_FILES['image_name']['name'])) {
-            $config['upload_path'] = FCPATH . 'ImageTerasJapan/reward';
+            $config['upload_path'] = FCPATH . '../ImageTerasJapan/reward';
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
             $config['max_size'] = 2048;
             $this->load->library('upload', $config);

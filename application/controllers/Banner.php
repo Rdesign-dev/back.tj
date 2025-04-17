@@ -99,7 +99,7 @@ class Banner extends CI_Controller {
 
         // Handle image upload if new image is provided
         if (!empty($_FILES['image']['name'])) {
-            $config['upload_path'] = FCPATH . 'ImageTerasJapan/banner/';
+            $config['upload_path'] = FCPATH . '../ImageTerasJapan/banner/';
             $config['allowed_types'] = 'gif|jpg|jpeg|png';
             $config['max_size'] = 2048;
             $this->load->library('upload', $config);

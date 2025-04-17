@@ -16,7 +16,7 @@ class Iklan extends CI_Controller {
             $data['title'] = "Tambah Iklan";
             $this->template->load('templates/dashboard', 'iklan/add', $data);
         } else {
-            $config['upload_path'] = FCPATH . '/ImageTerasJapan/promo';
+            $config['upload_path'] = FCPATH . '../ImageTerasJapan/promo';
             $config['allowed_types'] = 'gif|jpg|png|jpeg|avif';
             $this->load->library('upload', $config);
             
@@ -55,7 +55,7 @@ class Iklan extends CI_Controller {
             $data['title'] = "Tambah Promo";
             $this->template->load('templates/dashboard', 'iklan/add', $data);
         } else {
-            $upload_path = FCPATH . '/ImageTerasJapan/promo/';
+            $upload_path = FCPATH . '../ImageTerasJapan/promo/';
             
             if (!is_dir($upload_path)) {
                 mkdir($upload_path, 0777, true);
@@ -124,7 +124,7 @@ class Iklan extends CI_Controller {
                 ];
     
                 if ($_FILES['foto']['name']) {
-                    $upload_path = FCPATH . '/ImageTerasJapan/promo/';
+                    $upload_path = FCPATH . '../ImageTerasJapan/promo/';
                     
                     if (!is_dir($upload_path)) {
                         mkdir($upload_path, 0777, true);
@@ -158,7 +158,7 @@ class Iklan extends CI_Controller {
     public function delete($getId)
     {
         $id = encode_php_tags($getId);
-        $upload_path = FCPATH . '/ImageTerasJapan/promo/';
+        $upload_path = FCPATH . '../ImageTerasJapan/promo/';
         $foto = $this->db->get_where('promo', ['id' => $id])->row_array()['image_name'];
         
         if ($foto != 'default.png') {

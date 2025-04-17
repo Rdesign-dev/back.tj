@@ -87,7 +87,7 @@ class User extends CI_Controller
 
             // Handle photo upload
             if (!empty($_FILES['photo']['name'])) {
-                $config['upload_path']   = FCPATH . 'ImageTerasJapan/ProfPic/';
+                $config['upload_path']   = FCPATH . '../mageTerasJapan/ProfPic/';
                 $config['allowed_types'] = 'gif|jpg|jpeg|png';
                 $config['max_size']      = 10000;
                 
