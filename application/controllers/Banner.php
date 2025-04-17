@@ -22,7 +22,7 @@ class Banner extends CI_Controller {
     }
 
     public function save() {
-        $config['upload_path'] = FCPATH . 'ImageTerasJapan/banner/';
+        $config['upload_path'] = FCPATH . '../ImageTerasJapan/banner/';
         $config['allowed_types'] = 'gif|jpg|jpeg|png';
         $config['max_size'] = 2048;
         $this->load->library('upload', $config);
