@@ -160,7 +160,7 @@
                                 <span class="mr-2 d-none d-lg-inline small text-capitalize">
                                 <div class="sidebar-brand-text mx-2" style="color: white; font-size: 15pt; font-weight: bold;"><?= userdata('nama'); ?> | <?= userdata('namacabang'); ?> </div>
                                 </span>
-                                <img class="img-profile rounded-circle" src="<?= base_url('../ImageTerasJapan/Profpic/') . userdata('foto'); ?>">
+                                <img class="img-profile rounded-circle" src="https://terasjapan.com/ImageTerasJapan/Profpic/<?= userdata('foto'); ?>">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">

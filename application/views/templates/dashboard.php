@@ -260,7 +260,7 @@
                                     <?= userdata('name'); // Menggunakan 'name' bukan 'nama' ?>
                                 </span>
                                 <img class="img-profile rounded-circle ml-2"
-                                    src="<?= base_url('../ImageTerasJapan/ProfPic/' . userdata('photo')); ?>"
+                                    src="https://terasjapan.com/ImageTerasJapan/ProfPic/<?= userdata('photo'); ?>"
                                     alt="Foto Profil">
                             </a>
                             <!-- Dropdown - User Information -->
