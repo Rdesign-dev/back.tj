@@ -129,7 +129,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('FAQ'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('Faq'); ?>">
                     <i class="fas fa-file-invoice-dollar"></i>
                     <span>FAQ</span>
                 </a>
@@ -141,7 +141,7 @@
                 </a>
             </li> -->
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('content'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('Content'); ?>">
                     <i class="fas fa-file-contract"></i>
                     <span>Konten PopUp</span>
                 </a>
@@ -153,7 +153,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('feedback'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('Feedback'); ?>">
                     <i class="fas fa-file-pdf"></i>
                     <span>Feedback Member</span>
                 </a>

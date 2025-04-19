@@ -41,7 +41,7 @@
                         <td><?= $no++; ?></td>
                         <td><?= $row['name']; ?></td>
                         <td>
-                            <img src="<?= base_url('../ImageTerasJapan/contentpopup/') . $row['Image']; ?>" 
+                            <img src="https://terasjapan.com/ImageTerasJapan/contentpopup/<?= $row['Image'] ?>" 
                                  alt="<?= $row['name']; ?>" 
                                  width="100px" 
                                  height="100px">
