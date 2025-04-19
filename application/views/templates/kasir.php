@@ -72,7 +72,7 @@
             
              <!-- Nav Item - Dashboard -->
              <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('transaksikasir/tambahTransaksiKasir'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('TransaksiKasir/tambahTransaksiKasir'); ?>">
                 <i class="fas fa-history"></i>
                     <span>Transaksi</span>
                 </a>
@@ -84,13 +84,13 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('transaksikasir/historyTransaksiKasir'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('TransaksiKasir/historyTransaksiKasir'); ?>">
                 <i class="fas fa-file-alt"></i>
                     <span>Riwayat Transaksi <?= userdata('namacabang') ?></span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('transaksikasir/getHistorysaldoKasir'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('TransaksiKasir/getHistorysaldoKasir'); ?>">
                 <i class="fas fa-file"></i>
                     <span>Riwayat Top Up Saldo</span>
                 </a>
