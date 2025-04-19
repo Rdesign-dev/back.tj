@@ -47,9 +47,8 @@
                 <div class="row form-group">
                     <label class="col-md-4 text-md-right" for="nominal">Nominal TopUp</label>
                     <div class="col-md-6">
-                        <input type="number" id="nominal" name="nominal" class="form-control" 
-                               min="10000" step="1000" required 
-                               placeholder="Minimal Rp 10.000">
+                        <input type="text" id="nominal" name="nominal" class="form-control"
+                               placeholder="Minimal Rp 10.000" required autocomplete="off">
                         <?= form_error('nominal', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
@@ -66,15 +65,13 @@
                     </div>
                 </div>
 
-                <div id="buktiTransfer" style="display:none;">
-                    <div class="row form-group">
-                        <label class="col-md-4 text-md-right" for="bukti">Bukti Transfer</label>
-                        <div class="col-md-6">
-                            <input type="file" id="bukti" name="bukti" class="form-control" 
-                                   accept="image/*" data-max-size="10485760">
-                            <small class="text-muted">Max size: 10MB. Format: JPG, JPEG, PNG</small>
-                            <?= form_error('bukti', '<span class="text-danger small">', '</span>'); ?>
-                        </div>
+                <div class="row form-group">
+                    <label class="col-md-4 text-md-right" for="bukti">Bukti Pembayaran</label>
+                    <div class="col-md-6">
+                        <input type="file" id="bukti" name="bukti" class="form-control"
+                               accept="image/*" required>
+                        <small class="text-muted">Max size: 10MB. Format: JPG, JPEG, PNG</small>
+                        <?= form_error('bukti', '<span class="text-danger small">', '</span>'); ?>
                     </div>
                 </div>
 
@@ -98,49 +95,33 @@
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    var form = document.querySelector('form');
-
-    form.addEventListener("submit", function(event) {
-        var nominalInput = document.getElementById('nominal');
-        var metodeInput = document.getElementById('metode');
-        var buktiInput = document.getElementById('bukti');
-        var nomorInput = document.getElementById('nomor');
-        var namaInput = document.getElementById('nama');
-
-        if (!nominalInput.value.trim()) {
-            event.preventDefault();
-            nominalInput.classList.add("is-invalid");
-        } else {
-            nominalInput.classList.remove("is-invalid");
+    // Format nominal input with dot every 3 digits
+    const nominalInput = document.getElementById('nominal');
+    nominalInput.addEventListener('input', function(e) {
+        let value = this.value.replace(/\D/g, '');
+        if (value === '') {
+            this.value = '';
+            return;
         }
+        this.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    });
 
-        if (!metodeInput.value.trim()) {
-            event.preventDefault();
-            metodeInput.classList.add("is-invalid");
-        } else {
-            metodeInput.classList.remove("is-invalid");
-        }
+    // Remove formatting before submit
+    document.querySelector('form').addEventListener('submit', function(e) {
+        nominalInput.value = nominalInput.value.replace(/\D/g, '');
+    });
 
-        if (!buktiInput.value.trim()) {
-            event.preventDefault();
-            buktiInput.classList.add("is-invalid");
-        } else {
-            buktiInput.classList.remove("is-invalid");
-        }
-
-        if (!nomorInput.value.trim()) {
-            event.preventDefault();
-            nomorInput.classList.add("is-invalid");
-        } else {
-            nomorInput.classList.remove("is-invalid");
-        }
-
-        if (!namaInput.value.trim()) {
-            event.preventDefault();
-            namaInput.classList.add("is-invalid");
-        } else {
-            namaInput.classList.remove("is-invalid");
-        }
+    // JS validation for required fields
+    this.querySelector('form').addEventListener("submit", function(event) {
+        ['nominal','metode','bukti','nomor','nama'].forEach(function(id){
+            var el = document.getElementById(id);
+            if (el && !el.value.trim()) {
+                event.preventDefault();
+                el.classList.add("is-invalid");
+            } else if(el) {
+                el.classList.remove("is-invalid");
+            }
+        });
     });
 
     document.getElementById('metode').addEventListener('change', function() {

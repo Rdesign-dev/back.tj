@@ -434,23 +434,31 @@ public function convert_and_updateSaldoMember()
             throw new Exception('Member tidak ditemukan');
         }
 
-        // Handle file upload for transfer
-        $evidence_filename = 'struk.png';
-        if ($this->input->post('metode') == 'transferBank') {
-            $config['upload_path'] = FCPATH . '../ImageTerasJapan/transaction_proof/Topup';
-            $config['allowed_types'] = 'jpg|jpeg|png';
-            $config['max_size'] = 10240; // 10MB
-            $config['file_name'] = $this->generate_evidence_filename($user->id);
-
-            $this->load->library('upload', $config);
-
-            if (!$this->upload->do_upload('bukti')) {
-                throw new Exception('Gagal upload bukti: ' . $this->upload->display_errors('',''));
+        // Handle file upload untuk SEMUA metode
+        $random = '';
+        while (strlen($random) < 6) {
+            $digit = mt_rand(0, 9);
+            if (strpos($random, (string)$digit) === false) {
+                $random .= $digit;
             }
-
-            $upload_data = $this->upload->data();
-            $evidence_filename = $upload_data['file_name'];
         }
+        $datetime = date('YmdHis');
+        $ext = pathinfo($_FILES['bukti']['name'], PATHINFO_EXTENSION);
+        $filename = "TRX{$datetime}{$random}." . $ext;
+
+        $config['upload_path'] = FCPATH . '../ImageTerasJapan/transaction_proof/Topup';
+        $config['allowed_types'] = 'jpg|jpeg|png';
+        $config['max_size'] = 10240; // 10MB
+        $config['file_name'] = $filename;
+
+        $this->load->library('upload', $config);
+
+        if (!$this->upload->do_upload('bukti')) {
+            throw new Exception('Gagal upload bukti: ' . $this->upload->display_errors('',''));
+        }
+
+        $upload_data = $this->upload->data();
+        $evidence_filename = $upload_data['file_name'];
 
         // Prepare transaction data
         $transaction_data = [
