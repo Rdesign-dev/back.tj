@@ -161,8 +161,9 @@
                                 <div class="sidebar-brand-text mx-2" style="color: white; font-size: 15pt; font-weight: bold;"><?= userdata('nama'); ?> | <?= userdata('namacabang'); ?> </div>
                                 </span>
                                 <img class="img-profile rounded-circle" 
-                                     src="https://terasjapan.com/ImageTerasJapan/ProfPic/<?= userdata('foto'); ?>"
-                                     alt="Profile Picture">
+                                    src="https://terasjapan.com/ImageTerasJapan/ProfPic/<?= userdata('foto') ?? 'profile_default.png'; ?>"
+                                    alt="Profile Picture"
+                                    onerror="this.src='https://terasjapan.com/ImageTerasJapan/ProfPic/profile_default.png'">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">

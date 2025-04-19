@@ -111,7 +111,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('brand'); ?>">
+                <a class="nav-link pb-0" href="<?= base_url('Brand'); ?>">
                     <i class="fas fa-clone"></i>
                     <span>Detail Brand</span>
                 </a>
