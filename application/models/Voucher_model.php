@@ -13,6 +13,7 @@ class Voucher_model extends CI_Model {
         $this->db->select('rewards.*, brands.name as brand_name');
         $this->db->from('rewards');
         $this->db->join('brands', 'brands.id = rewards.brand_id', 'left');
+        $this->db->order_by('rewards.id', 'DESC'); // Urutkan berdasarkan id terbesar (terbaru)
         return $this->db->get()->result_array();
     }
 
