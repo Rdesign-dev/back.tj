@@ -66,26 +66,26 @@ class Brand_model extends CI_Model {
     {
         // Set timezone Jakarta
         date_default_timezone_set('Asia/Jakarta');
-        $now = date('Y-m-d H:i:s');
-        
-        // Log current server time
+        $now = date('Y-m-d');
+
+        // Log current server date
         log_message('info', 'Checking promo status at: ' . $now);
 
         // Get all promos that need status update
         $promos = $this->db->get('brand_promo')->result_array();
-        
+
         foreach ($promos as $promo) {
             $available_from = strtotime($promo['available_from']);
             $valid_until = strtotime($promo['valid_until']);
-            $current_time = strtotime($now);
+            $current_date = strtotime($now);
             $new_status = null;
 
             // Determine correct status
-            if ($current_time < $available_from) {
+            if ($current_date < $available_from) {
                 $new_status = 'Coming';
-            } else if ($current_time >= $available_from && $current_time < $valid_until) {
+            } else if ($current_date >= $available_from && $current_date <= $valid_until) {
                 $new_status = 'Available';
-            } else if ($current_time >= $valid_until) {
+            } else if ($current_date > $valid_until) {
                 $new_status = 'Expired';
             }
 
@@ -93,19 +93,19 @@ class Brand_model extends CI_Model {
             if ($new_status && $new_status !== $promo['status']) {
                 $this->db->where('id', $promo['id'])
                          ->update('brand_promo', ['status' => $new_status]);
-                
+
                 // Log status change
                 log_message('info', sprintf(
-                    'Promo ID: %d changed from %s to %s (Available from: %s, Valid until: %s)', 
+                    'Promo ID: %d changed from %s to %s (Available from: %s, Valid until: %s)',
                     $promo['id'],
                     $promo['status'],
                     $new_status,
-                    date('Y-m-d H:i:s', $available_from),
-                    date('Y-m-d H:i:s', $valid_until)
+                    $promo['available_from'],
+                    $promo['valid_until']
                 ));
             }
         }
-        
+
         return true;
     }
 
