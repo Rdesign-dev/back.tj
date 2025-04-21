@@ -142,6 +142,11 @@ class Brand_model extends CI_Model {
         return $this->db->trans_status() && $result;
     }
 
+    public function deletepromo($id)
+    {
+        return $this->db->delete('brand_promo', ['id' => $id]);
+    }
+
     public function get_all_vouchers() {
         return $this->db->get('rewards')->result_array();
     }

@@ -320,11 +320,11 @@ document.addEventListener('DOMContentLoaded', function() {
                              style="width: 100px; height: 50px; object-fit: cover;">
                     </td>
                     <td>
-                        <a href="${BASE_URL}brand/editpromo/${promo.id}" class="btn btn-circle btn-sm btn-warning">
+                        <a href="${BASE_URL}Brand/editpromo/${promo.id}" class="btn btn-circle btn-sm btn-warning">
                             <i class="fa fa-fw fa-edit"></i>
                         </a>
                         <a onclick="return confirm('Yakin ingin menghapus promo ini?')" 
-                           href="${BASE_URL}brand/deletepromo/${promo.id}" 
+                           href="<?= base_url('Brand/deletepromo/') ?>${promo.id}" 
                            class="btn btn-circle btn-sm btn-danger">
                             <i class="fa fa-fw fa-trash"></i>
                         </a>

@@ -365,6 +365,28 @@ class Brand extends CI_Controller {
         }
     }
 
+    public function deletepromo($id)
+    {
+        $promo = $this->brand->get_promo_by_id($id);
+
+        if (!$promo) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger" role="alert">Promo tidak ditemukan!</div>');
+            redirect('brand');
+        }
+
+        // Hapus gambar promo jika ada
+        if ($promo['promo_image'] && file_exists('../ImageTerasJapan/promo/' . $promo['promo_image'])) {
+            unlink('../ImageTerasJapan/promo/' . $promo['promo_image']);
+        }
+
+        if ($this->brand->deletepromo($id)) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-success" role="alert">Promo berhasil dihapus!</div>');
+        } else {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger" role="alert">Promo gagal dihapus!</div>');
+        }
+        redirect('brand');
+    }
+
     private function _validasi_promo()
     {
         $this->form_validation->set_rules('promo_name', 'Nama Promo', 'required|trim');
