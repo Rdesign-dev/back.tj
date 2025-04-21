@@ -38,23 +38,28 @@ class Brand_model extends CI_Model {
     public function get_brand_promos($brand_id)
     {
         return $this->db->select('
-            brand_promo.id,
-            brand_promo.promo_name,
-            brand_promo.promo_desc,
-            brand_promo.promo_image,
-            brand_promo.status,
-            brand_promo.available_from,
-            brand_promo.valid_until
+            id,
+            promo_name, 
+            promo_desc,
+            promo_image,
+            status,
+            priority,
+            available_from,
+            valid_until
         ')
         ->from('brand_promo')
-        ->where('brand_promo.id_brand', $brand_id)
-        ->order_by('brand_promo.available_from', 'DESC')
+        ->where('id_brand', $brand_id)
         ->get()
         ->result_array();
     }
 
     public function insert_promo($data)
     {
+        // Set default priority jika tidak ada
+        if (!isset($data['priority'])) {
+            $data['priority'] = 'Inactive';
+        }
+
         $this->db->trans_start();
         $result = $this->db->insert('brand_promo', $data);
         $this->db->trans_complete();
@@ -145,6 +150,18 @@ class Brand_model extends CI_Model {
     public function deletepromo($id)
     {
         return $this->db->delete('brand_promo', ['id' => $id]);
+    }
+
+    public function update_promo_priority($id, $newPriority)
+    {
+        $this->db->trans_start();
+        $result = $this->db->update('brand_promo', 
+            ['priority' => $newPriority], 
+            ['id' => $id]
+        );
+        $this->db->trans_complete();
+        
+        return $this->db->trans_status() && $result;
     }
 
     public function get_all_vouchers() {

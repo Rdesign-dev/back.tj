@@ -94,6 +94,7 @@
                         <th>Nama Promo</th>
                         <th>Deskripsi</th>
                         <th>Status</th>
+                        <th>Priority</th>  <!-- Kolom baru -->
                         <th>Tersedia Sejak</th>
                         <th>Batas Waktu</th>
                         <th>Gambar</th>
@@ -179,226 +180,257 @@
 </style>
 
 <script>
-// Define BASE_URL
+// Global variables
 const BASE_URL = '<?= base_url() ?>';
+let selectedBrandId = null;
 
-document.addEventListener('DOMContentLoaded', function() {
-    const brandImages = document.querySelectorAll('.brand-image');
-    const brandTableBody = document.getElementById('brandTableBody');
-    const promoTableBody = document.getElementById('promoTableBody');
-    const addPromoButton = document.getElementById('addPromoButton');
-    const addVoucherButton = document.getElementById('addVoucherButton');
-    let selectedBrandId = null;
+// Global functions
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
 
-    // Update the fetchBrandData function
-    async function fetchBrandData(brandId) {
-        selectedBrandId = brandId; // Store the selected brand ID
-        
-        // Show and update the Add Promo button
-        addPromoButton.style.display = 'inline-block';
-        addPromoButton.href = `${BASE_URL}brand/addpromo/${brandId}`;
-        addVoucherButton.style.display = 'inline-block';
-        addVoucherButton.href = `${BASE_URL}brand/add_voucher/${brandId}`;
-        
-        try {
-            const [brandResponse, promoResponse, voucherResponse] = await Promise.all([
-                fetch(`${BASE_URL}brand/get_brand_details/${brandId}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    },
-                    method: 'GET'
-                }),
-                fetch(`${BASE_URL}brand/get_brand_promos/${brandId}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    },
-                    method: 'GET'
-                }),
-                fetch(`${BASE_URL}brand/get_brand_vouchers/${brandId}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    },
-                    method: 'GET'
-                })
-            ]);
-
-            if (!brandResponse.ok) {
-                throw new Error(`Brand fetch failed: ${brandResponse.status}`);
-            }
-            if (!promoResponse.ok) {
-                throw new Error(`Promo fetch failed: ${promoResponse.status}`);
-            }
-            if (!voucherResponse.ok) {
-                throw new Error(`Voucher fetch failed: ${voucherResponse.status}`);
-            }
-
-            const brandData = await brandResponse.json();
-            const promoData = await promoResponse.json();
-            const voucherData = await voucherResponse.json();
-
-            if (brandData.error) {
-                throw new Error(brandData.error);
-            }
-
-            updateBrandTable(brandData);
-            updatePromoTable(promoData);
-            updateVoucherTable(voucherData);
-
-        } catch (error) {
-            console.error('Error:', error);
-            brandTableBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
-            promoTableBody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
-            document.getElementById('voucherTableBody').innerHTML = 
-            '<tr><td colspan="10" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
-            
-            // Hide the Add Promo button if there's an error
-            addPromoButton.style.display = 'none';
-        }
+function getCategoryLabel(category) {
+    switch(category) {
+        case 'oldmember': return 'Member Biasa';
+        case 'newmember': return 'Member Baru';
+        case 'code': return 'Kode Referal';
+        default: return 'Undefined';
     }
+}
 
-    function updateBrandTable(brand) {
-        if (!brand) return;
+function updateBrandTable(brand) {
+    if (!brand) return;
+    const brandTableBody = document.getElementById('brandTableBody');
+    
+    const row = `
+        <tr>
+            <td><img src="https://terasjapan.com/ImageTerasJapan/logo/${brand.image}" 
+                     alt="${brand.name}" 
+                     style="width: 50px; height: 50px; object-fit: contain;"></td>
+            <td><img src="https://terasjapan.com/ImageTerasJapan/banner/${brand.banner}" 
+                     alt="${brand.name} banner" 
+                     style="width: 100px; height: 50px; object-fit: cover;"></td>
+            <td>${brand.name}</td>
+            <td style="white-space: normal;">${brand.desc || '-'}</td>
+            <td>${brand.instagram || '-'}</td>
+            <td>${brand.tiktok || '-'}</td>
+            <td>${brand.wa || '-'}</td>
+            <td>${brand.web || '-'}</td>
+            <td>
+                <a href="${BASE_URL}brand/edit/${brand.id}" class="btn btn-circle btn-sm btn-warning">
+                    <i class="fa fa-fw fa-edit"></i>
+                </a>
+                <a onclick="return confirm('Yakin ingin menghapus data?')" 
+                   href="${BASE_URL}brand/delete/${brand.id}" 
+                   class="btn btn-circle btn-sm btn-danger">
+                    <i class="fa fa-fw fa-trash"></i>
+                </a>
+            </td>
+        </tr>`;
+    brandTableBody.innerHTML = row;
+}
+
+function updatePromoTable(promos) {
+    const promoTableBody = document.getElementById('promoTableBody');
+    let rows = '';
+    promos.forEach(promo => {
+        // Tambahkan pengecekan gambar
+        const imageUrl = `https://terasjapan.com/ImageTerasJapan/promo/${promo.promo_image}`;
         
-        const row = `
+        rows += `
             <tr>
+                <td>${promo.promo_name}</td>
+                <td style="white-space: normal;">${promo.promo_desc || '-'}</td>
                 <td>
-                    <img src="https://terasjapan.com/ImageTerasJapan/logo/${brand.image}" 
-                         alt="${brand.name}" 
-                         style="width: 50px; height: 50px; object-fit: contain;">
+                    <span class="status-badge status-${promo.status}">${promo.status}</span>
                 </td>
                 <td>
-                    <img src="https://terasjapan.com/ImageTerasJapan/banner/${brand.banner}" 
-                         alt="${brand.name} banner" 
-                         style="width: 100px; height: 50px; object-fit: cover;">
+                    <button onclick="togglePriority(${promo.id}, '${promo.priority}')" 
+                            class="btn btn-sm ${promo.priority === 'Active' ? 'btn-success' : 'btn-secondary'}">
+                        ${promo.priority}
+                    </button>
                 </td>
-                <td>${brand.name}</td>
-                <td style="white-space: normal;">${brand.desc || '-'}</td>
-                <td>${brand.instagram || '-'}</td>
-                <td>${brand.tiktok || '-'}</td>
-                <td>${brand.wa || '-'}</td>
-                <td>${brand.web || '-'}</td>
+                <td>${formatDate(promo.available_from)}</td>
+                <td>${formatDate(promo.valid_until)}</td>
                 <td>
-                    <a href="<?= base_url('brand/edit/' . $brand['id']) ?>" class="btn btn-circle btn-sm btn-warning"><i class="fa fa-fw fa-edit"></i></a>
-                    <a onclick="return confirm('Yakin ingin menghapus data?')" href="<?= base_url('brand/delete/' . $brand['id']) ?>" class="btn btn-circle btn-sm btn-danger"><i class="fa fa-fw fa-trash"></i></a>
+                    <img src="${imageUrl}" 
+                         alt="${promo.promo_name}"
+                         onerror="this.onerror=null; this.src='${BASE_URL}assets/img/no-image.jpg';"
+                         style="width: 100px; height: 50px; object-fit: cover; cursor: pointer;"
+                         onclick="window.open(this.src, '_blank')">
+                </td>
+                <td>
+                    <a href="${BASE_URL}Brand/editpromo/${promo.id}" 
+                       class="btn btn-circle btn-sm btn-warning">
+                        <i class="fa fa-fw fa-edit"></i>
+                    </a>
+                    <a onclick="return confirm('Yakin ingin menghapus promo ini?')" 
+                       href="${BASE_URL}Brand/deletepromo/${promo.id}" 
+                       class="btn btn-circle btn-sm btn-danger">
+                        <i class="fa fa-fw fa-trash"></i>
+                    </a>
                 </td>
             </tr>`;
-        brandTableBody.innerHTML = row;
+    });
+    promoTableBody.innerHTML = rows || '<tr><td colspan="8" class="text-center">Tidak ada promo untuk brand ini</td></tr>';
+}
+
+function updateVoucherTable(vouchers) {
+    const voucherTableBody = document.getElementById('voucherTableBody');
+    if (!vouchers || !Array.isArray(vouchers)) {
+        voucherTableBody.innerHTML = '<tr><td colspan="10" class="text-center">Data voucher tidak tersedia</td></tr>';
+        return;
     }
 
-    function updatePromoTable(promos) {
-        let rows = '';
-        promos.forEach(promo => {
-            rows += `
-                <tr>
-                    <td>${promo.promo_name}</td>
-                    <td style="white-space: normal;">${promo.promo_desc || '-'}</td>
-                    <td>
-                        <span class="status-badge status-${promo.status}">
-                            ${promo.status}
-                        </span>
-                    </td>
-                    <td>${promo.available_from ? new Date(promo.available_from).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    }) : '-'}</td>
-                    <td>${promo.valid_until ? new Date(promo.valid_until).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    }) : '-'}</td>
-                    <td>
-                        <img src="https://terasjapan.com/ImageTerasJapan/promo/${promo.promo_image}" 
-                             alt="${promo.promo_name}" 
-                             style="width: 100px; height: 50px; object-fit: cover;">
-                    </td>
-                    <td>
-                        <a href="${BASE_URL}Brand/editpromo/${promo.id}" class="btn btn-circle btn-sm btn-warning">
-                            <i class="fa fa-fw fa-edit"></i>
-                        </a>
-                        <a onclick="return confirm('Yakin ingin menghapus promo ini?')" 
-                           href="<?= base_url('Brand/deletepromo/') ?>${promo.id}" 
-                           class="btn btn-circle btn-sm btn-danger">
-                            <i class="fa fa-fw fa-trash"></i>
-                        </a>
-                    </td>
-                </tr>`;
-        });
-        promoTableBody.innerHTML = rows || '<tr><td colspan="7" class="text-center">Tidak ada promo untuk brand ini</td></tr>';
-    }
+    let rows = '';
+    vouchers.forEach((voucher, index) => {
+        rows += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${voucher.title}</td>
+                <td>
+                    <img src="https://terasjapan.com/ImageTerasJapan/voucher/${voucher.image_name}" 
+                         alt="${voucher.title}" 
+                         style="width: 100px; height: 50px; object-fit: cover;">
+                </td>
+                <td>${voucher.points_required}</td>
+                <td>${getCategoryLabel(voucher.category)}</td>
+                <td style="white-space: normal;">${voucher.description || '-'}</td>
+                <td>${formatDate(voucher.valid_until)}</td>
+                <td>${voucher.total_days || '-'}</td>
+                <td>${voucher.qty}</td>
+                <td>
+                    <a href="${BASE_URL}brand/edit_voucher/${voucher.id}" 
+                       class="btn btn-circle btn-sm btn-warning">
+                        <i class="fa fa-fw fa-edit"></i>
+                    </a>
+                    <a onclick="return confirm('Yakin ingin menghapus voucher ini?')" 
+                       href="${BASE_URL}brand/delete_voucher/${voucher.id}" 
+                       class="btn btn-circle btn-sm btn-danger">
+                        <i class="fa fa-fw fa-trash"></i>
+                    </a>
+                </td>
+            </tr>`;
+    });
+    voucherTableBody.innerHTML = rows || '<tr><td colspan="10" class="text-center">Tidak ada voucher untuk brand ini</td></tr>';
+}
 
-    function updateVoucherTable(vouchers) {
-        const tbody = document.getElementById('voucherTableBody');
-        if (!vouchers || vouchers.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" class="text-center">Tidak ada voucher untuk brand ini</td></tr>';
-            return;
+function togglePriority(id, currentPriority) {
+    if (!confirm('Yakin ingin mengubah priority promo ini?')) return;
+    
+    fetch(`${BASE_URL}brand/togglePriority/${id}`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
         }
-    
-        let rows = '';
-        vouchers.forEach((voucher, index) => {
-            rows += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${voucher.title}</td>
-                    <td>
-                        ${voucher.image_name ? 
-                            `<img src="https://terasjapan.com/ImageTerasJapan/reward/${voucher.image_name}" 
-                                  alt="Voucher Image" 
-                                  width="150px" 
-                                  height="100px"
-                                  class="img-thumbnail">` : 
-                            '<span class="text-muted">No image</span>'}
-                    </td>
-                    <td>${voucher.points_required}</td>
-                    <td>${getCategoryLabel(voucher.category)}</td>
-                    <td>${voucher.description || '-'}</td>
-                    <td>${formatDate(voucher.valid_until)}</td>
-                    <td>${voucher.total_days || '-'}</td>
-                    <td>${voucher.qty}</td>
-                    <td>
-                        <a href="${BASE_URL}brand/edit_voucher/${voucher.id}" 
-                           class="btn btn-circle btn-sm btn-warning">
-                            <i class="fa fa-fw fa-edit"></i>
-                        </a>
-                    </td>
-                </tr>`;
-        });
-        tbody.innerHTML = rows;
-    }
-    
-    function getCategoryLabel(category) {
-        switch(category) {
-            case 'oldmember': return 'Member Biasa';
-            case 'newmember': return 'Member Baru';
-            case 'code': return 'Kode Referal';
-            default: return 'Undefined';
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const activeBrand = document.querySelector('.brand-image.border-primary');
+            if (activeBrand) {
+                fetchBrandData(activeBrand.dataset.id);
+            }
+        } else {
+            alert(data.message || 'Gagal mengubah priority');
         }
-    }
-    
-    function formatDate(dateString) {
-        if (!dateString) return '-';
-        return new Date(dateString).toLocaleDateString('id-ID', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-    }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat mengubah priority');
+    });
+}
 
+async function fetchBrandData(brandId) {
+    selectedBrandId = brandId; // Store the selected brand ID
+    
+    const addPromoButton = document.getElementById('addPromoButton');
+    const addVoucherButton = document.getElementById('addVoucherButton');
+    const brandTableBody = document.getElementById('brandTableBody');
+    const promoTableBody = document.getElementById('promoTableBody');
+    const voucherTableBody = document.getElementById('voucherTableBody');
+
+    // Show and update the Add Promo button
+    addPromoButton.style.display = 'inline-block';
+    addPromoButton.href = `${BASE_URL}brand/addpromo/${brandId}`;
+    addVoucherButton.style.display = 'inline-block';
+    addVoucherButton.href = `${BASE_URL}brand/add_voucher/${brandId}`;
+    
+    try {
+        const [brandResponse, promoResponse, voucherResponse] = await Promise.all([
+            fetch(`${BASE_URL}brand/get_brand_details/${brandId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                method: 'GET'
+            }),
+            fetch(`${BASE_URL}brand/get_brand_promos/${brandId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                method: 'GET'
+            }),
+            fetch(`${BASE_URL}brand/get_brand_vouchers/${brandId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                method: 'GET'
+            })
+        ]);
+
+        if (!brandResponse.ok) {
+            throw new Error(`Brand fetch failed: ${brandResponse.status}`);
+        }
+        if (!promoResponse.ok) {
+            throw new Error(`Promo fetch failed: ${promoResponse.status}`);
+        }
+        if (!voucherResponse.ok) {
+            throw new Error(`Voucher fetch failed: ${voucherResponse.status}`);
+        }
+
+        const brandData = await brandResponse.json();
+        const promoData = await promoResponse.json();
+        const voucherData = await voucherResponse.json();
+
+        if (brandData.error) {
+            throw new Error(brandData.error);
+        }
+
+        updateBrandTable(brandData);
+        updatePromoTable(promoData);
+        updateVoucherTable(voucherData);
+
+    } catch (error) {
+        console.error('Error:', error);
+        brandTableBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
+        promoTableBody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
+        voucherTableBody.innerHTML = 
+        '<tr><td colspan="10" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
+        
+        // Hide the Add Promo button if there's an error
+        addPromoButton.style.display = 'none';
+    }
+}
+
+// DOM Ready Event
+document.addEventListener('DOMContentLoaded', function() {
+    const brandImages = document.querySelectorAll('.brand-image');
+    
     brandImages.forEach(img => {
         img.addEventListener('click', function() {
             const brandId = this.dataset.id;
             fetchBrandData(brandId);
             
-            // Remove active class from all images
             brandImages.forEach(img => img.classList.remove('border-primary'));
-            // Add active class to clicked image
             this.classList.add('border-primary');
         });
     });

@@ -494,25 +494,6 @@ class Brand extends CI_Controller {
         }
     }
 
-    // public function delete_voucher($id) {
-    //     $voucher = $this->brand->get_voucher_by_id($id);
-        
-    //     if ($voucher) {
-    //         // Delete image if exists
-    //         if ($voucher['image_name'] && file_exists('../ImageTerasJapan/reward/' . $voucher['image_name'])) {
-    //             unlink('../ImageTerasJapan/reward/' . $voucher['image_name']);
-    //         }
-            
-    //         if ($this->brand->delete_voucher($id)) {
-    //             $this->session->set_flashdata('pesan', '<div class="alert alert-success">Voucher berhasil dihapus!</div>');
-    //         } else {
-    //             $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Voucher gagal dihapus!</div>');
-    //         }
-    //     }
-        
-    //     redirect('brand');
-    // }
-
     private function generate_voucher_code($brand) {
         $timestamp = time();
         $random_number = str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT);
@@ -716,5 +697,34 @@ class Brand extends CI_Controller {
         }
 
         return $this->upload->data('file_name'); // Return the uploaded file name
+    }
+
+    public function togglePriority($id)
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+            return;
+        }
+
+        $promo = $this->brand->get_promo_by_id($id);
+        if (!$promo) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'success' => false,
+                    'message' => 'Promo tidak ditemukan'
+                ]));
+            return;
+        }
+
+        $newPriority = ($promo['priority'] === 'Active') ? 'Inactive' : 'Active';
+        $success = $this->brand->update_promo_priority($id, $newPriority);
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'success' => $success,
+                'message' => $success ? 'Priority berhasil diubah' : 'Gagal mengubah priority'
+            ]));
     }
 }
