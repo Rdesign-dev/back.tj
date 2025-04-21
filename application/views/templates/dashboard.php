@@ -99,12 +99,6 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pb-0" href="<?= base_url('iklan'); ?>">
-                    <i class="fas fa-clone"></i>
-                    <span>Promo Mingguan</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('banner'); ?>">
                     <i class="fas fa-clone"></i>
                     <span>Banner</span>
