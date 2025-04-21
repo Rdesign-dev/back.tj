@@ -323,14 +323,18 @@ function updateVoucherTable(vouchers) {
 function togglePriority(id, currentPriority) {
     if (!confirm('Yakin ingin mengubah priority promo ini?')) return;
     
-    fetch(`${BASE_URL}brand/togglePriority/${id}`, {
+    // Gunakan Brand (B besar) untuk konsistensi dengan controller
+    fetch(`${BASE_URL}Brand/togglePriority/${id}`, {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
             'Accept': 'application/json'
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             const activeBrand = document.querySelector('.brand-image.border-primary');
