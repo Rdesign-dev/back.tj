@@ -108,10 +108,11 @@ class Voucher extends CI_Controller {
     }
 
     public function delete($id) {
-        if ($this->voucher->delete($this->voucher->table, 'id', $id)) {
-            $this->session->set_flashdata('pesan','<div class="alert alert-success" role="alert">Data Berhasil Dihapus</div>');
-        } else {
-            $this->session->set_flashdata('pesan','<div class="alert alert-danger" role="alert">Data Gagal Dihapus</div>');
+        try {
+            $this->voucher->delete($this->voucher->table, 'id', $id);
+            $this->session->set_flashdata('pesan', '<div class="alert alert-success" role="alert">Data Berhasil Dihapus</div>');
+        } catch (Exception $e) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-danger" role="alert">' . $e->getMessage() . '</div>');
         }
         redirect('voucher');
     }

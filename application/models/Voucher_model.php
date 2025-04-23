@@ -21,8 +21,21 @@ class Voucher_model extends CI_Model {
         return $this->db->insert($this->table, $data);
     }
 
+    public function is_voucher_used($id) {
+        $this->db->where('reward_id', $id);
+        $query = $this->db->get('redeem_voucher'); // Replace 'redeem_voucher' with your actual table name
+        return $query->num_rows() > 0;
+    }
+
     public function delete($table, $pk, $id) {
-        return $this->db->delete($table, [$pk => $id]);
+        if ($this->is_voucher_used($id)) {
+            throw new Exception("Voucher sedang digunakan dan tidak bisa dihapus.");
+        }
+
+        $this->db->where($pk, $id);
+        $this->db->delete($table);
+
+        return true;
     }
 
     public function update($table, $pk, $id, $data) {
