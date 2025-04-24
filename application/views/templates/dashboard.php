@@ -105,6 +105,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link pb-0" href="<?= base_url('Mission'); ?>">
+                    <i class="fas fa-clone"></i>
+                    <span>Misi</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('Brand'); ?>">
                     <i class="fas fa-clone"></i>
                     <span>Detail Brand</span>
@@ -157,6 +163,19 @@
                     <i class="fas fa-history"></i>
                     <span>CheckIn Poin Member</span>
                 </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link pb-0" href="<?= base_url('Level'); ?>">
+                    <i class="fas fa-history"></i>
+                    <span>Level Control</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link pb-0" href="<?= base_url('Benefit'); ?>">
+                    <i class="fas fa-history"></i>
+                    <span>Benefit Level</span>
+                </a>
+            </li>
             <!-- <li class="nav-item">
                 <a class="nav-link pb-0" href="<?= base_url('undian/inputPoinUndian'); ?>">
                     <i class="fas fa-gift"></i>
